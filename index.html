@@ -8,11 +8,26 @@
   <style>
     :root {
       --hh-blue: #005cab;
-      --hh-dark: #102033;
-      --hh-light: #f3f7fb;
+      --hh-blue-dark: #073b72;
+      --bg: #f3f7fb;
+      --text: #102033;
       --card: #ffffff;
       --border: #d9e2ec;
       --muted: #5f6f7f;
+      --chip-bg: #e7f0fb;
+      --chip-text: #073b72;
+      --shadow: rgba(0,0,0,0.08);
+    }
+
+    body.dark {
+      --bg: #0f1722;
+      --text: #f3f7fb;
+      --card: #182334;
+      --border: #2f3f55;
+      --muted: #b6c2d1;
+      --chip-bg: #243a56;
+      --chip-text: #d8eaff;
+      --shadow: rgba(0,0,0,0.35);
     }
 
     * { box-sizing: border-box; }
@@ -20,14 +35,24 @@
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background: var(--hh-light);
-      color: var(--hh-dark);
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     header {
-      background: linear-gradient(135deg, var(--hh-blue), #073b72);
+      background: linear-gradient(135deg, var(--hh-blue), var(--hh-blue-dark));
       color: white;
-      padding: 28px 18px;
+      padding: 24px 18px;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
     }
 
     header h1 {
@@ -40,6 +65,21 @@
       font-size: 16px;
     }
 
+    .theme-toggle {
+      background: rgba(255,255,255,0.16);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      font-weight: bold;
+    }
+
+    .theme-toggle:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
     main {
       max-width: 1200px;
       margin: 0 auto;
@@ -47,14 +87,15 @@
     }
 
     .filters {
-      background: white;
+      background: var(--card);
       padding: 14px;
       border-radius: 14px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 8px var(--shadow);
       margin-bottom: 18px;
       display: grid;
       gap: 10px;
       grid-template-columns: 1fr;
+      border: 1px solid var(--border);
     }
 
     .filters input,
@@ -64,7 +105,8 @@
       border-radius: 8px;
       font-size: 15px;
       width: 100%;
-      background: white;
+      background: var(--card);
+      color: var(--text);
     }
 
     .filter-label {
@@ -87,7 +129,7 @@
       background: var(--card);
       border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 10px var(--shadow);
       border: 1px solid var(--border);
       transition: 0.2s ease;
     }
@@ -98,13 +140,18 @@
 
     .image-wrap {
       width: 100%;
-      height: 170px;
+      aspect-ratio: 4 / 3;
       background: #eef3f8;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      cursor: zoom-in;
+    }
+
+    body.dark .image-wrap {
+      background: #111827;
     }
 
     .image-wrap img {
@@ -147,8 +194,8 @@
 
     .tag {
       display: inline-block;
-      background: #e7f0fb;
-      color: #073b72;
+      background: var(--chip-bg);
+      color: var(--chip-text);
       padding: 4px 8px;
       border-radius: 999px;
       font-size: 12px;
@@ -177,12 +224,62 @@
     }
 
     .empty {
-      background: white;
+      background: var(--card);
       padding: 18px;
       border-radius: 12px;
       text-align: center;
       color: var(--muted);
       grid-column: 1 / -1;
+      border: 1px solid var(--border);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      inset: 0;
+      background: rgba(0,0,0,0.86);
+      padding: 20px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal-content {
+      max-width: min(95vw, 1100px);
+      max-height: 86vh;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .modal img {
+      max-width: 100%;
+      max-height: 86vh;
+      display: block;
+      object-fit: contain;
+    }
+
+    .modal-close {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      background: white;
+      color: #111827;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+    }
+
+    .modal-close:hover {
+      background: #e7f0fb;
     }
 
     @media (min-width: 700px) {
@@ -212,13 +309,28 @@
         grid-template-columns: repeat(3, 1fr);
       }
     }
+
+    @media (max-width: 520px) {
+      .header-inner {
+        flex-direction: column;
+      }
+
+      .theme-toggle {
+        align-self: flex-start;
+      }
+    }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>🏃 HH Route Finder</h1>
-    <p>No one runs alone 💙 Find route inspiration for your next run.</p>
+    <div class="header-inner">
+      <div>
+        <h1>🏃 HH Route Finder</h1>
+        <p>No one runs alone 💙 Find route inspiration for your next run.</p>
+      </div>
+      <button class="theme-toggle" id="themeToggle" type="button">🌙 Dark mode</button>
+    </div>
   </header>
 
   <main>
@@ -233,10 +345,17 @@
     <section class="routes" id="routes"></section>
   </main>
 
+  <div class="modal" id="imageModal" aria-hidden="true">
+    <button class="modal-close" id="modalClose" type="button">Close ✕</button>
+    <div class="modal-content">
+      <img id="modalImage" src="" alt="Expanded route image">
+    </div>
+  </div>
+
   <script>
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRfoX7-jgCe8kdf4nb9voLj57OvH6GSg7nSRuOVuwHptiaeRGinIS4ZLZTvXxE3NRtaLX8RU2naHtyV/pub?gid=0&single=true&output=csv";
 
-    const FALLBACK_IMAGE = "https://placehold.co/900x500/e7f0fb/073b72?text=HH+Route+Finder";
+    const FALLBACK_IMAGE = "https://placehold.co/900x675/e7f0fb/073b72?text=HH+Route+Finder";
 
     const EXCLUDED_FILTER_FIELDS = [
       "id",
@@ -456,7 +575,7 @@
 
         container.innerHTML += `
           <article class="card">
-            <div class="image-wrap">
+            <div class="image-wrap" onclick="openImageModal('${image.replace(/'/g, "\\'")}', '${name.replace(/'/g, "\\'")}')">
               <img src="${image}" alt="${name}" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'">
             </div>
             <div class="card-content">
@@ -507,7 +626,64 @@
       displayRoutes(filtered);
     }
 
+    function openImageModal(src, alt) {
+      const modal = document.getElementById("imageModal");
+      const image = document.getElementById("modalImage");
+
+      image.src = src;
+      image.alt = alt || "Expanded route image";
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeImageModal() {
+      const modal = document.getElementById("imageModal");
+      const image = document.getElementById("modalImage");
+
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+      image.src = "";
+    }
+
+    function setTheme(mode) {
+      const button = document.getElementById("themeToggle");
+
+      if (mode === "dark") {
+        document.body.classList.add("dark");
+        button.textContent = "☀️ Light mode";
+      } else {
+        document.body.classList.remove("dark");
+        button.textContent = "🌙 Dark mode";
+      }
+
+      localStorage.setItem("hh-theme", mode);
+    }
+
     document.getElementById("search").addEventListener("input", filterRoutes);
+
+    document.getElementById("modalClose").addEventListener("click", closeImageModal);
+
+    document.getElementById("imageModal").addEventListener("click", event => {
+      if (event.target.id === "imageModal") closeImageModal();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeImageModal();
+    });
+
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      const isDark = document.body.classList.contains("dark");
+      setTheme(isDark ? "light" : "dark");
+    });
+
+    const savedTheme = localStorage.getItem("hh-theme");
+    if (savedTheme) {
+      setTheme(savedTheme);
+    } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      setTheme("dark");
+    } else {
+      setTheme("light");
+    }
   </script>
 </body>
 </html>
