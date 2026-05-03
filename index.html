@@ -73,7 +73,9 @@
     }
 
     .theme-toggle,
-    .view-toggle {
+    .view-toggle,
+    .advanced-toggle,
+    .small-button {
       background: rgba(255,255,255,0.16);
       color: white;
       border: 1px solid rgba(255,255,255,0.35);
@@ -102,10 +104,27 @@
       border-radius: 14px;
       box-shadow: 0 2px 8px var(--shadow);
       margin-bottom: 18px;
+      border: 1px solid var(--border);
+    }
+
+    .basic-search {
       display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .advanced-filters {
+      display: none;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
       gap: 10px;
       grid-template-columns: 1fr;
-      border: 1px solid var(--border);
+    }
+
+    .advanced-filters.open {
+      display: grid;
     }
 
     .filters input,
@@ -128,6 +147,55 @@
     .filter-control {
       display: flex;
       flex-direction: column;
+    }
+
+    .advanced-search-button {
+      padding: 10px 13px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--hh-blue);
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      height: 41px;
+    }
+
+    .advanced-search-button:hover {
+      background: #004985;
+    }
+
+    .distance-control {
+      display: grid;
+      gap: 8px;
+    }
+
+    .distance-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .unit-toggle {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+      width: fit-content;
+      background: var(--card);
+    }
+
+    .unit-toggle button {
+      border: none;
+      padding: 7px 12px;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text);
+      font-weight: bold;
+    }
+
+    .unit-toggle button.active {
+      background: var(--hh-blue);
+      color: white;
     }
 
     .count {
@@ -227,6 +295,13 @@
       margin: 0 4px 4px 0;
     }
 
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
     .button {
       display: inline-block;
       background: var(--hh-blue);
@@ -236,10 +311,27 @@
       border-radius: 8px;
       font-weight: bold;
       font-size: 14px;
+      border: none;
+      cursor: pointer;
     }
 
     .button:hover {
       background: #004985;
+    }
+
+    .copy-button {
+      background: transparent;
+      color: var(--hh-blue);
+      border: 1px solid var(--hh-blue);
+    }
+
+    .copy-button:hover {
+      background: var(--chip-bg);
+    }
+
+    body.dark .copy-button {
+      color: #d8eaff;
+      border-color: #d8eaff;
     }
 
     .empty {
@@ -268,6 +360,7 @@
     .list-view .card-content {
       flex: 1;
       padding: 16px;
+      min-width: 0;
     }
 
     .list-view .card h2 {
@@ -324,12 +417,8 @@
     }
 
     @media (min-width: 700px) {
-      .filters {
+      .advanced-filters {
         grid-template-columns: repeat(3, 1fr);
-      }
-
-      .filters .search-box {
-        grid-column: span 3;
       }
 
       .routes.tile-view {
@@ -338,12 +427,12 @@
     }
 
     @media (min-width: 1000px) {
-      .filters {
+      .advanced-filters {
         grid-template-columns: repeat(4, 1fr);
       }
 
-      .filters .search-box {
-        grid-column: span 4;
+      .distance-control {
+        grid-column: span 2;
       }
 
       .routes.tile-view {
@@ -352,15 +441,48 @@
     }
 
     @media (max-width: 700px) {
+      .basic-search {
+        grid-template-columns: 1fr;
+      }
+
+      .advanced-search-button {
+        width: 100%;
+      }
+
       .list-view .card {
-        display: block;
+        display: grid;
+        grid-template-columns: 112px 1fr;
+        align-items: stretch;
       }
 
       .list-view .image-wrap {
-        width: 100%;
-        min-height: auto;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
+        width: 112px;
+        height: 100%;
+        min-height: 150px;
+        aspect-ratio: auto;
+        border-right: 1px solid var(--border);
+        border-bottom: none;
+      }
+
+      .list-view .card-content {
+        padding: 12px;
+      }
+
+      .list-view .card h2 {
+        font-size: 16px;
+      }
+
+      .list-view .description {
+        font-size: 14px;
+      }
+
+      .list-view .meta,
+      .list-view .distance {
+        font-size: 13px;
+      }
+
+      .list-view .tags {
+        display: none;
       }
     }
 
@@ -372,6 +494,28 @@
       .top-buttons {
         justify-content: flex-start;
       }
+
+      .distance-row {
+        grid-template-columns: 1fr;
+      }
+
+      .list-view .card {
+        grid-template-columns: 96px 1fr;
+      }
+
+      .list-view .image-wrap {
+        width: 96px;
+        min-height: 145px;
+      }
+
+      .button-row {
+        gap: 6px;
+      }
+
+      .button {
+        padding: 8px 10px;
+        font-size: 13px;
+      }
     }
   </style>
 </head>
@@ -381,7 +525,7 @@
     <div class="header-inner">
       <div>
         <h1>🏃 HH Route Finder</h1>
-        <p>No one runs alone 💙 Find route inspiration for your next run.</p>
+        <p>Find route inspiration for your next run 💙</p>
       </div>
 
       <div class="top-buttons">
@@ -394,9 +538,29 @@
 
   <main>
     <section class="filters" id="filters">
-      <div class="filter-control search-box">
-        <label class="filter-label" for="search">Search</label>
-        <input type="text" id="search" placeholder="Search routes, areas, start points, tags..." />
+      <div class="basic-search">
+        <div class="filter-control">
+          <label class="filter-label" for="search">Search</label>
+          <input type="text" id="search" placeholder="Search routes, areas, start points, tags..." />
+        </div>
+
+        <button class="advanced-search-button" id="advancedToggle" type="button">Advanced search ▾</button>
+      </div>
+
+      <div class="advanced-filters" id="advancedFilters">
+        <div class="filter-control distance-control">
+          <label class="filter-label">Distance range</label>
+
+          <div class="unit-toggle" aria-label="Distance unit">
+            <button type="button" id="milesButton" class="active">Miles</button>
+            <button type="button" id="kmButton">KM</button>
+          </div>
+
+          <div class="distance-row">
+            <input type="number" id="minDistance" min="0" step="0.1" placeholder="Min distance">
+            <input type="number" id="maxDistance" min="0" step="0.1" placeholder="Max distance">
+          </div>
+        </div>
       </div>
     </section>
 
@@ -420,6 +584,8 @@
       "id",
       "name",
       "description",
+      "distance_miles",
+      "distance_km",
       "outdooractive_url",
       "route_url",
       "url",
@@ -432,6 +598,7 @@
 
     let routesData = [];
     let headers = [];
+    let distanceUnit = "miles";
 
     function parseCSV(text) {
       const rows = [];
@@ -485,8 +652,34 @@
       return route[key] ? String(route[key]).trim() : "";
     }
 
+    function getMiles(route) {
+      const miles = parseFloat(getRouteValue(route, "distance_miles"));
+      if (!isNaN(miles)) return miles;
+
+      const km = parseFloat(getRouteValue(route, "distance_km"));
+      if (!isNaN(km)) return km / 1.60934;
+
+      return 0;
+    }
+
     function milesToKm(miles) {
       return (miles * 1.60934).toFixed(1);
+    }
+
+    function displayDistance(miles) {
+      if (!miles) return "";
+
+      if (distanceUnit === "km") {
+        return `${milesToKm(miles)} km (${miles.toFixed(1)} miles)`;
+      }
+
+      return `${miles.toFixed(1)} miles (${milesToKm(miles)} km)`;
+    }
+
+    function inputDistanceToMiles(value) {
+      const number = parseFloat(value);
+      if (isNaN(number)) return null;
+      return distanceUnit === "km" ? number / 1.60934 : number;
     }
 
     function getFirstAvailable(route, keys) {
@@ -505,7 +698,7 @@
     }
 
     function createDynamicFilters() {
-      const filtersContainer = document.getElementById("filters");
+      const filtersContainer = document.getElementById("advancedFilters");
 
       const filterFields = headers.filter(header => {
         if (EXCLUDED_FILTER_FIELDS.includes(header)) return false;
@@ -617,8 +810,7 @@
 
       data.forEach(route => {
         const name = getRouteValue(route, "name");
-        const miles = parseFloat(getRouteValue(route, "distance_miles")) || 0;
-        const km = miles ? milesToKm(miles) : "";
+        const miles = getMiles(route);
         const terrain = getRouteValue(route, "terrain");
         const difficulty = getRouteValue(route, "difficulty");
         const routeType = getRouteValue(route, "route_type");
@@ -634,17 +826,20 @@
 
         container.innerHTML += `
           <article class="card">
-            <div class="image-wrap" onclick="openImageModal('${image.replace(/'/g, "\\'")}', '${name.replace(/'/g, "\\'")}')">
-              <img src="${image}" alt="${name}" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'">
+            <div class="image-wrap" onclick="openImageModal('${escapeForAttribute(image)}', '${escapeForAttribute(name)}')">
+              <img src="${escapeForAttribute(image)}" alt="${escapeForAttribute(name)}" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'">
             </div>
             <div class="card-content">
               <h2>${name}</h2>
-              ${miles ? `<p class="distance">${miles} miles (${km} km)</p>` : ""}
+              ${miles ? `<p class="distance">${displayDistance(miles)}</p>` : ""}
               ${metaLineOne ? `<p class="meta">${metaLineOne}</p>` : ""}
               ${metaLineTwo ? `<p class="meta">${metaLineTwo}</p>` : ""}
               ${description ? `<p class="description">${description}</p>` : ""}
               ${tags.length ? `<div class="tags">${tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>` : ""}
-              ${link ? `<a class="button" href="${link}" target="_blank" rel="noopener">View route</a>` : ""}
+              <div class="button-row">
+                ${link ? `<a class="button" href="${escapeForAttribute(link)}" target="_blank" rel="noopener">View route</a>` : ""}
+                ${link ? `<button class="button copy-button" type="button" onclick="copyRouteUrl('${escapeForAttribute(link)}', this)">Copy URL</button>` : ""}
+              </div>
             </div>
           </article>
         `;
@@ -654,6 +849,8 @@
     function filterRoutes() {
       const search = document.getElementById("search").value.toLowerCase();
       const dynamicFilters = Array.from(document.querySelectorAll(".dynamic-filter"));
+      const minDistanceMiles = inputDistanceToMiles(document.getElementById("minDistance").value);
+      const maxDistanceMiles = inputDistanceToMiles(document.getElementById("maxDistance").value);
 
       const filtered = routesData.filter(route => {
         const searchableText = headers
@@ -663,6 +860,10 @@
           .toLowerCase();
 
         const matchesSearch = searchableText.includes(search);
+
+        const routeMiles = getMiles(route);
+        const matchesMinDistance = minDistanceMiles === null || routeMiles >= minDistanceMiles;
+        const matchesMaxDistance = maxDistanceMiles === null || routeMiles <= maxDistanceMiles;
 
         const matchesDynamicFilters = dynamicFilters.every(filter => {
           const field = filter.dataset.field;
@@ -679,10 +880,17 @@
           return routeValue === selectedValue;
         });
 
-        return matchesSearch && matchesDynamicFilters;
+        return matchesSearch && matchesMinDistance && matchesMaxDistance && matchesDynamicFilters;
       });
 
       displayRoutes(filtered);
+    }
+
+    function escapeForAttribute(value) {
+      return String(value || "")
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/"/g, "&quot;");
     }
 
     function openImageModal(src, alt) {
@@ -702,6 +910,29 @@
       modal.classList.remove("open");
       modal.setAttribute("aria-hidden", "true");
       image.src = "";
+    }
+
+    function copyRouteUrl(url, button) {
+      navigator.clipboard.writeText(url).then(() => {
+        const originalText = button.textContent;
+        button.textContent = "Copied!";
+        setTimeout(() => {
+          button.textContent = originalText;
+        }, 1400);
+      }).catch(() => {
+        const textArea = document.createElement("textarea");
+        textArea.value = url;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+
+        const originalText = button.textContent;
+        button.textContent = "Copied!";
+        setTimeout(() => {
+          button.textContent = originalText;
+        }, 1400);
+      });
     }
 
     function setTheme(mode) {
@@ -732,7 +963,32 @@
       localStorage.setItem("hh-view-mode", mode);
     }
 
+    function setDistanceUnit(unit) {
+      distanceUnit = unit;
+
+      document.getElementById("milesButton").classList.toggle("active", unit === "miles");
+      document.getElementById("kmButton").classList.toggle("active", unit === "km");
+
+      const minInput = document.getElementById("minDistance");
+      const maxInput = document.getElementById("maxDistance");
+
+      minInput.placeholder = unit === "km" ? "Min km" : "Min miles";
+      maxInput.placeholder = unit === "km" ? "Max km" : "Max miles";
+
+      localStorage.setItem("hh-distance-unit", unit);
+      filterRoutes();
+    }
+
     document.getElementById("search").addEventListener("input", filterRoutes);
+    document.getElementById("minDistance").addEventListener("input", filterRoutes);
+    document.getElementById("maxDistance").addEventListener("input", filterRoutes);
+
+    document.getElementById("advancedToggle").addEventListener("click", () => {
+      const panel = document.getElementById("advancedFilters");
+      const button = document.getElementById("advancedToggle");
+      const isOpen = panel.classList.toggle("open");
+      button.textContent = isOpen ? "Advanced search ▴" : "Advanced search ▾";
+    });
 
     document.getElementById("modalClose").addEventListener("click", closeImageModal);
 
@@ -751,6 +1007,8 @@
 
     document.getElementById("tileViewButton").addEventListener("click", () => setViewMode("tile"));
     document.getElementById("listViewButton").addEventListener("click", () => setViewMode("list"));
+    document.getElementById("milesButton").addEventListener("click", () => setDistanceUnit("miles"));
+    document.getElementById("kmButton").addEventListener("click", () => setDistanceUnit("km"));
 
     const savedTheme = localStorage.getItem("hh-theme");
     if (savedTheme) {
@@ -763,6 +1021,9 @@
 
     const savedViewMode = localStorage.getItem("hh-view-mode") || "tile";
     setViewMode(savedViewMode);
+
+    const savedDistanceUnit = localStorage.getItem("hh-distance-unit") || "miles";
+    setDistanceUnit(savedDistanceUnit);
   </script>
 </body>
 </html>
