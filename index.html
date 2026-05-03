@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HH Route Finder</title>
+  <style>
+    :root {
+      --hh-blue: #0b5cab;
+      --hh-dark: #102033;
+      --hh-light: #f3f7fb;
+      --card: #ffffff;
+      --border: #d9e2ec;
+      --muted: #5f6f7f;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--hh-light);
+      color: var(--hh-dark);
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--hh-blue), #073b72);
+      color: white;
+      padding: 28px 18px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .intro, .filters, .status {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .intro p { margin: 0; line-height: 1.45; }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      background: white;
+    }
+
+    .routes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .route-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      min-height: 260px;
+    }
+
+    .route-card h2 {
+      margin: 0 0 8px;
+      font-size: 1.2rem;
+      color: var(--hh-blue);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .pill {
+      background: #eaf2fb;
+      color: #0b4278;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 0.82rem;
+      font-weight: bold;
+    }
+
+    .description {
+      line-height: 1.45;
+      color: var(--hh-dark);
+      margin: 8px 0;
+      flex-grow: 1;
+    }
+
+    .notes {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.35;
+      margin: 8px 0 12px;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    a.button {
+      display: inline-block;
+      background: var(--hh-blue);
+      color: white;
+      text-decoration: none;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    a.button.secondary {
+      background: #eef4fa;
+      color: var(--hh-blue);
+      border: 1px solid var(--border);
+    }
+
+    .empty {
+      text-align: center;
+      padding: 32px;
+      background: white;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      color: var(--muted);
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 850px) {
+      .filters-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .routes-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+      header h1 { font-size: 1.7rem; }
+      .filters-grid { grid-template-columns: 1fr; }
+      .routes-grid { grid-template-columns: 1fr; }
+      main { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>HH Route Finder</h1>
+    <p>Run route inspiration for Hucknall Harriers 💙</p>
+  </header>
+
+  <main>
+    <section class="intro">
+      <p>Use the filters below to find route ideas by distance, terrain, start point and difficulty. These are informal route suggestions rather than organised group runs — please check conditions and run safely.</p>
+    </section>
+
+    <section class="filters">
+      <div class="filters-grid">
+        <div>
+          <label for="search">Search</label>
+          <input id="search" type="search" placeholder="Search routes, areas, notes..." />
+        </div>
+        <div>
+          <label for="terrain">Terrain</label>
+          <select id="terrain"><option value="">All terrain</option></select>
+        </div>
+        <div>
+          <label for="difficulty">Difficulty</label>
+          <select id="difficulty"><option value="">All difficulty</option></select>
+        </div>
+        <div>
+          <label for="startPoint">Start point</label>
+          <select id="startPoint"><option value="">All start points</option></select>
+        </div>
+      </div>
+    </section>
+
+    <div id="status" class="status">Loading routes...</div>
+    <section id="routes" class="routes-grid"></section>
+  </main>
+
+  <footer>No one runs alone.</footer>
+
+  <script>
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRfoX7-jgCe8kdf4nb9voLj57OvH6GSg7nSRuOVuwHptiaeRGinIS4ZLZTvXxE3NRtaLX8RU2naHtyV/pub?gid=0&single=true&output=csv";
+
+    let allRoutes = [];
+
+    const fields = {
+      search: document.getElementById("search"),
+      terrain: document.getElementById("terrain"),
+      difficulty: document.getElementById("difficulty"),
+      startPoint: document.getElementById("startPoint"),
+      routes: document.getElementById("routes"),
+      status: document.getElementById("status")
+    };
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let cell = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (char === '"' && inQuotes && next === '"') {
+          cell += '"';
+          i++;
+        } else if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          row.push(cell.trim());
+          cell = "";
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (cell || row.length) {
+            row.push(cell.trim());
+            rows.push(row);
+            row = [];
+            cell = "";
+          }
+          if (char === '\r' && next === '\n') i++;
+        } else {
+          cell += char;
+        }
+      }
+
+      if (cell || row.length) {
+        row.push(cell.trim());
+        rows.push(row);
+      }
+
+      return rows;
+    }
+
+    function normaliseHeader(header) {
+      return header.toLowerCase().trim().replace(/\s+/g, "_");
+    }
+
+    function csvToObjects(csv) {
+      const rows = parseCSV(csv).filter(row => row.some(cell => cell !== ""));
+      const headers = rows[0].map(normaliseHeader);
+      return rows.slice(1).map(row => {
+        const obj = {};
+        headers.forEach((header, index) => obj[header] = row[index] || "");
+        return obj;
+      }).filter(route => route.name);
+    }
+
+    function milesToKm(miles) {
+      const n = Number(miles);
+      return Number.isFinite(n) ? (n * 1.60934).toFixed(1) : "";
+    }
+
+    function uniqueValues(key) {
+      return [...new Set(allRoutes.map(r => r[key]).filter(Boolean))].sort();
+    }
+
+    function populateSelect(select, values) {
+      values.forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+      });
+    }
+
+    function routeMatches(route) {
+      const search = fields.search.value.toLowerCase();
+      const haystack = Object.values(route).join(" ").toLowerCase();
+
+      return (!search || haystack.includes(search)) &&
+        (!fields.terrain.value || route.terrain === fields.terrain.value) &&
+        (!fields.difficulty.value || route.difficulty === fields.difficulty.value) &&
+        (!fields.startPoint.value || route.start_point === fields.startPoint.value);
+    }
+
+    function yesNoPill(label, value) {
+      if (!value || value.toLowerCase() !== "yes") return "";
+      return `<span class="pill">${label}</span>`;
+    }
+
+    function renderRoutes() {
+      const filtered = allRoutes.filter(routeMatches);
+      fields.routes.innerHTML = "";
+      fields.status.textContent = `${filtered.length} route${filtered.length === 1 ? "" : "s"} found`;
+
+      if (!filtered.length) {
+        fields.routes.innerHTML = `<div class="empty">No routes match those filters.</div>`;
+        return;
+      }
+
+      filtered.forEach(route => {
+        const miles = route.distance_miles || "";
+        const km = milesToKm(miles);
+        const outdoorUrl = route.outdooractive_url || route.map_link || "";
+
+        const card = document.createElement("article");
+        card.className = "route-card";
+        card.innerHTML = `
+          <h2>${route.name}</h2>
+          <div class="meta">
+            ${miles ? `<span class="pill">${miles} miles${km ? ` / ${km} km` : ""}</span>` : ""}
+            ${route.terrain ? `<span class="pill">${route.terrain}</span>` : ""}
+            ${route.difficulty ? `<span class="pill">${route.difficulty}</span>` : ""}
+            ${route.route_type ? `<span class="pill">${route.route_type}</span>` : ""}
+            ${yesNoPill("Winter friendly", route.good_for_winter)}
+            ${yesNoPill("Headtorch", route.headtorch_needed)}
+            ${yesNoPill("Pub nearby", route.pub_nearby)}
+          </div>
+          ${route.start_point ? `<p><strong>Start:</strong> ${route.start_point}${route.area ? `, ${route.area}` : ""}</p>` : ""}
+          ${route.description ? `<p class="description">${route.description}</p>` : ""}
+          ${route.notes ? `<p class="notes"><strong>Notes:</strong> ${route.notes}</p>` : ""}
+          <div class="button-row">
+            ${outdoorUrl ? `<a class="button" href="${outdoorUrl}" target="_blank" rel="noopener">View route</a>` : ""}
+          </div>
+        `;
+        fields.routes.appendChild(card);
+      });
+    }
+
+    async function loadRoutes() {
+      try {
+        const response = await fetch(SHEET_URL);
+        if (!response.ok) throw new Error("Could not load Google Sheet CSV");
+        const csv = await response.text();
+        allRoutes = csvToObjects(csv);
+
+        populateSelect(fields.terrain, uniqueValues("terrain"));
+        populateSelect(fields.difficulty, uniqueValues("difficulty"));
+        populateSelect(fields.startPoint, uniqueValues("start_point"));
+
+        renderRoutes();
+      } catch (error) {
+        fields.status.textContent = "Could not load routes. Check the Google Sheet publish link.";
+        console.error(error);
+      }
+    }
+
+    [fields.search, fields.terrain, fields.difficulty, fields.startPoint].forEach(el => {
+      el.addEventListener("input", renderRoutes);
+      el.addEventListener("change", renderRoutes);
+    });
+
+    loadRoutes();
+  </script>
+</body>
+</html>
