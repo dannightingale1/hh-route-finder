@@ -1,175 +1,365 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HH Route Finder</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f5f5f5;
+    :root {
+      --hh-blue: #005cab;
+      --hh-dark: #102033;
+      --hh-light: #f3f7fb;
+      --card: #ffffff;
+      --border: #d9e2ec;
+      --muted: #5f6f7f;
     }
 
-    h2 {
-      margin-bottom: 5px;
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--hh-light);
+      color: var(--hh-dark);
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--hh-blue), #073b72);
+      color: white;
+      padding: 28px 18px;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px;
     }
 
     .filters {
-      margin-bottom: 15px;
+      background: white;
+      padding: 14px;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom: 18px;
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr;
     }
 
-    .filters input, .filters select {
-      margin: 5px;
-      padding: 8px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+    .filters input,
+    .filters select {
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      width: 100%;
+    }
+
+    .routes {
+      display: grid;
+      gap: 16px;
     }
 
     .card {
-      background: white;
-      border-radius: 10px;
+      background: var(--card);
+      border-radius: 14px;
       overflow: hidden;
-      margin-bottom: 15px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
     }
 
-     .card img {
+    .card img {
       width: 100%;
       height: 140px;
       object-fit: cover;
       object-position: center;
       display: block;
       border-bottom: 1px solid #eee;
-    }
+      background: #e9eef5;
     }
 
     .card-content {
-      padding: 12px;
+      padding: 14px;
     }
 
-    .card h3 {
-      margin: 0 0 5px;
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .distance {
+      font-weight: bold;
+      margin: 0 0 8px;
     }
 
     .meta {
+      color: var(--muted);
       font-size: 14px;
-      color: #666;
-      margin-bottom: 8px;
+      margin: 0 0 10px;
     }
 
-    button {
-      padding: 8px 12px;
-      background: #007bff;
+    .description {
+      margin: 0 0 12px;
+      line-height: 1.4;
+    }
+
+    .tags {
+      margin-bottom: 12px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #e7f0fb;
+      color: #073b72;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      margin: 0 4px 4px 0;
+    }
+
+    .button {
+      display: inline-block;
+      background: var(--hh-blue);
       color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+      text-decoration: none;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
     }
 
-    button:hover {
-      background: #0056b3;
+    .button:hover {
+      background: #004985;
     }
 
+    .count {
+      color: var(--muted);
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .empty {
+      background: white;
+      padding: 18px;
+      border-radius: 12px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    @media (min-width: 700px) {
+      .filters {
+        grid-template-columns: 2fr 1fr 1fr;
+      }
+
+      .routes {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1000px) {
+      .routes {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
   </style>
 </head>
 
 <body>
+  <header>
+    <h1>🏃 HH Route Finder</h1>
+    <p>No one runs alone 💙 Find route inspiration for Hucknall Harriers runs.</p>
+  </header>
 
-<h2>🏃 HH Route Finder</h2>
-<p>No one runs alone 💙</p>
+  <main>
+    <section class="filters">
+      <input type="text" id="search" placeholder="Search routes, areas, start points..." />
 
-<div class="filters">
-  <input type="text" id="search" placeholder="Search routes...">
-  
-  <select id="terrain">
-    <option value="">All Terrain</option>
-    <option>Road</option>
-    <option>Trail</option>
-    <option>Mixed</option>
-  </select>
+      <select id="terrain">
+        <option value="">All terrain</option>
+        <option value="Road">Road</option>
+        <option value="Trail">Trail</option>
+        <option value="Mixed">Mixed</option>
+      </select>
 
-  <select id="difficulty">
-    <option value="">All Difficulty</option>
-    <option>Easy</option>
-    <option>Moderate</option>
-    <option>Hilly</option>
-  </select>
-</div>
+      <select id="difficulty">
+        <option value="">All difficulty</option>
+        <option value="Easy">Easy</option>
+        <option value="Moderate">Moderate</option>
+        <option value="Hilly">Hilly</option>
+      </select>
+    </section>
 
-<div id="routes"></div>
+    <div class="count" id="count"></div>
+    <section class="routes" id="routes"></section>
+  </main>
 
-<script>
+  <script>
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRfoX7-jgCe8kdf4nb9voLj57OvH6GSg7nSRuOVuwHptiaeRGinIS4ZLZTvXxE3NRtaLX8RU2naHtyV/pub?gid=0&single=true&output=csv";
 
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRfoX7-jgCe8kdf4nb9voLj57OvH6GSg7nSRuOVuwHptiaeRGinIS4ZLZTvXxE3NRtaLX8RU2naHtyV/pub?gid=0&single=true&output=csv";
+    const FALLBACK_IMAGE = "https://via.placeholder.com/800x400?text=HH+Route+Finder";
 
-let routesData = [];
+    let routesData = [];
 
-fetch(SHEET_URL)
-  .then(res => res.text())
-  .then(csv => {
-    const rows = csv.split("\n").slice(1);
+    function parseCSV(text) {
+      const rows = [];
+      let current = [];
+      let value = "";
+      let insideQuotes = false;
 
-    routesData = rows.map(r => {
-      const cols = r.split(",");
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
 
-      return {
-        name: cols[1],
-        miles: parseFloat(cols[2]),
-        terrain: cols[5],
-        difficulty: cols[6],
-        description: cols[8],
-        link: cols[9],
-        image: cols[10] || "https://via.placeholder.com/400x200?text=HH+Route"
-      };
-    });
+        if (char === '"' && insideQuotes && next === '"') {
+          value += '"';
+          i++;
+        } else if (char === '"') {
+          insideQuotes = !insideQuotes;
+        } else if (char === "," && !insideQuotes) {
+          current.push(value);
+          value = "";
+        } else if ((char === "\n" || char === "\r") && !insideQuotes) {
+          if (value || current.length) {
+            current.push(value);
+            rows.push(current);
+            current = [];
+            value = "";
+          }
+        } else {
+          value += char;
+        }
+      }
 
-    displayRoutes(routesData);
-  });
+      if (value || current.length) {
+        current.push(value);
+        rows.push(current);
+      }
 
-function displayRoutes(data) {
-  const container = document.getElementById("routes");
-  container.innerHTML = "";
+      return rows;
+    }
 
-  data.forEach(r => {
-    const km = (r.miles * 1.60934).toFixed(1);
+    function normaliseHeader(header) {
+      return header.trim().toLowerCase();
+    }
 
-    container.innerHTML += `
-      <div class="card">
-        <img src="${r.image}" alt="Route image">
-        <div class="card-content">
-          <h3>${r.name}</h3>
-          <p><strong>${r.miles} miles (${km} km)</strong></p>
-          <p class="meta">${r.terrain} | ${r.difficulty}</p>
-          <p>${r.description}</p>
-          <a href="${r.link}" target="_blank">
-            <button>View Route</button>
-          </a>
-        </div>
-      </div>
-    `;
-  });
-}
+    function milesToKm(miles) {
+      return (miles * 1.60934).toFixed(1);
+    }
 
-document.getElementById("search").addEventListener("input", filter);
-document.getElementById("terrain").addEventListener("change", filter);
-document.getElementById("difficulty").addEventListener("change", filter);
+    function getRouteValue(route, key) {
+      return route[key] ? route[key].trim() : "";
+    }
 
-function filter() {
-  const search = document.getElementById("search").value.toLowerCase();
-  const terrain = document.getElementById("terrain").value;
-  const difficulty = document.getElementById("difficulty").value;
+    fetch(SHEET_URL)
+      .then(response => response.text())
+      .then(csv => {
+        const rows = parseCSV(csv);
+        const headers = rows[0].map(normaliseHeader);
 
-  const filtered = routesData.filter(r =>
-    r.name.toLowerCase().includes(search) &&
-    (terrain === "" || r.terrain === terrain) &&
-    (difficulty === "" || r.difficulty === difficulty)
-  );
+        routesData = rows.slice(1).map(row => {
+          const route = {};
+          headers.forEach((header, index) => {
+            route[header] = row[index] || "";
+          });
+          return route;
+        }).filter(route => getRouteValue(route, "name"));
 
-  displayRoutes(filtered);
-}
+        displayRoutes(routesData);
+      })
+      .catch(error => {
+        document.getElementById("routes").innerHTML =
+          `<div class="empty">Sorry, the routes could not be loaded.</div>`;
+        console.error(error);
+      });
 
-</script>
+    function displayRoutes(data) {
+      const container = document.getElementById("routes");
+      const count = document.getElementById("count");
 
+      count.textContent = `${data.length} route${data.length === 1 ? "" : "s"} found`;
+      container.innerHTML = "";
+
+      if (!data.length) {
+        container.innerHTML = `<div class="empty">No routes match those filters.</div>`;
+        return;
+      }
+
+      data.forEach(route => {
+        const name = getRouteValue(route, "name");
+        const miles = parseFloat(getRouteValue(route, "distance_miles")) || 0;
+        const km = milesToKm(miles);
+        const terrain = getRouteValue(route, "terrain");
+        const difficulty = getRouteValue(route, "difficulty");
+        const routeType = getRouteValue(route, "route_type");
+        const startPoint = getRouteValue(route, "start_point");
+        const area = getRouteValue(route, "area");
+        const description = getRouteValue(route, "description");
+        const link = getRouteValue(route, "outdooractive_url");
+        const image = getRouteValue(route, "image_url") || FALLBACK_IMAGE;
+        const tags = getRouteValue(route, "tags")
+          .split(",")
+          .map(tag => tag.trim())
+          .filter(Boolean);
+
+        container.innerHTML += `
+          <article class="card">
+            <img src="${image}" alt="${name}">
+            <div class="card-content">
+              <h2>${name}</h2>
+              <p class="distance">${miles} miles (${km} km)</p>
+              <p class="meta">${terrain} ${difficulty ? "| " + difficulty : ""} ${routeType ? "| " + routeType : ""}</p>
+              <p class="meta">${startPoint}${area ? " · " + area : ""}</p>
+              <p class="description">${description}</p>
+              <div class="tags">
+                ${tags.map(tag => `<span class="tag">${tag}</span>`).join("")}
+              </div>
+              ${link ? `<a class="button" href="${link}" target="_blank" rel="noopener">View route</a>` : ""}
+            </div>
+          </article>
+        `;
+      });
+    }
+
+    function filterRoutes() {
+      const search = document.getElementById("search").value.toLowerCase();
+      const terrain = document.getElementById("terrain").value;
+      const difficulty = document.getElementById("difficulty").value;
+
+      const filtered = routesData.filter(route => {
+        const searchableText = [
+          getRouteValue(route, "name"),
+          getRouteValue(route, "start_point"),
+          getRouteValue(route, "area"),
+          getRouteValue(route, "description"),
+          getRouteValue(route, "tags")
+        ].join(" ").toLowerCase();
+
+        const matchesSearch = searchableText.includes(search);
+        const matchesTerrain = !terrain || getRouteValue(route, "terrain") === terrain;
+        const matchesDifficulty = !difficulty || getRouteValue(route, "difficulty") === difficulty;
+
+        return matchesSearch && matchesTerrain && matchesDifficulty;
+      });
+
+      displayRoutes(filtered);
+    }
+
+    document.getElementById("search").addEventListener("input", filterRoutes);
+    document.getElementById("terrain").addEventListener("change", filterRoutes);
+    document.getElementById("difficulty").addEventListener("change", filterRoutes);
+  </script>
 </body>
 </html>
