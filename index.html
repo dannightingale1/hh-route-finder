@@ -65,7 +65,15 @@
       font-size: 16px;
     }
 
-    .theme-toggle {
+    .top-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .theme-toggle,
+    .view-toggle {
       background: rgba(255,255,255,0.16);
       color: white;
       border: 1px solid rgba(255,255,255,0.35);
@@ -76,8 +84,10 @@
       font-weight: bold;
     }
 
-    .theme-toggle:hover {
-      background: rgba(255,255,255,0.25);
+    .theme-toggle:hover,
+    .view-toggle:hover,
+    .view-toggle.active {
+      background: rgba(255,255,255,0.28);
     }
 
     main {
@@ -120,9 +130,23 @@
       flex-direction: column;
     }
 
+    .count {
+      color: var(--muted);
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
     .routes {
       display: grid;
       gap: 16px;
+    }
+
+    .routes.tile-view {
+      grid-template-columns: 1fr;
+    }
+
+    .routes.list-view {
+      grid-template-columns: 1fr;
     }
 
     .card {
@@ -148,6 +172,7 @@
       justify-content: center;
       overflow: hidden;
       cursor: zoom-in;
+      flex-shrink: 0;
     }
 
     body.dark .image-wrap {
@@ -217,12 +242,6 @@
       background: #004985;
     }
 
-    .count {
-      color: var(--muted);
-      margin-bottom: 12px;
-      font-size: 14px;
-    }
-
     .empty {
       background: var(--card);
       padding: 18px;
@@ -231,6 +250,28 @@
       color: var(--muted);
       grid-column: 1 / -1;
       border: 1px solid var(--border);
+    }
+
+    .list-view .card {
+      display: flex;
+      align-items: stretch;
+    }
+
+    .list-view .image-wrap {
+      width: 260px;
+      min-height: 195px;
+      aspect-ratio: 4 / 3;
+      border-bottom: none;
+      border-right: 1px solid var(--border);
+    }
+
+    .list-view .card-content {
+      flex: 1;
+      padding: 16px;
+    }
+
+    .list-view .card h2 {
+      font-size: 21px;
     }
 
     .modal {
@@ -291,7 +332,7 @@
         grid-column: span 3;
       }
 
-      .routes {
+      .routes.tile-view {
         grid-template-columns: repeat(2, 1fr);
       }
     }
@@ -305,8 +346,21 @@
         grid-column: span 4;
       }
 
-      .routes {
+      .routes.tile-view {
         grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 700px) {
+      .list-view .card {
+        display: block;
+      }
+
+      .list-view .image-wrap {
+        width: 100%;
+        min-height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
       }
     }
 
@@ -315,8 +369,8 @@
         flex-direction: column;
       }
 
-      .theme-toggle {
-        align-self: flex-start;
+      .top-buttons {
+        justify-content: flex-start;
       }
     }
   </style>
@@ -329,7 +383,12 @@
         <h1>🏃 HH Route Finder</h1>
         <p>No one runs alone 💙 Find route inspiration for your next run.</p>
       </div>
-      <button class="theme-toggle" id="themeToggle" type="button">🌙 Dark mode</button>
+
+      <div class="top-buttons">
+        <button class="view-toggle active" id="tileViewButton" type="button">▦ Tile view</button>
+        <button class="view-toggle" id="listViewButton" type="button">☰ List view</button>
+        <button class="theme-toggle" id="themeToggle" type="button">🌙 Dark mode</button>
+      </div>
     </div>
   </header>
 
@@ -342,7 +401,7 @@
     </section>
 
     <div class="count" id="count"></div>
-    <section class="routes" id="routes"></section>
+    <section class="routes tile-view" id="routes"></section>
   </main>
 
   <div class="modal" id="imageModal" aria-hidden="true">
@@ -659,6 +718,20 @@
       localStorage.setItem("hh-theme", mode);
     }
 
+    function setViewMode(mode) {
+      const routes = document.getElementById("routes");
+      const tileButton = document.getElementById("tileViewButton");
+      const listButton = document.getElementById("listViewButton");
+
+      routes.classList.remove("tile-view", "list-view");
+      routes.classList.add(mode === "list" ? "list-view" : "tile-view");
+
+      tileButton.classList.toggle("active", mode !== "list");
+      listButton.classList.toggle("active", mode === "list");
+
+      localStorage.setItem("hh-view-mode", mode);
+    }
+
     document.getElementById("search").addEventListener("input", filterRoutes);
 
     document.getElementById("modalClose").addEventListener("click", closeImageModal);
@@ -676,6 +749,9 @@
       setTheme(isDark ? "light" : "dark");
     });
 
+    document.getElementById("tileViewButton").addEventListener("click", () => setViewMode("tile"));
+    document.getElementById("listViewButton").addEventListener("click", () => setViewMode("list"));
+
     const savedTheme = localStorage.getItem("hh-theme");
     if (savedTheme) {
       setTheme(savedTheme);
@@ -684,6 +760,9 @@
     } else {
       setTheme("light");
     }
+
+    const savedViewMode = localStorage.getItem("hh-view-mode") || "tile";
+    setViewMode(savedViewMode);
   </script>
 </body>
 </html>
