@@ -15,9 +15,7 @@
       --muted: #5f6f7f;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -43,7 +41,7 @@
     }
 
     main {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 18px;
     }
@@ -66,6 +64,18 @@
       border-radius: 8px;
       font-size: 15px;
       width: 100%;
+      background: white;
+    }
+
+    .filter-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .filter-control {
+      display: flex;
+      flex-direction: column;
     }
 
     .routes {
@@ -79,16 +89,30 @@
       overflow: hidden;
       box-shadow: 0 2px 10px rgba(0,0,0,0.08);
       border: 1px solid var(--border);
+      transition: 0.2s ease;
     }
 
-    .card img {
+    .card:hover {
+      transform: translateY(-2px);
+    }
+
+    .image-wrap {
       width: 100%;
-      height: 140px;
-      object-fit: cover;
+      height: 170px;
+      background: #eef3f8;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
       object-position: center;
       display: block;
-      border-bottom: 1px solid #eee;
-      background: #e9eef5;
     }
 
     .card-content {
@@ -98,6 +122,7 @@
     .card h2 {
       margin: 0 0 8px;
       font-size: 20px;
+      line-height: 1.2;
     }
 
     .distance {
@@ -157,11 +182,16 @@
       border-radius: 12px;
       text-align: center;
       color: var(--muted);
+      grid-column: 1 / -1;
     }
 
     @media (min-width: 700px) {
       .filters {
-        grid-template-columns: 2fr 1fr 1fr;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .filters .search-box {
+        grid-column: span 3;
       }
 
       .routes {
@@ -170,6 +200,14 @@
     }
 
     @media (min-width: 1000px) {
+      .filters {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .filters .search-box {
+        grid-column: span 4;
+      }
+
       .routes {
         grid-template-columns: repeat(3, 1fr);
       }
@@ -180,26 +218,15 @@
 <body>
   <header>
     <h1>🏃 HH Route Finder</h1>
-    <p>No one runs alone 💙 Find route inspiration for Hucknall Harriers runs.</p>
+    <p>No one runs alone 💙 Find route inspiration for your next run.</p>
   </header>
 
   <main>
-    <section class="filters">
-      <input type="text" id="search" placeholder="Search routes, areas, start points..." />
-
-      <select id="terrain">
-        <option value="">All terrain</option>
-        <option value="Road">Road</option>
-        <option value="Trail">Trail</option>
-        <option value="Mixed">Mixed</option>
-      </select>
-
-      <select id="difficulty">
-        <option value="">All difficulty</option>
-        <option value="Easy">Easy</option>
-        <option value="Moderate">Moderate</option>
-        <option value="Hilly">Hilly</option>
-      </select>
+    <section class="filters" id="filters">
+      <div class="filter-control search-box">
+        <label class="filter-label" for="search">Search</label>
+        <input type="text" id="search" placeholder="Search routes, areas, start points, tags..." />
+      </div>
     </section>
 
     <div class="count" id="count"></div>
@@ -209,9 +236,24 @@
   <script>
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRfoX7-jgCe8kdf4nb9voLj57OvH6GSg7nSRuOVuwHptiaeRGinIS4ZLZTvXxE3NRtaLX8RU2naHtyV/pub?gid=0&single=true&output=csv";
 
-    const FALLBACK_IMAGE = "https://via.placeholder.com/800x400?text=HH+Route+Finder";
+    const FALLBACK_IMAGE = "https://placehold.co/900x500/e7f0fb/073b72?text=HH+Route+Finder";
+
+    const EXCLUDED_FILTER_FIELDS = [
+      "id",
+      "name",
+      "description",
+      "outdooractive_url",
+      "route_url",
+      "url",
+      "link",
+      "image_url",
+      "image",
+      "photo",
+      "photo_url"
+    ];
 
     let routesData = [];
+    let headers = [];
 
     function parseCSV(text) {
       const rows = [];
@@ -252,22 +294,119 @@
     }
 
     function normaliseHeader(header) {
-      return header.trim().toLowerCase();
+      return header.trim().toLowerCase().replace(/\s+/g, "_");
+    }
+
+    function labelFromHeader(header) {
+      return header
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, char => char.toUpperCase());
+    }
+
+    function getRouteValue(route, key) {
+      return route[key] ? String(route[key]).trim() : "";
     }
 
     function milesToKm(miles) {
       return (miles * 1.60934).toFixed(1);
     }
 
-    function getRouteValue(route, key) {
-      return route[key] ? route[key].trim() : "";
+    function getFirstAvailable(route, keys) {
+      for (const key of keys) {
+        const value = getRouteValue(route, key);
+        if (value) return value;
+      }
+      return "";
+    }
+
+    function splitMultiValues(value) {
+      return value
+        .split(",")
+        .map(item => item.trim())
+        .filter(Boolean);
+    }
+
+    function createDynamicFilters() {
+      const filtersContainer = document.getElementById("filters");
+
+      const filterFields = headers.filter(header => {
+        if (EXCLUDED_FILTER_FIELDS.includes(header)) return false;
+
+        const values = routesData
+          .map(route => getRouteValue(route, header))
+          .filter(Boolean);
+
+        const uniqueValues = new Set();
+        values.forEach(value => {
+          if (header === "tags") {
+            splitMultiValues(value).forEach(tag => uniqueValues.add(tag));
+          } else {
+            uniqueValues.add(value);
+          }
+        });
+
+        return uniqueValues.size > 0 && uniqueValues.size <= 30;
+      });
+
+      filterFields.forEach(field => {
+        const values = new Set();
+
+        routesData.forEach(route => {
+          const value = getRouteValue(route, field);
+          if (!value) return;
+
+          if (field === "tags") {
+            splitMultiValues(value).forEach(tag => values.add(tag));
+          } else {
+            values.add(value);
+          }
+        });
+
+        const sortedValues = Array.from(values).sort((a, b) => {
+          const numA = parseFloat(a);
+          const numB = parseFloat(b);
+          if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+          return a.localeCompare(b);
+        });
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "filter-control";
+
+        const label = document.createElement("label");
+        label.className = "filter-label";
+        label.textContent = labelFromHeader(field);
+        label.setAttribute("for", `filter-${field}`);
+
+        const select = document.createElement("select");
+        select.id = `filter-${field}`;
+        select.dataset.field = field;
+        select.className = "dynamic-filter";
+
+        const allOption = document.createElement("option");
+        allOption.value = "";
+        allOption.textContent = `All ${labelFromHeader(field).toLowerCase()}`;
+        select.appendChild(allOption);
+
+        sortedValues.forEach(value => {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = value;
+          select.appendChild(option);
+        });
+
+        select.addEventListener("change", filterRoutes);
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(select);
+        filtersContainer.appendChild(wrapper);
+      });
     }
 
     fetch(SHEET_URL)
       .then(response => response.text())
       .then(csv => {
         const rows = parseCSV(csv);
-        const headers = rows[0].map(normaliseHeader);
+        headers = rows[0].map(normaliseHeader);
 
         routesData = rows.slice(1).map(row => {
           const route = {};
@@ -277,6 +416,7 @@
           return route;
         }).filter(route => getRouteValue(route, "name"));
 
+        createDynamicFilters();
         displayRoutes(routesData);
       })
       .catch(error => {
@@ -300,32 +440,32 @@
       data.forEach(route => {
         const name = getRouteValue(route, "name");
         const miles = parseFloat(getRouteValue(route, "distance_miles")) || 0;
-        const km = milesToKm(miles);
+        const km = miles ? milesToKm(miles) : "";
         const terrain = getRouteValue(route, "terrain");
         const difficulty = getRouteValue(route, "difficulty");
         const routeType = getRouteValue(route, "route_type");
         const startPoint = getRouteValue(route, "start_point");
         const area = getRouteValue(route, "area");
         const description = getRouteValue(route, "description");
-        const link = getRouteValue(route, "outdooractive_url");
-        const image = getRouteValue(route, "image_url") || FALLBACK_IMAGE;
-        const tags = getRouteValue(route, "tags")
-          .split(",")
-          .map(tag => tag.trim())
-          .filter(Boolean);
+        const link = getFirstAvailable(route, ["outdooractive_url", "route_url", "url", "link"]);
+        const image = getFirstAvailable(route, ["image_url", "image", "photo_url", "photo"]) || FALLBACK_IMAGE;
+        const tags = splitMultiValues(getRouteValue(route, "tags"));
+
+        const metaLineOne = [terrain, difficulty, routeType].filter(Boolean).join(" | ");
+        const metaLineTwo = [startPoint, area].filter(Boolean).join(" · ");
 
         container.innerHTML += `
           <article class="card">
-            <img src="${image}" alt="${name}">
+            <div class="image-wrap">
+              <img src="${image}" alt="${name}" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'">
+            </div>
             <div class="card-content">
               <h2>${name}</h2>
-              <p class="distance">${miles} miles (${km} km)</p>
-              <p class="meta">${terrain} ${difficulty ? "| " + difficulty : ""} ${routeType ? "| " + routeType : ""}</p>
-              <p class="meta">${startPoint}${area ? " · " + area : ""}</p>
-              <p class="description">${description}</p>
-              <div class="tags">
-                ${tags.map(tag => `<span class="tag">${tag}</span>`).join("")}
-              </div>
+              ${miles ? `<p class="distance">${miles} miles (${km} km)</p>` : ""}
+              ${metaLineOne ? `<p class="meta">${metaLineOne}</p>` : ""}
+              ${metaLineTwo ? `<p class="meta">${metaLineTwo}</p>` : ""}
+              ${description ? `<p class="description">${description}</p>` : ""}
+              ${tags.length ? `<div class="tags">${tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>` : ""}
               ${link ? `<a class="button" href="${link}" target="_blank" rel="noopener">View route</a>` : ""}
             </div>
           </article>
@@ -335,31 +475,39 @@
 
     function filterRoutes() {
       const search = document.getElementById("search").value.toLowerCase();
-      const terrain = document.getElementById("terrain").value;
-      const difficulty = document.getElementById("difficulty").value;
+      const dynamicFilters = Array.from(document.querySelectorAll(".dynamic-filter"));
 
       const filtered = routesData.filter(route => {
-        const searchableText = [
-          getRouteValue(route, "name"),
-          getRouteValue(route, "start_point"),
-          getRouteValue(route, "area"),
-          getRouteValue(route, "description"),
-          getRouteValue(route, "tags")
-        ].join(" ").toLowerCase();
+        const searchableText = headers
+          .filter(header => !["image_url", "image", "photo_url", "photo"].includes(header))
+          .map(header => getRouteValue(route, header))
+          .join(" ")
+          .toLowerCase();
 
         const matchesSearch = searchableText.includes(search);
-        const matchesTerrain = !terrain || getRouteValue(route, "terrain") === terrain;
-        const matchesDifficulty = !difficulty || getRouteValue(route, "difficulty") === difficulty;
 
-        return matchesSearch && matchesTerrain && matchesDifficulty;
+        const matchesDynamicFilters = dynamicFilters.every(filter => {
+          const field = filter.dataset.field;
+          const selectedValue = filter.value;
+
+          if (!selectedValue) return true;
+
+          const routeValue = getRouteValue(route, field);
+
+          if (field === "tags") {
+            return splitMultiValues(routeValue).includes(selectedValue);
+          }
+
+          return routeValue === selectedValue;
+        });
+
+        return matchesSearch && matchesDynamicFilters;
       });
 
       displayRoutes(filtered);
     }
 
     document.getElementById("search").addEventListener("input", filterRoutes);
-    document.getElementById("terrain").addEventListener("change", filterRoutes);
-    document.getElementById("difficulty").addEventListener("change", filterRoutes);
   </script>
 </body>
 </html>
