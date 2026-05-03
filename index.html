@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HH Route Finder</title>
+  <title>Hucknall Harriers Running Routes</title>
 
   <style>
     :root {
       --hh-blue: #005cab;
       --hh-blue-dark: #073b72;
+      --hh-green: #c8ff00;
       --bg: #f3f7fb;
       --text: #102033;
       --card: #ffffff;
@@ -41,28 +42,72 @@
     }
 
     header {
-      background: linear-gradient(135deg, var(--hh-blue), var(--hh-blue-dark));
+      background: url("banner.jpg") center/cover no-repeat;
       color: white;
-      padding: 24px 18px;
+      padding: 22px 18px;
+      position: relative;
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(0,0,0,0.78), rgba(0,0,0,0.48), rgba(0,0,0,0.38));
     }
 
     .header-inner {
+      position: relative;
+      z-index: 1;
       max-width: 1200px;
+      width: 100%;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .brand-area {
+      display: flex;
+      align-items: center;
       gap: 16px;
-      align-items: flex-start;
+      min-width: 0;
+    }
+
+    .logo-link {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      height: 62px;
+      width: auto;
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+      background: rgba(0,0,0,0.25);
+    }
+
+    .title-block {
+      min-width: 0;
     }
 
     header h1 {
-      margin: 0 0 8px;
-      font-size: 28px;
+      margin: 0 0 7px;
+      font-size: clamp(24px, 4vw, 38px);
+      line-height: 1.05;
+      color: var(--hh-green);
+      text-shadow: 0 2px 8px rgba(0,0,0,0.65);
     }
 
     header p {
       margin: 0;
       font-size: 16px;
+      color: white;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.65);
     }
 
     .top-buttons {
@@ -70,26 +115,26 @@
       gap: 8px;
       flex-wrap: wrap;
       justify-content: flex-end;
+      flex-shrink: 0;
     }
 
     .theme-toggle,
-    .view-toggle,
-    .advanced-toggle,
-    .small-button {
+    .view-toggle {
       background: rgba(255,255,255,0.16);
       color: white;
-      border: 1px solid rgba(255,255,255,0.35);
+      border: 1px solid rgba(255,255,255,0.38);
       border-radius: 999px;
       padding: 8px 12px;
       cursor: pointer;
       white-space: nowrap;
       font-weight: bold;
+      backdrop-filter: blur(4px);
     }
 
     .theme-toggle:hover,
     .view-toggle:hover,
     .view-toggle.active {
-      background: rgba(255,255,255,0.28);
+      background: rgba(255,255,255,0.30);
     }
 
     main {
@@ -440,6 +485,31 @@
       }
     }
 
+    @media (max-width: 760px) {
+      header {
+        min-height: 190px;
+      }
+
+      .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .brand-area {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .logo {
+        height: 50px;
+      }
+
+      .top-buttons {
+        justify-content: flex-start;
+      }
+    }
+
     @media (max-width: 700px) {
       .basic-search {
         grid-template-columns: 1fr;
@@ -487,14 +557,6 @@
     }
 
     @media (max-width: 520px) {
-      .header-inner {
-        flex-direction: column;
-      }
-
-      .top-buttons {
-        justify-content: flex-start;
-      }
-
       .distance-row {
         grid-template-columns: 1fr;
       }
@@ -523,9 +585,15 @@
 <body>
   <header>
     <div class="header-inner">
-      <div>
-        <h1>🏃 HH Route Finder</h1>
-        <p>Find route inspiration for your next run 💙</p>
+      <div class="brand-area">
+        <a href="https://www.hucknallharriers.co.uk/" class="logo-link" aria-label="Go to Hucknall Harriers website">
+          <img src="logo.jpg" alt="Hucknall Harriers Running Group logo" class="logo">
+        </a>
+
+        <div class="title-block">
+          <h1>Hucknall Harriers Running Routes</h1>
+          <p>Find route inspiration for your next run 💙</p>
+        </div>
       </div>
 
       <div class="top-buttons">
