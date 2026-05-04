@@ -1,1496 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HH Route Finder</title>
-
-  <style>
-    :root {
-      --hh-blue: #005cab;
-      --hh-blue-dark: #073b72;
-      --hh-green: #c8ff00;
-      --bg: #f3f7fb;
-      --text: #102033;
-      --card: #ffffff;
-      --border: #d9e2ec;
-      --muted: #5f6f7f;
-      --chip-bg: #e7f0fb;
-      --chip-text: #073b72;
-      --shadow: rgba(0,0,0,0.08);
-    }
-
-    body.dark {
-      --bg: #0f1722;
-      --text: #f3f7fb;
-      --card: #182334;
-      --border: #2f3f55;
-      --muted: #b6c2d1;
-      --chip-bg: #243a56;
-      --chip-text: #d8eaff;
-      --shadow: rgba(0,0,0,0.35);
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-
-    header {
-      background: url("banner.jpg") center/cover no-repeat;
-      color: white;
-      padding: 22px 18px;
-      position: relative;
-      min-height: 150px;
-      display: flex;
-      align-items: center;
-    }
-
-    header::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, rgba(0,0,0,0.78), rgba(0,0,0,0.48), rgba(0,0,0,0.38));
-    }
-
-    .header-inner {
-      position: relative;
-      z-index: 1;
-      max-width: 1200px;
-      width: 100%;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      gap: 18px;
-      align-items: center;
-    }
-
-    .brand-area {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      min-width: 0;
-    }
-
-    .logo-link {
-      display: flex;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .logo {
-      height: 62px;
-      width: auto;
-      border-radius: 4px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.35);
-      background: rgba(0,0,0,0.25);
-    }
-
-    .title-block { min-width: 0; }
-
-    header h1 {
-      margin: 0 0 7px;
-      font-size: clamp(24px, 4vw, 38px);
-      line-height: 1.05;
-      color: var(--hh-green);
-      text-shadow: 0 2px 8px rgba(0,0,0,0.65);
-    }
-
-    header p {
-      margin: 0;
-      font-size: 16px;
-      color: white;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.65);
-    }
-
-    .top-buttons {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      flex-shrink: 0;
-    }
-
-    .theme-toggle,
-    .view-toggle {
-      background: rgba(255,255,255,0.16);
-      color: white;
-      border: 1px solid rgba(255,255,255,0.38);
-      border-radius: 999px;
-      padding: 8px 12px;
-      cursor: pointer;
-      white-space: nowrap;
-      font-weight: bold;
-      backdrop-filter: blur(4px);
-    }
-
-    .theme-toggle:hover,
-    .view-toggle:hover,
-    .view-toggle.active {
-      background: rgba(255,255,255,0.30);
-    }
-
-    main {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 18px;
-    }
-
-    .panel,
-    .filters {
-      background: var(--card);
-      padding: 14px;
-      border-radius: 14px;
-      box-shadow: 0 2px 8px var(--shadow);
-      margin-bottom: 18px;
-      border: 1px solid var(--border);
-    }
-
-    .panel h2 {
-      margin: 0 0 10px;
-      font-size: 20px;
-    }
-
-    .panel p {
-      margin: 0 0 12px;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-
-    .basic-search {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: 10px;
-      align-items: end;
-    }
-
-    .advanced-filters {
-      display: none;
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-      gap: 10px;
-      grid-template-columns: 1fr;
-    }
-
-    .advanced-filters.open { display: grid; }
-
-    .filters input,
-    .filters select,
-    .panel select {
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 15px;
-      width: 100%;
-      background: var(--card);
-      color: var(--text);
-    }
-
-    .filter-label {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-
-    .filter-control {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .advanced-search-button,
-    .wizard-toggle-button {
-      padding: 10px 13px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--hh-blue);
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-      height: 41px;
-    }
-
-    .advanced-search-button:hover,
-    .wizard-toggle-button:hover {
-      background: #004985;
-    }
-
-    .distance-control {
-      display: grid;
-      gap: 8px;
-    }
-
-    .distance-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .unit-toggle {
-      display: flex;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      overflow: hidden;
-      width: fit-content;
-      background: var(--card);
-    }
-
-    .unit-toggle button {
-      border: none;
-      padding: 7px 12px;
-      cursor: pointer;
-      background: transparent;
-      color: var(--text);
-      font-weight: bold;
-    }
-
-    .unit-toggle button.active {
-      background: var(--hh-blue);
-      color: white;
-    }
-
-    .wizard-panel {
-      display: none;
-    }
-
-    .wizard-panel.open {
-      display: block;
-    }
-
-    .wizard-steps {
-      display: grid;
-      gap: 14px;
-    }
-
-    .wizard-step {
-      border-top: 1px solid var(--border);
-      padding-top: 12px;
-    }
-
-    .wizard-step:first-child {
-      border-top: none;
-      padding-top: 0;
-    }
-
-    .wizard-step h3 {
-      font-size: 15px;
-      margin: 0 0 8px;
-      color: var(--muted);
-    }
-
-    .quick-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .quick-button {
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 8px 11px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .quick-button:hover,
-    .quick-button.active {
-      background: var(--hh-blue);
-      color: white;
-      border-color: var(--hh-blue);
-    }
-
-    .wizard-actions,
-    .planner-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-      align-items: end;
-    }
-
-    .planner-grid {
-      display: grid;
-      gap: 10px;
-      grid-template-columns: 1fr;
-    }
-
-    .planner-result {
-      display: none;
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-    }
-
-    .planner-result.open {
-      display: block;
-    }
-
-    .planner-result h3 {
-      margin: 0 0 10px;
-    }
-
-    .planner-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .planner-item {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px;
-      background: var(--bg);
-      display: grid;
-      grid-template-columns: 72px 1fr;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .planner-item img {
-      width: 72px;
-      aspect-ratio: 4/3;
-      object-fit: contain;
-      background: #eef3f8;
-      border-radius: 8px;
-    }
-
-    body.dark .planner-item img {
-      background: #111827;
-    }
-
-    .planner-item strong {
-      display: block;
-      margin-bottom: 3px;
-    }
-
-    .planner-item span {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .count {
-      color: var(--muted);
-      margin-bottom: 12px;
-      font-size: 14px;
-    }
-
-    .routes {
-      display: grid;
-      gap: 16px;
-    }
-
-    .routes.tile-view { grid-template-columns: 1fr; }
-    .routes.list-view { grid-template-columns: 1fr; }
-
-    .card {
-      background: var(--card);
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 2px 10px var(--shadow);
-      border: 1px solid var(--border);
-      transition: 0.2s ease;
-    }
-
-    .card:hover { transform: translateY(-2px); }
-
-    .image-wrap {
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      background: #eef3f8;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      cursor: zoom-in;
-      flex-shrink: 0;
-      position: relative;
-    }
-
-    .image-wrap::after {
-      content: "Preview map";
-      position: absolute;
-      right: 8px;
-      bottom: 8px;
-      background: rgba(0,0,0,0.65);
-      color: white;
-      padding: 4px 7px;
-      border-radius: 999px;
-      font-size: 11px;
-      opacity: 0;
-      transition: 0.2s ease;
-    }
-
-    .image-wrap:hover::after {
-      opacity: 1;
-    }
-
-    body.dark .image-wrap { background: #111827; }
-
-    .image-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: center;
-      display: block;
-    }
-
-    .card-content { padding: 14px; }
-
-    .card h2 {
-      margin: 0 0 8px;
-      font-size: 20px;
-      line-height: 1.2;
-    }
-
-    .distance {
-      font-weight: bold;
-      margin: 0 0 8px;
-    }
-
-    .meta {
-      color: var(--muted);
-      font-size: 14px;
-      margin: 0 0 10px;
-    }
-
-    .description {
-      margin: 0 0 12px;
-      line-height: 1.4;
-    }
-
-    .tags { margin-bottom: 12px; }
-
-    .tag {
-      display: inline-block;
-      background: var(--chip-bg);
-      color: var(--chip-text);
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: 12px;
-      margin: 0 4px 4px 0;
-    }
-
-    .button-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .button {
-      display: inline-block;
-      background: var(--hh-blue);
-      color: white;
-      text-decoration: none;
-      padding: 9px 12px;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 14px;
-      border: none;
-      cursor: pointer;
-    }
-
-    .button:hover { background: #004985; }
-
-    .copy-button {
-      background: transparent;
-      color: var(--hh-blue);
-      border: 1px solid var(--hh-blue);
-    }
-
-    .copy-button:hover { background: var(--chip-bg); }
-
-    body.dark .copy-button {
-      color: #d8eaff;
-      border-color: #d8eaff;
-    }
-
-    .empty {
-      background: var(--card);
-      padding: 18px;
-      border-radius: 12px;
-      text-align: center;
-      color: var(--muted);
-      grid-column: 1 / -1;
-      border: 1px solid var(--border);
-    }
-
-    .list-view .card {
-      display: flex;
-      align-items: stretch;
-    }
-
-    .list-view .image-wrap {
-      width: 260px;
-      min-height: 195px;
-      aspect-ratio: 4 / 3;
-      border-bottom: none;
-      border-right: 1px solid var(--border);
-    }
-
-    .list-view .card-content {
-      flex: 1;
-      padding: 16px;
-      min-width: 0;
-    }
-
-    .list-view .card h2 { font-size: 21px; }
-
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 9999;
-      inset: 0;
-      background: rgba(0,0,0,0.86);
-      padding: 20px;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal.open { display: flex; }
-
-    .modal-content {
-      max-width: min(95vw, 1100px);
-      max-height: 86vh;
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .modal img {
-      max-width: 100%;
-      max-height: 86vh;
-      display: block;
-      object-fit: contain;
-    }
-
-    .modal-close {
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      background: white;
-      color: #111827;
-      border: none;
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.35);
-    }
-
-    .modal-close:hover { background: #e7f0fb; }
-
-    @media (min-width: 700px) {
-      .advanced-filters { grid-template-columns: repeat(3, 1fr); }
-      .routes.tile-view { grid-template-columns: repeat(2, 1fr); }
-      .planner-grid { grid-template-columns: repeat(3, 1fr); }
-      .planner-list { grid-template-columns: repeat(3, 1fr); }
-    }
-
-    @media (min-width: 1000px) {
-      .advanced-filters { grid-template-columns: repeat(4, 1fr); }
-      .distance-control { grid-column: span 2; }
-      .routes.tile-view { grid-template-columns: repeat(3, 1fr); }
-    }
-
-    @media (max-width: 760px) {
-      header { min-height: 190px; }
-
-      .header-inner {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .brand-area {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .logo { height: 50px; }
-      .top-buttons { justify-content: flex-start; }
-    }
-
-    @media (max-width: 700px) {
-      .basic-search { grid-template-columns: 1fr; }
-
-      .advanced-search-button,
-      .wizard-toggle-button {
-        width: 100%;
-      }
-
-      .list-view .card {
-        display: grid;
-        grid-template-columns: 112px 1fr;
-        align-items: stretch;
-      }
-
-      .list-view .image-wrap {
-        width: 112px;
-        height: 100%;
-        min-height: 150px;
-        aspect-ratio: auto;
-        border-right: 1px solid var(--border);
-        border-bottom: none;
-      }
-
-      .list-view .card-content { padding: 12px; }
-      .list-view .card h2 { font-size: 16px; }
-      .list-view .description { font-size: 14px; }
-      .list-view .meta,
-      .list-view .distance { font-size: 13px; }
-      .list-view .tags { display: none; }
-      .image-wrap::after { display: none; }
-    }
-
-    @media (max-width: 520px) {
-      .distance-row { grid-template-columns: 1fr; }
-
-      .list-view .card { grid-template-columns: 96px 1fr; }
-
-      .list-view .image-wrap {
-        width: 96px;
-        min-height: 145px;
-      }
-
-      .button-row { gap: 6px; }
-
-      .button {
-        padding: 8px 10px;
-        font-size: 13px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hucknall Harriers Route Tools</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .small-link {
+            font-size: 0.9rem;
+            color: #0077cc;
+            cursor: pointer;
+            text-decoration: underline;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        #mapImage {
+            width: 100%;
+            max-width: 650px;
+            border: 2px solid #ccc;
+            margin: 10px 0;
+        }
+
+        .nav-buttons button {
+            margin: 5px;
+            padding: 8px 14px;
+            font-size: 1rem;
+        }
+
+        #copyRoutes {
+            margin-top: 15px;
+            padding: 10px 16px;
+            font-size: 1rem;
+            background: #0077cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #copyRoutes:hover {
+            background: #005fa3;
+        }
+    </style>
 </head>
 
 <body>
-  <header>
-    <div class="header-inner">
-      <div class="brand-area">
-        <a href="https://www.hucknallharriers.co.uk/" class="logo-link" aria-label="Go to Hucknall Harriers website">
-          <img src="logo.jpg" alt="Hucknall Harriers Running Group logo" class="logo">
-        </a>
 
-        <div class="title-block">
-          <h1>HH Route Finder</h1>
-          <p>Find route inspiration for your next run</p>
-        </div>
-      </div>
+    <h1>Hucknall Harriers Route Tools</h1>
 
-      <div class="top-buttons">
-        <button class="view-toggle active" id="tileViewButton" type="button">▦ Tile view</button>
-        <button class="view-toggle" id="listViewButton" type="button">☰ List view</button>
-        <button class="theme-toggle" id="themeToggle" type="button">🌙 Dark mode</button>
-      </div>
+    <!-- Quick Search -->
+    <a id="quickSearchLink" class="small-link">Quick search</a>
+
+    <div id="quickSearchContainer" style="display:none;">
+        <h2>Quick Search</h2>
+        <p>Search functionality goes here…</p>
     </div>
-  </header>
 
-  <main>
-    <section class="filters" id="filters">
-      <div class="basic-search">
-        <div class="filter-control">
-          <label class="filter-label" for="search">Search</label>
-          <input type="text" id="search" placeholder="Search routes, areas, start points, tags..." />
-        </div>
+    <hr>
 
-        <div class="filter-control">
-          <label class="filter-label" for="sortBy">Sort</label>
-          <select id="sortBy">
-            <option value="default">Default order</option>
-            <option value="distance-asc">Distance: short to long</option>
-            <option value="distance-desc">Distance: long to short</option>
-            <option value="name-asc">Name: A to Z</option>
-            <option value="start-asc">Start point: A to Z</option>
-          </select>
-        </div>
+    <!-- MapRun Planner -->
+    <a id="maprunPlannerLink" class="small-link">MapRun planner</a>
 
-        <button class="advanced-search-button" id="advancedToggle" type="button">Advanced search ▾</button>
-      </div>
-
-      <div class="advanced-filters" id="advancedFilters">
-        <div class="filter-control distance-control">
-          <label class="filter-label">Distance range</label>
-
-          <div class="unit-toggle" aria-label="Distance unit">
-            <button type="button" id="milesButton" class="active">Miles</button>
-            <button type="button" id="kmButton">KM</button>
-          </div>
-
-          <div class="distance-row">
-            <input type="number" id="minDistance" min="0" step="0.1" placeholder="Min distance">
-            <input type="number" id="maxDistance" min="0" step="0.1" placeholder="Max distance">
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="panel">
-      <button class="wizard-toggle-button" id="wizardToggle" type="button">Quick route wizard ▾</button>
-
-      <div class="wizard-panel" id="wizardPanel">
-        <p>Tap a few buttons and the route list will filter instantly.</p>
-
-        <div class="wizard-steps">
-          <div class="wizard-step">
-            <h3>1. Distance</h3>
-            <div class="quick-buttons">
-              <button class="quick-button distance-preset" data-min="0" data-max="3.5">Around 5k</button>
-              <button class="quick-button distance-preset" data-min="3.6" data-max="5.3">Around 7.5k</button>
-              <button class="quick-button distance-preset" data-min="5.4" data-max="6.8">Around 10k</button>
-              <button class="quick-button distance-preset" data-min="6.9" data-max="">Longer</button>
-              <button class="quick-button" id="clearDistancePreset">Any distance</button>
-            </div>
-          </div>
-
-          <div class="wizard-step">
-            <h3>2. Start location</h3>
-            <div class="quick-buttons" id="startQuickButtons"></div>
-          </div>
-
-          <div class="wizard-step">
-            <h3>3. Terrain</h3>
-            <div class="quick-buttons" id="terrainQuickButtons"></div>
-          </div>
-
-          <div class="wizard-actions">
-            <button class="button" id="clearWizard" type="button">Clear wizard</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2>MapRun planner</h2>
-      <p>Pick a start point and terrain, then generate a simple 5k / 7.5k / 10k set from matching routes.</p>
-
-      <div class="planner-grid">
-        <div class="filter-control">
-          <label class="filter-label" for="plannerStart">Start location</label>
-          <select id="plannerStart">
-            <option value="">Choose start location</option>
-          </select>
-        </div>
-
-        <div class="filter-control">
-          <label class="filter-label" for="plannerTerrain">Terrain</label>
-          <select id="plannerTerrain">
-            <option value="">Any terrain</option>
-          </select>
-        </div>
-
-        <div class="filter-control">
-          <label class="filter-label">&nbsp;</label>
-          <button class="button" id="generatePlanner" type="button">Generate MapRun set</button>
-        </div>
-      </div>
-
-      <div class="planner-result" id="plannerResult"></div>
-    </section>
-
-    <div class="count" id="count"></div>
-    <section class="routes tile-view" id="routes"></section>
-  </main>
-
-  <div class="modal" id="imageModal" aria-hidden="true">
-    <button class="modal-close" id="modalClose" type="button">Close ✕</button>
-    <div class="modal-content">
-      <img id="modalImage" src="" alt="Expanded route image">
+    <div id="maprunPlannerContainer" style="display:none;">
+        <h2>MapRun Planner</h2>
+        <p>Planner UI goes here…</p>
     </div>
-  </div>
 
-  <script>
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRfoX7-jgCe8kdf4nb9voLj57OvH6GSg7nSRuOVuwHptiaeRGinIS4ZLZTvXxE3NRtaLX8RU2naHtyV/pub?gid=0&single=true&output=csv";
+    <hr>
 
-    const FALLBACK_IMAGE = "https://placehold.co/900x675/e7f0fb/073b72?text=HH+Route+Finder";
+    <!-- MapRun Viewer -->
+    <h2>MapRun Options</h2>
 
-    const EXCLUDED_FILTER_FIELDS = [
-      "id",
-      "name",
-      "description",
-      "distance_miles",
-      "distance_km",
-      "outdooractive_url",
-      "route_url",
-      "url",
-      "link",
-      "image_url",
-      "image",
-      "photo",
-      "photo_url"
-    ];
+    <div id="maprunViewer">
+        <div id="runCounter">Run 1 of 3</div>
 
-    let routesData = [];
-    let headers = [];
-    let distanceUnit = "miles";
-    let activeQuickStart = "";
-    let activeQuickTerrain = "";
+        <img id="mapImage" src="map1.jpg" alt="MapRun Map">
 
-    function parseCSV(text) {
-      const rows = [];
-      let current = [];
-      let value = "";
-      let insideQuotes = false;
-
-      for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        const next = text[i + 1];
-
-        if (char === '"' && insideQuotes && next === '"') {
-          value += '"';
-          i++;
-        } else if (char === '"') {
-          insideQuotes = !insideQuotes;
-        } else if (char === "," && !insideQuotes) {
-          current.push(value);
-          value = "";
-        } else if ((char === "\n" || char === "\r") && !insideQuotes) {
-          if (value || current.length) {
-            current.push(value);
-            rows.push(current);
-            current = [];
-            value = "";
-          }
-        } else {
-          value += char;
-        }
-      }
-
-      if (value || current.length) {
-        current.push(value);
-        rows.push(current);
-      }
-
-      return rows;
-    }
-
-    function normaliseHeader(header) {
-      return header.trim().toLowerCase().replace(/\s+/g, "_");
-    }
-
-    function labelFromHeader(header) {
-      return header
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, char => char.toUpperCase());
-    }
-
-    function getRouteValue(route, key) {
-      return route[key] ? String(route[key]).trim() : "";
-    }
-
-    function getMiles(route) {
-      const miles = parseFloat(getRouteValue(route, "distance_miles"));
-      if (!isNaN(miles)) return miles;
-
-      const km = parseFloat(getRouteValue(route, "distance_km"));
-      if (!isNaN(km)) return km / 1.60934;
-
-      return 0;
-    }
-
-    function milesToKm(miles) {
-      return (miles * 1.60934).toFixed(1);
-    }
-
-    function displayDistance(miles) {
-      if (!miles) return "";
-
-      if (distanceUnit === "km") {
-        return `${milesToKm(miles)} km (${miles.toFixed(1)} miles)`;
-      }
-
-      return `${miles.toFixed(1)} miles (${milesToKm(miles)} km)`;
-    }
-
-    function inputDistanceToMiles(value) {
-      const number = parseFloat(value);
-      if (isNaN(number)) return null;
-      return distanceUnit === "km" ? number / 1.60934 : number;
-    }
-
-    function milesToCurrentUnit(miles) {
-      return distanceUnit === "km" ? (miles * 1.60934).toFixed(1) : miles.toFixed(1);
-    }
-
-    function getFirstAvailable(route, keys) {
-      for (const key of keys) {
-        const value = getRouteValue(route, key);
-        if (value) return value;
-      }
-      return "";
-    }
-
-    function splitMultiValues(value) {
-      return value
-        .split(",")
-        .map(item => item.trim())
-        .filter(Boolean);
-    }
-
-    function uniqueValues(field) {
-      return Array.from(new Set(routesData.map(route => getRouteValue(route, field)).filter(Boolean)))
-        .sort((a, b) => a.localeCompare(b));
-    }
-
-    function createDynamicFilters() {
-      const filtersContainer = document.getElementById("advancedFilters");
-
-      const filterFields = headers.filter(header => {
-        if (EXCLUDED_FILTER_FIELDS.includes(header)) return false;
-
-        const values = routesData
-          .map(route => getRouteValue(route, header))
-          .filter(Boolean);
-
-        const uniqueValuesSet = new Set();
-        values.forEach(value => {
-          if (header === "tags") {
-            splitMultiValues(value).forEach(tag => uniqueValuesSet.add(tag));
-          } else {
-            uniqueValuesSet.add(value);
-          }
-        });
-
-        return uniqueValuesSet.size > 0 && uniqueValuesSet.size <= 30;
-      });
-
-      filterFields.forEach(field => {
-        const values = new Set();
-
-        routesData.forEach(route => {
-          const value = getRouteValue(route, field);
-          if (!value) return;
-
-          if (field === "tags") {
-            splitMultiValues(value).forEach(tag => values.add(tag));
-          } else {
-            values.add(value);
-          }
-        });
-
-        const sortedValues = Array.from(values).sort((a, b) => {
-          const numA = parseFloat(a);
-          const numB = parseFloat(b);
-          if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-          return a.localeCompare(b);
-        });
-
-        const wrapper = document.createElement("div");
-        wrapper.className = "filter-control";
-
-        const label = document.createElement("label");
-        label.className = "filter-label";
-        label.textContent = labelFromHeader(field);
-        label.setAttribute("for", `filter-${field}`);
-
-        const select = document.createElement("select");
-        select.id = `filter-${field}`;
-        select.dataset.field = field;
-        select.className = "dynamic-filter";
-
-        const allOption = document.createElement("option");
-        allOption.value = "";
-        allOption.textContent = `All ${labelFromHeader(field).toLowerCase()}`;
-        select.appendChild(allOption);
-
-        sortedValues.forEach(value => {
-          const option = document.createElement("option");
-          option.value = value;
-          option.textContent = value;
-          select.appendChild(option);
-        });
-
-        select.addEventListener("change", () => {
-          if (field === "start_point") activeQuickStart = select.value;
-          if (field === "terrain") activeQuickTerrain = select.value;
-          updateQuickButtonStates();
-          filterRoutes();
-        });
-
-        wrapper.appendChild(label);
-        wrapper.appendChild(select);
-        filtersContainer.appendChild(wrapper);
-      });
-    }
-
-    function populateQuickWizard() {
-      const startContainer = document.getElementById("startQuickButtons");
-      const terrainContainer = document.getElementById("terrainQuickButtons");
-
-      startContainer.innerHTML = "";
-      terrainContainer.innerHTML = "";
-
-      const starts = uniqueValues("start_point");
-      const terrains = uniqueValues("terrain");
-
-      const anyStart = document.createElement("button");
-      anyStart.className = "quick-button quick-start active";
-      anyStart.textContent = "Any start";
-      anyStart.dataset.value = "";
-      anyStart.addEventListener("click", () => setQuickFilter("start_point", ""));
-      startContainer.appendChild(anyStart);
-
-      starts.slice(0, 12).forEach(start => {
-        const button = document.createElement("button");
-        button.className = "quick-button quick-start";
-        button.textContent = start;
-        button.dataset.value = start;
-        button.addEventListener("click", () => setQuickFilter("start_point", start));
-        startContainer.appendChild(button);
-      });
-
-      const anyTerrain = document.createElement("button");
-      anyTerrain.className = "quick-button quick-terrain active";
-      anyTerrain.textContent = "Any terrain";
-      anyTerrain.dataset.value = "";
-      anyTerrain.addEventListener("click", () => setQuickFilter("terrain", ""));
-      terrainContainer.appendChild(anyTerrain);
-
-      terrains.forEach(terrain => {
-        const button = document.createElement("button");
-        button.className = "quick-button quick-terrain";
-        button.textContent = terrain;
-        button.dataset.value = terrain;
-        button.addEventListener("click", () => setQuickFilter("terrain", terrain));
-        terrainContainer.appendChild(button);
-      });
-    }
-
-    function populatePlanner() {
-      const startSelect = document.getElementById("plannerStart");
-      const terrainSelect = document.getElementById("plannerTerrain");
-
-      uniqueValues("start_point").forEach(start => {
-        const option = document.createElement("option");
-        option.value = start;
-        option.textContent = start;
-        startSelect.appendChild(option);
-      });
-
-      uniqueValues("terrain").forEach(terrain => {
-        const option = document.createElement("option");
-        option.value = terrain;
-        option.textContent = terrain;
-        terrainSelect.appendChild(option);
-      });
-    }
-
-    fetch(SHEET_URL)
-      .then(response => response.text())
-      .then(csv => {
-        const rows = parseCSV(csv);
-        headers = rows[0].map(normaliseHeader);
-
-        routesData = rows.slice(1).map(row => {
-          const route = {};
-          headers.forEach((header, index) => {
-            route[header] = row[index] || "";
-          });
-          return route;
-        }).filter(route => getRouteValue(route, "name"));
-
-        createDynamicFilters();
-        populateQuickWizard();
-        populatePlanner();
-        displayRoutes(getSortedRoutes(routesData));
-      })
-      .catch(error => {
-        document.getElementById("routes").innerHTML =
-          `<div class="empty">Sorry, the routes could not be loaded.</div>`;
-        console.error(error);
-      });
-
-    function displayRoutes(data) {
-      const container = document.getElementById("routes");
-      const count = document.getElementById("count");
-
-      count.textContent = `${data.length} route${data.length === 1 ? "" : "s"} found`;
-      container.innerHTML = "";
-
-      if (!data.length) {
-        container.innerHTML = `<div class="empty">No routes match those filters.</div>`;
-        return;
-      }
-
-      data.forEach(route => {
-        const name = getRouteValue(route, "name");
-        const miles = getMiles(route);
-        const terrain = getRouteValue(route, "terrain");
-        const difficulty = getRouteValue(route, "difficulty");
-        const routeType = getRouteValue(route, "route_type");
-        const startPoint = getRouteValue(route, "start_point");
-        const area = getRouteValue(route, "area");
-        const description = getRouteValue(route, "description");
-        const link = getFirstAvailable(route, ["outdooractive_url", "route_url", "url", "link"]);
-        const image = getFirstAvailable(route, ["image_url", "image", "photo_url", "photo"]) || FALLBACK_IMAGE;
-        const tags = splitMultiValues(getRouteValue(route, "tags"));
-
-        const metaLineOne = [terrain, difficulty, routeType].filter(Boolean).join(" | ");
-        const metaLineTwo = [startPoint, area].filter(Boolean).join(" · ");
-
-        container.innerHTML += `
-          <article class="card">
-            <div class="image-wrap" onclick="openImageModal('${escapeForAttribute(image)}', '${escapeForAttribute(name)}')">
-              <img src="${escapeForAttribute(image)}" alt="${escapeForAttribute(name)}" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'">
-            </div>
-            <div class="card-content">
-              <h2>${name}</h2>
-              ${miles ? `<p class="distance">${displayDistance(miles)}</p>` : ""}
-              ${metaLineOne ? `<p class="meta">${metaLineOne}</p>` : ""}
-              ${metaLineTwo ? `<p class="meta">${metaLineTwo}</p>` : ""}
-              ${description ? `<p class="description">${description}</p>` : ""}
-              ${tags.length ? `<div class="tags">${tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>` : ""}
-              <div class="button-row">
-                ${link ? `<a class="button" href="${escapeForAttribute(link)}" target="_blank" rel="noopener">View route</a>` : ""}
-                ${link ? `<button class="button copy-button" type="button" onclick="copyRouteUrl('${escapeForAttribute(link)}', this)">Copy URL</button>` : ""}
-              </div>
-            </div>
-          </article>
-        `;
-      });
-    }
-
-    function getFilteredRoutes() {
-      const search = document.getElementById("search").value.toLowerCase();
-      const dynamicFilters = Array.from(document.querySelectorAll(".dynamic-filter"));
-      const minDistanceMiles = inputDistanceToMiles(document.getElementById("minDistance").value);
-      const maxDistanceMiles = inputDistanceToMiles(document.getElementById("maxDistance").value);
-
-      return routesData.filter(route => {
-        const searchableText = headers
-          .filter(header => !["image_url", "image", "photo_url", "photo"].includes(header))
-          .map(header => getRouteValue(route, header))
-          .join(" ")
-          .toLowerCase();
-
-        const matchesSearch = searchableText.includes(search);
-
-        const routeMiles = getMiles(route);
-        const matchesMinDistance = minDistanceMiles === null || routeMiles >= minDistanceMiles;
-        const matchesMaxDistance = maxDistanceMiles === null || routeMiles <= maxDistanceMiles;
-
-        const matchesDynamicFilters = dynamicFilters.every(filter => {
-          const field = filter.dataset.field;
-          const selectedValue = filter.value;
-
-          if (!selectedValue) return true;
-
-          const routeValue = getRouteValue(route, field);
-
-          if (field === "tags") {
-            return splitMultiValues(routeValue).includes(selectedValue);
-          }
-
-          return routeValue === selectedValue;
-        });
-
-        return matchesSearch && matchesMinDistance && matchesMaxDistance && matchesDynamicFilters;
-      });
-    }
-
-    function getSortedRoutes(data) {
-      const sortBy = document.getElementById("sortBy").value;
-      const sorted = [...data];
-
-      if (sortBy === "distance-asc") {
-        sorted.sort((a, b) => getMiles(a) - getMiles(b));
-      } else if (sortBy === "distance-desc") {
-        sorted.sort((a, b) => getMiles(b) - getMiles(a));
-      } else if (sortBy === "name-asc") {
-        sorted.sort((a, b) => getRouteValue(a, "name").localeCompare(getRouteValue(b, "name")));
-      } else if (sortBy === "start-asc") {
-        sorted.sort((a, b) => getRouteValue(a, "start_point").localeCompare(getRouteValue(b, "start_point")));
-      }
-
-      return sorted;
-    }
-
-    function filterRoutes() {
-      displayRoutes(getSortedRoutes(getFilteredRoutes()));
-    }
-
-    function setQuickFilter(field, value) {
-      const select = document.querySelector(`.dynamic-filter[data-field="${field}"]`);
-      if (select) select.value = value;
-
-      if (field === "start_point") activeQuickStart = value;
-      if (field === "terrain") activeQuickTerrain = value;
-
-      updateQuickButtonStates();
-      filterRoutes();
-    }
-
-    function updateQuickButtonStates() {
-      document.querySelectorAll(".quick-start").forEach(button => {
-        button.classList.toggle("active", button.dataset.value === activeQuickStart);
-      });
-
-      document.querySelectorAll(".quick-terrain").forEach(button => {
-        button.classList.toggle("active", button.dataset.value === activeQuickTerrain);
-      });
-
-      const min = document.getElementById("minDistance").value;
-      const max = document.getElementById("maxDistance").value;
-
-      document.querySelectorAll(".distance-preset").forEach(button => {
-        const minMatch = button.dataset.min === min;
-        const maxMatch = button.dataset.max === max;
-        button.classList.toggle("active", minMatch && maxMatch);
-      });
-    }
-
-    function clearWizard() {
-      document.getElementById("minDistance").value = "";
-      document.getElementById("maxDistance").value = "";
-      setQuickFilter("start_point", "");
-      setQuickFilter("terrain", "");
-      updateQuickButtonStates();
-      filterRoutes();
-    }
-
-    function generatePlanner() {
-      const start = document.getElementById("plannerStart").value;
-      const terrain = document.getElementById("plannerTerrain").value;
-      const result = document.getElementById("plannerResult");
-
-      if (!start) {
-        result.className = "planner-result open";
-        result.innerHTML = `<div class="empty">Choose a start location first.</div>`;
-        return;
-      }
-
-      const candidates = routesData.filter(route => {
-        const startMatches = getRouteValue(route, "start_point") === start;
-        const terrainMatches = !terrain || getRouteValue(route, "terrain") === terrain;
-        return startMatches && terrainMatches;
-      });
-
-      const targets = [
-        { label: "5k", miles: 3.1 },
-        { label: "7.5k", miles: 4.7 },
-        { label: "10k", miles: 6.2 }
-      ];
-
-      const chosen = [];
-      targets.forEach(target => {
-        const available = candidates
-          .filter(route => !chosen.includes(route))
-          .map(route => ({ route, diff: Math.abs(getMiles(route) - target.miles) }))
-          .sort((a, b) => a.diff - b.diff);
-
-        if (available.length) {
-          chosen.push(available[0].route);
-        }
-      });
-
-      if (!chosen.length) {
-        result.className = "planner-result open";
-        result.innerHTML = `<div class="empty">No matching routes found for that start location and terrain.</div>`;
-        return;
-      }
-
-      result.className = "planner-result open";
-      result.innerHTML = `
-        <h3>Suggested MapRun set from ${start}</h3>
-        <div class="planner-list">
-          ${chosen.map((route, index) => {
-            const target = targets[index];
-            const name = getRouteValue(route, "name");
-            const miles = getMiles(route);
-            const link = getFirstAvailable(route, ["outdooractive_url", "route_url", "url", "link"]);
-            const image = getFirstAvailable(route, ["image_url", "image", "photo_url", "photo"]) || FALLBACK_IMAGE;
-
-            return `
-              <div class="planner-item">
-                <img src="${escapeForAttribute(image)}" alt="${escapeForAttribute(name)}">
-                <div>
-                  <strong>${target ? target.label : "Route"} · ${name}</strong>
-                  <span>${displayDistance(miles)}</span>
-                  <div style="margin-top:6px;">
-                    ${link ? `<a class="button" href="${escapeForAttribute(link)}" target="_blank" rel="noopener">View</a>` : ""}
-                  </div>
-                </div>
-              </div>
-            `;
-          }).join("")}
+        <div class="nav-buttons">
+            <button id="prevRun">Previous</button>
+            <button id="nextRun">Next</button>
         </div>
-      `;
-    }
 
-    function escapeForAttribute(value) {
-      return String(value || "")
-        .replace(/\\/g, "\\\\")
-        .replace(/'/g, "\\'")
-        .replace(/"/g, "&quot;");
-    }
+        <button id="copyRoutes">Copy routes to clipboard</button>
+    </div>
 
-    function openImageModal(src, alt) {
-      const modal = document.getElementById("imageModal");
-      const image = document.getElementById("modalImage");
+    <script>
+        // -----------------------------
+        // Quick Search toggle
+        // -----------------------------
+        document.getElementById("quickSearchLink").addEventListener("click", () => {
+            document.getElementById("quickSearchContainer").style.display = "block";
+        });
 
-      image.src = src;
-      image.alt = alt || "Expanded route image";
-      modal.classList.add("open");
-      modal.setAttribute("aria-hidden", "false");
-    }
+        // -----------------------------
+        // MapRun Planner toggle
+        // -----------------------------
+        document.getElementById("maprunPlannerLink").addEventListener("click", () => {
+            document.getElementById("maprunPlannerContainer").style.display = "block";
+        });
 
-    function closeImageModal() {
-      const modal = document.getElementById("imageModal");
-      const image = document.getElementById("modalImage");
+        // -----------------------------
+        // MapRun Data (replace with real data)
+        // -----------------------------
+        const mapruns = [
+            {
+                image: "map1.jpg",
+                short: "https://example.com/short1",
+                medium: "https://example.com/medium1",
+                long: "https://example.com/long1"
+            },
+            {
+                image: "map2.jpg",
+                short: "https://example.com/short2",
+                medium: "https://example.com/medium2",
+                long: "https://example.com/long2"
+            },
+            {
+                image: "map3.jpg",
+                short: "https://example.com/short3",
+                medium: "https://example.com/medium3",
+                long: "https://example.com/long3"
+            }
+        ];
 
-      modal.classList.remove("open");
-      modal.setAttribute("aria-hidden", "true");
-      image.src = "";
-    }
+        let currentIndex = 0;
 
-    function copyRouteUrl(url, button) {
-      navigator.clipboard.writeText(url).then(() => {
-        const originalText = button.textContent;
-        button.textContent = "Copied!";
-        setTimeout(() => { button.textContent = originalText; }, 1400);
-      }).catch(() => {
-        const textArea = document.createElement("textarea");
-        textArea.value = url;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textArea);
+        function renderMaprun() {
+            const total = mapruns.length;
+            const item = mapruns[currentIndex];
 
-        const originalText = button.textContent;
-        button.textContent = "Copied!";
-        setTimeout(() => { button.textContent = originalText; }, 1400);
-      });
-    }
+            document.getElementById("runCounter").textContent =
+                `Run ${currentIndex + 1} of ${total}`;
 
-    function setTheme(mode) {
-      const button = document.getElementById("themeToggle");
+            document.getElementById("mapImage").src = item.image;
+        }
 
-      if (mode === "dark") {
-        document.body.classList.add("dark");
-        button.textContent = "☀️ Light mode";
-      } else {
-        document.body.classList.remove("dark");
-        button.textContent = "🌙 Dark mode";
-      }
+        document.getElementById("prevRun").addEventListener("click", () => {
+            currentIndex = (currentIndex - 1 + mapruns.length) % mapruns.length;
+            renderMaprun();
+        });
 
-      localStorage.setItem("hh-theme", mode);
-    }
+        document.getElementById("nextRun").addEventListener("click", () => {
+            currentIndex = (currentIndex + 1) % mapruns.length;
+            renderMaprun();
+        });
 
-    function setViewMode(mode) {
-      const routes = document.getElementById("routes");
-      const tileButton = document.getElementById("tileViewButton");
-      const listButton = document.getElementById("listViewButton");
+        // -----------------------------
+        // Copy Routes Button
+        // -----------------------------
+        document.getElementById("copyRoutes").addEventListener("click", () => {
+            const item = mapruns[currentIndex];
 
-      routes.classList.remove("tile-view", "list-view");
-      routes.classList.add(mode === "list" ? "list-view" : "tile-view");
+            const text =
+`Short Route: ${item.short}
 
-      tileButton.classList.toggle("active", mode !== "list");
-      listButton.classList.toggle("active", mode === "list");
+Medium Route: ${item.medium}
 
-      localStorage.setItem("hh-view-mode", mode);
-    }
+Long Route: ${item.long}`;
 
-    function setDistanceUnit(unit) {
-      const oldUnit = distanceUnit;
-      distanceUnit = unit;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Copied to clipboard!");
+            });
+        });
 
-      const minInput = document.getElementById("minDistance");
-      const maxInput = document.getElementById("maxDistance");
+        // Initial render
+        renderMaprun();
+    </script>
 
-      if (oldUnit !== unit) {
-        if (minInput.value) minInput.value = milesToCurrentUnit(inputDistanceToMiles(minInput.value));
-        if (maxInput.value) maxInput.value = milesToCurrentUnit(inputDistanceToMiles(maxInput.value));
-      }
-
-      document.getElementById("milesButton").classList.toggle("active", unit === "miles");
-      document.getElementById("kmButton").classList.toggle("active", unit === "km");
-
-      minInput.placeholder = unit === "km" ? "Min km" : "Min miles";
-      maxInput.placeholder = unit === "km" ? "Max km" : "Max miles";
-
-      localStorage.setItem("hh-distance-unit", unit);
-      filterRoutes();
-    }
-
-    document.getElementById("search").addEventListener("input", filterRoutes);
-    document.getElementById("sortBy").addEventListener("change", filterRoutes);
-    document.getElementById("minDistance").addEventListener("input", () => { updateQuickButtonStates(); filterRoutes(); });
-    document.getElementById("maxDistance").addEventListener("input", () => { updateQuickButtonStates(); filterRoutes(); });
-
-    document.getElementById("advancedToggle").addEventListener("click", () => {
-      const panel = document.getElementById("advancedFilters");
-      const button = document.getElementById("advancedToggle");
-      const isOpen = panel.classList.toggle("open");
-      button.textContent = isOpen ? "Advanced search ▴" : "Advanced search ▾";
-    });
-
-    document.getElementById("wizardToggle").addEventListener("click", () => {
-      const panel = document.getElementById("wizardPanel");
-      const button = document.getElementById("wizardToggle");
-      const isOpen = panel.classList.toggle("open");
-      button.textContent = isOpen ? "Quick route wizard ▴" : "Quick route wizard ▾";
-    });
-
-    document.querySelectorAll(".distance-preset").forEach(button => {
-      button.addEventListener("click", () => {
-        document.getElementById("minDistance").value = button.dataset.min ? milesToCurrentUnit(parseFloat(button.dataset.min)) : "";
-        document.getElementById("maxDistance").value = button.dataset.max ? milesToCurrentUnit(parseFloat(button.dataset.max)) : "";
-        updateQuickButtonStates();
-        filterRoutes();
-      });
-    });
-
-    document.getElementById("clearDistancePreset").addEventListener("click", () => {
-      document.getElementById("minDistance").value = "";
-      document.getElementById("maxDistance").value = "";
-      updateQuickButtonStates();
-      filterRoutes();
-    });
-
-    document.getElementById("clearWizard").addEventListener("click", clearWizard);
-    document.getElementById("generatePlanner").addEventListener("click", generatePlanner);
-
-    document.getElementById("modalClose").addEventListener("click", closeImageModal);
-
-    document.getElementById("imageModal").addEventListener("click", event => {
-      if (event.target.id === "imageModal") closeImageModal();
-    });
-
-    document.addEventListener("keydown", event => {
-      if (event.key === "Escape") closeImageModal();
-    });
-
-    document.getElementById("themeToggle").addEventListener("click", () => {
-      const isDark = document.body.classList.contains("dark");
-      setTheme(isDark ? "light" : "dark");
-    });
-
-    document.getElementById("tileViewButton").addEventListener("click", () => setViewMode("tile"));
-    document.getElementById("listViewButton").addEventListener("click", () => setViewMode("list"));
-    document.getElementById("milesButton").addEventListener("click", () => setDistanceUnit("miles"));
-    document.getElementById("kmButton").addEventListener("click", () => setDistanceUnit("km"));
-
-    const savedTheme = localStorage.getItem("hh-theme");
-    if (savedTheme) {
-      setTheme(savedTheme);
-    } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setTheme("dark");
-    } else {
-      setTheme("light");
-    }
-
-    const savedViewMode = localStorage.getItem("hh-view-mode") || "tile";
-    setViewMode(savedViewMode);
-
-    const savedDistanceUnit = localStorage.getItem("hh-distance-unit") || "miles";
-    setDistanceUnit(savedDistanceUnit);
-  </script>
 </body>
 </html>
