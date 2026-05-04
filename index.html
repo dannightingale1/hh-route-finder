@@ -980,6 +980,8 @@
 
     let routesData = [];
     let headers = [];
+    let currentPage = 1;
+    let pageSize = 25;
     let distanceUnit = "miles";
     let activeQuickStart = "";
     let activeQuickPassesThrough = "";
@@ -1512,6 +1514,81 @@
       return sorted;
     }
 
+
+    function getPageSizeValue() {
+      return pageSize === "all" ? "all" : Number(pageSize || 25);
+    }
+
+    function getTotalPages(totalItems) {
+      const size = getPageSizeValue();
+      if (size === "all") return 1;
+      return Math.max(1, Math.ceil(totalItems / size));
+    }
+
+    function getPaginatedRoutes(routes) {
+      const size = getPageSizeValue();
+      if (size === "all") return routes;
+
+      const totalPages = getTotalPages(routes.length);
+      currentPage = Math.min(Math.max(1, currentPage), totalPages);
+
+      const start = (currentPage - 1) * size;
+      return routes.slice(start, start + size);
+    }
+
+    function updatePaginationControls(totalItems) {
+      const totalPages = getTotalPages(totalItems);
+      currentPage = Math.min(Math.max(1, currentPage), totalPages);
+
+      const size = getPageSizeValue();
+      const startItem = totalItems === 0 ? 0 : size === "all" ? 1 : ((currentPage - 1) * size) + 1;
+      const endItem = totalItems === 0 ? 0 : size === "all" ? totalItems : Math.min(totalItems, currentPage * size);
+
+      const info = totalItems
+        ? `Page ${currentPage} of ${totalPages} · showing ${startItem}-${endItem} of ${totalItems}`
+        : "No routes found";
+
+      ["Top", "Bottom"].forEach(pos => {
+        const infoEl = document.getElementById(`pageInfo${pos}`);
+        if (infoEl) infoEl.textContent = info;
+
+        const first = document.getElementById(`firstPage${pos}`);
+        const prev = document.getElementById(`prevPage${pos}`);
+        const next = document.getElementById(`nextPage${pos}`);
+        const last = document.getElementById(`lastPage${pos}`);
+
+        if (first) first.disabled = currentPage <= 1 || totalItems === 0;
+        if (prev) prev.disabled = currentPage <= 1 || totalItems === 0;
+        if (next) next.disabled = currentPage >= totalPages || totalItems === 0;
+        if (last) last.disabled = currentPage >= totalPages || totalItems === 0;
+
+        const select = document.getElementById(`pageSizeSelect${pos}`);
+        if (select) select.value = String(pageSize);
+      });
+    }
+
+    function setPage(newPage) {
+      currentPage = newPage;
+      renderAllRouteViews();
+      const browsePanel = document.getElementById("browseRoutesPanel");
+      if (browsePanel && browsePanel.classList.contains("active")) {
+        browsePanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    function setPageSize(value) {
+      pageSize = value === "all" ? "all" : Number(value);
+      currentPage = 1;
+      localStorage.setItem("hh-page-size", String(pageSize));
+      renderAllRouteViews();
+    }
+
+
+    function resetPaginationAndRender() {
+      currentPage = 1;
+      renderAllRouteViews();
+    }
+
     function renderAllRouteViews() {
       displayRoutes(getSortedRoutes(getFindRunRoutes()), "findRoutes", "findCount");
       displayRoutes(getSortedRoutes(getBrowseRoutes()), "browseRoutes", "browseCount");
@@ -1870,12 +1947,12 @@ ${longLink}`;
       button.setAttribute("aria-expanded", "false");
     }
 
-    document.getElementById("search").addEventListener("input", renderAllRouteViews);
+    document.getElementById("search").addEventListener("input", resetPaginationAndRender);
     document.getElementById("sortBy").addEventListener("change", renderAllRouteViews);
-    document.getElementById("minDistance").addEventListener("input", renderAllRouteViews);
-    document.getElementById("maxDistance").addEventListener("input", renderAllRouteViews);
-    document.getElementById("minAscent").addEventListener("input", renderAllRouteViews);
-    document.getElementById("maxAscent").addEventListener("input", renderAllRouteViews);
+    document.getElementById("minDistance").addEventListener("input", resetPaginationAndRender);
+    document.getElementById("maxDistance").addEventListener("input", resetPaginationAndRender);
+    document.getElementById("minAscent").addEventListener("input", resetPaginationAndRender);
+    document.getElementById("maxAscent").addEventListener("input", resetPaginationAndRender);
 
     document.getElementById("advancedToggle").addEventListener("click", () => {
       const panel = document.getElementById("advancedFilters");
