@@ -874,6 +874,8 @@
               <option value="default">Default order</option>
               <option value="distance-asc">Distance: short to long</option>
               <option value="distance-desc">Distance: long to short</option>
+              <option value="ascent-asc">Ascent: low to high</option>
+              <option value="ascent-desc">Ascent: high to low</option>
               <option value="name-asc">Name: A to Z</option>
               <option value="start-asc">Start point: A to Z</option>
             </select>
@@ -894,6 +896,14 @@
             <div class="distance-row">
               <input type="number" id="minDistance" min="0" step="0.1" placeholder="Min distance">
               <input type="number" id="maxDistance" min="0" step="0.1" placeholder="Max distance">
+            </div>
+          </div>
+
+          <div class="filter-control distance-control">
+            <label class="filter-label">Ascent range (ft)</label>
+            <div class="distance-row">
+              <input type="number" id="minAscent" min="0" step="1" placeholder="Min ascent ft">
+              <input type="number" id="maxAscent" min="0" step="1" placeholder="Max ascent ft">
             </div>
           </div>
         </div>
@@ -1000,7 +1010,11 @@
       "image_url",
       "image",
       "photo",
-      "photo_url"
+      "photo_url",
+      "ascent",
+      "ascent_ft",
+      "elevation_gain",
+      "elevation_gain_ft"
     ];
 
     let routesData = [];
@@ -1087,10 +1101,26 @@
       return `${miles.toFixed(1)} miles (${milesToKm(miles)} km)`;
     }
 
+    function formatAscent(value) {
+      const cleanValue = String(value || "").trim();
+      if (!cleanValue) return "";
+
+      const number = parseFloat(cleanValue.replace(/,/g, ""));
+      if (!isNaN(number)) return `Ascent: ${Math.round(number)} ft`;
+
+      return `Ascent: ${cleanValue}`;
+    }
+
     function inputDistanceToMiles(value) {
       const number = parseFloat(value);
       if (isNaN(number)) return null;
       return distanceUnit === "km" ? number / 1.60934 : number;
+    }
+
+    function getAscentFeet(route) {
+      const value = getFirstAvailable(route, ["ascent_ft", "ascent", "elevation_gain_ft", "elevation_gain"]);
+      const number = parseFloat(String(value || "").replace(/,/g, ""));
+      return isNaN(number) ? null : number;
     }
 
     function milesToCurrentUnit(miles) {
@@ -1129,7 +1159,7 @@
 
         const uniqueValuesSet = new Set();
         values.forEach(value => {
-          if (header === "tags") {
+          if (["tags", "passes_through", "passes", "key_locations", "locations"].includes(header)) {
             splitMultiValues(value).forEach(tag => uniqueValuesSet.add(tag));
           } else {
             uniqueValuesSet.add(value);
@@ -1146,7 +1176,7 @@
           const value = getRouteValue(route, field);
           if (!value) return;
 
-          if (field === "tags") {
+          if (["tags", "passes_through", "passes", "key_locations", "locations"].includes(field)) {
             splitMultiValues(value).forEach(tag => values.add(tag));
           } else {
             values.add(value);
@@ -1301,17 +1331,20 @@
         const name = getRouteValue(route, "name");
         const miles = getMiles(route);
         const terrain = getRouteValue(route, "terrain");
-        const difficulty = getRouteValue(route, "difficulty");
+        const ascent = getFirstAvailable(route, ["ascent_ft", "ascent", "elevation_gain_ft", "elevation_gain"]);
         const routeType = getRouteValue(route, "route_type");
         const startPoint = getRouteValue(route, "start_point");
         const area = getRouteValue(route, "area");
+        const passesThrough = getFirstAvailable(route, ["passes_through", "passes", "key_locations", "locations"]);
         const description = getRouteValue(route, "description");
         const link = getFirstAvailable(route, ["outdooractive_url", "route_url", "url", "link"]);
         const image = getFirstAvailable(route, ["image_url", "image", "photo_url", "photo"]) || FALLBACK_IMAGE;
         const tags = splitMultiValues(getRouteValue(route, "tags"));
 
-        const metaLineOne = [terrain, difficulty, routeType].filter(Boolean).join(" | ");
+        const ascentText = formatAscent(ascent);
+        const metaLineOne = [terrain, ascentText, routeType].filter(Boolean).join(" | ");
         const metaLineTwo = [startPoint, area].filter(Boolean).join(" · ");
+        const passesThroughLine = passesThrough ? `Passes through: ${passesThrough}` : "";
 
         container.innerHTML += `
           <article class="card">
@@ -1323,6 +1356,7 @@
               ${miles ? `<p class="distance">${displayDistance(miles)}</p>` : ""}
               ${metaLineOne ? `<p class="meta">${metaLineOne}</p>` : ""}
               ${metaLineTwo ? `<p class="meta">${metaLineTwo}</p>` : ""}
+              ${passesThroughLine ? `<p class="meta">${passesThroughLine}</p>` : ""}
               ${description ? `<p class="description">${description}</p>` : ""}
               ${tags.length ? `<div class="tags">${tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>` : ""}
               <div class="button-row">
@@ -1340,6 +1374,8 @@
       const dynamicFilters = Array.from(document.querySelectorAll(".dynamic-filter"));
       const minDistanceMiles = inputDistanceToMiles(document.getElementById("minDistance").value);
       const maxDistanceMiles = inputDistanceToMiles(document.getElementById("maxDistance").value);
+      const minAscent = parseFloat(document.getElementById("minAscent").value);
+      const maxAscent = parseFloat(document.getElementById("maxAscent").value);
 
       return routesData.filter(route => {
         const searchableText = headers
@@ -1351,8 +1387,11 @@
         const matchesSearch = searchableText.includes(search);
 
         const routeMiles = getMiles(route);
+        const routeAscent = getAscentFeet(route);
         const matchesMinDistance = minDistanceMiles === null || routeMiles >= minDistanceMiles;
         const matchesMaxDistance = maxDistanceMiles === null || routeMiles <= maxDistanceMiles;
+        const matchesMinAscent = isNaN(minAscent) || (routeAscent !== null && routeAscent >= minAscent);
+        const matchesMaxAscent = isNaN(maxAscent) || (routeAscent !== null && routeAscent <= maxAscent);
 
         const matchesDynamicFilters = dynamicFilters.every(filter => {
           const field = filter.dataset.field;
@@ -1362,14 +1401,14 @@
 
           const routeValue = getRouteValue(route, field);
 
-          if (field === "tags") {
+          if (["tags", "passes_through", "passes", "key_locations", "locations"].includes(field)) {
             return splitMultiValues(routeValue).includes(selectedValue);
           }
 
           return routeValue === selectedValue;
         });
 
-        return matchesSearch && matchesMinDistance && matchesMaxDistance && matchesDynamicFilters;
+        return matchesSearch && matchesMinDistance && matchesMaxDistance && matchesMinAscent && matchesMaxAscent && matchesDynamicFilters;
       });
     }
 
@@ -1381,6 +1420,10 @@
         sorted.sort((a, b) => getMiles(a) - getMiles(b));
       } else if (sortBy === "distance-desc") {
         sorted.sort((a, b) => getMiles(b) - getMiles(a));
+      } else if (sortBy === "ascent-asc") {
+        sorted.sort((a, b) => (getAscentFeet(a) ?? Number.MAX_SAFE_INTEGER) - (getAscentFeet(b) ?? Number.MAX_SAFE_INTEGER));
+      } else if (sortBy === "ascent-desc") {
+        sorted.sort((a, b) => (getAscentFeet(b) ?? -1) - (getAscentFeet(a) ?? -1));
       } else if (sortBy === "name-asc") {
         sorted.sort((a, b) => getRouteValue(a, "name").localeCompare(getRouteValue(b, "name")));
       } else if (sortBy === "start-asc") {
@@ -1694,6 +1737,8 @@ ${longLink}`;
     document.getElementById("sortBy").addEventListener("change", filterRoutes);
     document.getElementById("minDistance").addEventListener("input", () => { updateQuickButtonStates(); filterRoutes(); });
     document.getElementById("maxDistance").addEventListener("input", () => { updateQuickButtonStates(); filterRoutes(); });
+    document.getElementById("minAscent").addEventListener("input", filterRoutes);
+    document.getElementById("maxAscent").addEventListener("input", filterRoutes);
 
     document.getElementById("advancedToggle").addEventListener("click", () => {
       const panel = document.getElementById("advancedFilters");
@@ -1759,18 +1804,12 @@ ${longLink}`;
 
     function setActiveTab(tabName) {
       const routeTab = document.getElementById("routeFinderTab");
-      const maprunTab = document.getElementById("maprunPlannerTab");
       const routePanel = document.getElementById("routeFinderPanel");
-      const maprunPanel = document.getElementById("maprunPlannerPanel");
 
-      const isMaprun = tabName === "maprun";
+      routeTab.classList.add("active");
+      routePanel.classList.add("active");
 
-      routeTab.classList.toggle("active", !isMaprun);
-      maprunTab.classList.toggle("active", isMaprun);
-      routePanel.classList.toggle("active", !isMaprun);
-      maprunPanel.classList.toggle("active", isMaprun);
-
-      localStorage.setItem("hh-active-tab", isMaprun ? "maprun" : "routes");
+      localStorage.setItem("hh-active-tab", "routes");
     }
 
     document.getElementById("routeFinderTab").addEventListener("click", () => setActiveTab("routes"));
