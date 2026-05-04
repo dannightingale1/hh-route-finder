@@ -915,7 +915,48 @@
       </section>
 
       <div class="count" id="browseCount"></div>
+
+      <div class="pagination-bar" id="browsePaginationTop">
+        <div class="pagination-controls">
+          <button type="button" id="firstPageTop">⏮ Start</button>
+          <button type="button" id="prevPageTop">◀ Back</button>
+          <button type="button" id="nextPageTop">Forward ▶</button>
+          <button type="button" id="lastPageTop">End ⏭</button>
+        </div>
+        <div class="pagination-info" id="pageInfoTop"></div>
+        <label class="page-size-wrap">
+          Per page
+          <select id="pageSizeSelectTop" class="page-size-select">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="all">All</option>
+          </select>
+        </label>
+      </div>
+
       <section class="routes tile-view" id="browseRoutes"></section>
+
+      <div class="pagination-bar" id="browsePaginationBottom">
+        <div class="pagination-controls">
+          <button type="button" id="firstPageBottom">⏮ Start</button>
+          <button type="button" id="prevPageBottom">◀ Back</button>
+          <button type="button" id="nextPageBottom">Forward ▶</button>
+          <button type="button" id="lastPageBottom">End ⏭</button>
+        </div>
+        <div class="pagination-info" id="pageInfoBottom"></div>
+        <label class="page-size-wrap">
+          Per page
+          <select id="pageSizeSelectBottom" class="page-size-select">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="all">All</option>
+          </select>
+        </label>
+      </div>
     </section>
 
     <section class="tab-panel" id="maprunPlannerPanel">
@@ -980,6 +1021,8 @@
 
     let routesData = [];
     let headers = [];
+    let currentPage = 1;
+    let pageSize = 25;
     let currentPage = 1;
     let pageSize = 25;
     let distanceUnit = "miles";
