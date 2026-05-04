@@ -556,6 +556,21 @@
 
     .tags { margin-bottom: 12px; }
 
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0 0 12px;
+      align-items: center;
+    }
+
+    .chip-group-title {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 2px;
+    }
+
     .tag {
       display: inline-block;
       background: var(--chip-bg);
@@ -830,7 +845,12 @@
           </div>
 
           <div class="find-step">
-            <h3>3. What type?</h3>
+            <h3>3. Passes through?</h3>
+            <div class="quick-buttons" id="passesThroughQuickButtons"></div>
+          </div>
+
+          <div class="find-step">
+            <h3>4. What type?</h3>
             <div class="quick-buttons" id="terrainQuickButtons"></div>
           </div>
 
@@ -962,6 +982,7 @@
     let headers = [];
     let distanceUnit = "miles";
     let activeQuickStart = "";
+    let activeQuickPassesThrough = "";
     let activeQuickTerrain = "";
     let quickDistance = { min: null, max: null };
     let plannerOptions = { short: [], medium: [], long: [] };
@@ -1089,8 +1110,8 @@
     }
 
     function splitMultiValues(value) {
-      return value
-        .split(",")
+      return String(value || "")
+        .split(/[,/|;]/)
         .map(item => item.trim())
         .filter(Boolean);
     }
@@ -1098,6 +1119,16 @@
     function uniqueValues(field) {
       return Array.from(new Set(routesData.map(route => getRouteValue(route, field)).filter(Boolean)))
         .sort((a, b) => a.localeCompare(b));
+    }
+
+    function uniqueMultiValues(field) {
+      const values = new Set();
+
+      routesData.forEach(route => {
+        splitMultiValues(getRouteValue(route, field)).forEach(value => values.add(value));
+      });
+
+      return Array.from(values).sort((a, b) => a.localeCompare(b));
     }
 
     function createDynamicFilters() {
@@ -1183,12 +1214,15 @@
 
     function populateFindRunButtons() {
       const startContainer = document.getElementById("startQuickButtons");
+      const passesThroughContainer = document.getElementById("passesThroughQuickButtons");
       const terrainContainer = document.getElementById("terrainQuickButtons");
 
       startContainer.innerHTML = "";
+      if (passesThroughContainer) passesThroughContainer.innerHTML = "";
       terrainContainer.innerHTML = "";
 
       const starts = uniqueValues("start_point");
+      const passesThroughValues = uniqueMultiValues("passes_through");
       const terrains = uniqueValues("terrain");
 
       const anyStart = document.createElement("button");
@@ -1198,7 +1232,7 @@
       anyStart.addEventListener("click", () => setQuickFilter("start_point", ""));
       startContainer.appendChild(anyStart);
 
-      starts.slice(0, 14).forEach(start => {
+      starts.forEach(start => {
         const button = document.createElement("button");
         button.className = "quick-button quick-start";
         button.textContent = start;
@@ -1206,6 +1240,24 @@
         button.addEventListener("click", () => setQuickFilter("start_point", start));
         startContainer.appendChild(button);
       });
+
+      if (passesThroughContainer) {
+        const anyPassesThrough = document.createElement("button");
+        anyPassesThrough.className = "quick-button quick-passes-through active";
+        anyPassesThrough.textContent = "Anywhere";
+        anyPassesThrough.dataset.value = "";
+        anyPassesThrough.addEventListener("click", () => setQuickFilter("passes_through", ""));
+        passesThroughContainer.appendChild(anyPassesThrough);
+
+        passesThroughValues.forEach(value => {
+          const button = document.createElement("button");
+          button.className = "quick-button quick-passes-through";
+          button.textContent = value;
+          button.dataset.value = value;
+          button.addEventListener("click", () => setQuickFilter("passes_through", value));
+          passesThroughContainer.appendChild(button);
+        });
+      }
 
       const anyTerrain = document.createElement("button");
       anyTerrain.className = "quick-button quick-terrain active";
@@ -1291,11 +1343,11 @@
       const metaLineTwo = [startPoint, area].filter(Boolean).join(" · ");
 
       const passesThroughHtml = passesThroughTags.length
-        ? `<div class="tags"><strong class="filter-label">Passes through:</strong> ${passesThroughTags.map(tag => clickableChipHtml("passes_through", tag)).join("")}</div>`
+        ? `<div class="chip-group"><span class="chip-group-title">Passes through:</span>${passesThroughTags.map(tag => clickableChipHtml("passes_through", tag)).join("")}</div>`
         : "";
 
       const tagsHtml = tags.length
-        ? `<div class="tags"><strong class="filter-label">Tags:</strong> ${tags.map(tag => clickableChipHtml("tags", tag)).join("")}</div>`
+        ? `<div class="chip-group"><span class="chip-group-title">Tags:</span>${tags.map(tag => clickableChipHtml("tags", tag)).join("")}</div>`
         : "";
 
       return `
@@ -1323,7 +1375,9 @@
 
     function clickableChipHtml(field, value) {
       const safeValue = escapeForAttribute(value);
-      return `<button class="tag clickable" type="button" onclick="applyChipFilter('${field}', '${safeValue}')">${value}</button>`;
+      const filter = document.querySelector(`.dynamic-filter[data-field="${field}"]`);
+      const isActive = filter && filter.value === value;
+      return `<button class="tag clickable ${isActive ? "active-filter" : ""}" type="button" onclick="applyChipFilter('${field}', '${safeValue}')">${value}</button>`;
     }
 
     function applyChipFilter(field, value) {
@@ -1355,6 +1409,7 @@
       }
 
       if (field === "start_point") activeQuickStart = value;
+      if (field === "passes_through") activeQuickPassesThrough = value;
       if (field === "terrain") activeQuickTerrain = value;
 
       updateQuickButtonStates();
@@ -1386,9 +1441,10 @@
         const matchesMin = quickDistance.min === null || routeMiles >= quickDistance.min;
         const matchesMax = quickDistance.max === null || routeMiles <= quickDistance.max;
         const matchesStart = !activeQuickStart || getRouteValue(route, "start_point") === activeQuickStart;
+        const matchesPassesThrough = !activeQuickPassesThrough || splitMultiValues(getRouteValue(route, "passes_through")).includes(activeQuickPassesThrough);
         const matchesTerrain = !activeQuickTerrain || getRouteValue(route, "terrain") === activeQuickTerrain;
 
-        return matchesMin && matchesMax && matchesStart && matchesTerrain;
+        return matchesMin && matchesMax && matchesStart && matchesPassesThrough && matchesTerrain;
       });
     }
 
@@ -1472,6 +1528,7 @@
       if (select) select.value = value;
 
       if (field === "start_point") activeQuickStart = value;
+      if (field === "passes_through") activeQuickPassesThrough = value;
       if (field === "terrain") activeQuickTerrain = value;
 
       updateQuickButtonStates();
@@ -1481,6 +1538,10 @@
     function updateQuickButtonStates() {
       document.querySelectorAll(".quick-start").forEach(button => {
         button.classList.toggle("active", button.dataset.value === activeQuickStart);
+      });
+
+      document.querySelectorAll(".quick-passes-through").forEach(button => {
+        button.classList.toggle("active", button.dataset.value === activeQuickPassesThrough);
       });
 
       document.querySelectorAll(".quick-terrain").forEach(button => {
@@ -1503,6 +1564,7 @@
     function clearFindRun() {
       quickDistance = { min: null, max: null };
       setQuickFilter("start_point", "");
+      setQuickFilter("passes_through", "");
       setQuickFilter("terrain", "");
       updateQuickButtonStates();
       renderAllRouteViews();
