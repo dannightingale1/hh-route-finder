@@ -566,6 +566,18 @@
       margin: 0 4px 4px 0;
     }
 
+    .tag.clickable {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .tag.clickable:hover,
+    .tag.clickable.active-filter {
+      background: var(--hh-blue);
+      color: white;
+    }
+
     .button-row {
       display: flex;
       flex-wrap: wrap;
@@ -1100,7 +1112,7 @@
 
         const uniqueValuesSet = new Set();
         values.forEach(value => {
-          if (header === "tags") {
+          if (header === "tags" || header === "passes_through") {
             splitMultiValues(value).forEach(tag => uniqueValuesSet.add(tag));
           } else {
             uniqueValuesSet.add(value);
@@ -1117,7 +1129,7 @@
           const value = getRouteValue(route, field);
           if (!value) return;
 
-          if (field === "tags") {
+          if (field === "tags" || field === "passes_through") {
             splitMultiValues(value).forEach(tag => values.add(tag));
           } else {
             values.add(value);
@@ -1272,10 +1284,19 @@
       const candidateImage = getFirstAvailable(route, ["image_url", "image", "photo_url", "photo"]);
       const image = isUsefulImageUrl(candidateImage) ? candidateImage : FALLBACK_IMAGE;
       const tags = splitMultiValues(getRouteValue(route, "tags"));
+      const passesThroughTags = splitMultiValues(passesThrough);
       const ascent = displayAscent(route);
 
       const metaLineOne = [terrain, routeType, ascent].filter(Boolean).join(" | ");
-      const metaLineTwo = [startPoint, passesThrough, area].filter(Boolean).join(" · ");
+      const metaLineTwo = [startPoint, area].filter(Boolean).join(" · ");
+
+      const passesThroughHtml = passesThroughTags.length
+        ? `<div class="tags"><strong class="filter-label">Passes through:</strong> ${passesThroughTags.map(tag => clickableChipHtml("passes_through", tag)).join("")}</div>`
+        : "";
+
+      const tagsHtml = tags.length
+        ? `<div class="tags"><strong class="filter-label">Tags:</strong> ${tags.map(tag => clickableChipHtml("tags", tag)).join("")}</div>`
+        : "";
 
       return `
         <article class="card">
@@ -1288,7 +1309,8 @@
             ${metaLineOne ? `<p class="meta">${metaLineOne}</p>` : ""}
             ${metaLineTwo ? `<p class="meta">${metaLineTwo}</p>` : ""}
             ${description ? `<p class="description">${description}</p>` : ""}
-            ${tags.length ? `<div class="tags">${tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>` : ""}
+            ${passesThroughHtml}
+            ${tagsHtml}
             <div class="button-row">
               ${link ? `<a class="button" href="${escapeForAttribute(link)}" target="_blank" rel="noopener">View route</a>` : ""}
               ${link ? `<button class="button copy-button" type="button" onclick="copyRouteUrl('${escapeForAttribute(link)}', this)">Copy URL</button>` : ""}
@@ -1296,6 +1318,50 @@
           </div>
         </article>
       `;
+    }
+
+
+    function clickableChipHtml(field, value) {
+      const safeValue = escapeForAttribute(value);
+      return `<button class="tag clickable" type="button" onclick="applyChipFilter('${field}', '${safeValue}')">${value}</button>`;
+    }
+
+    function applyChipFilter(field, value) {
+      setActiveTab("browse");
+
+      const advancedPanel = document.getElementById("advancedFilters");
+      const advancedButton = document.getElementById("advancedToggle");
+      if (advancedPanel && !advancedPanel.classList.contains("open")) {
+        advancedPanel.classList.add("open");
+        advancedButton.textContent = "Advanced search ▴";
+      }
+
+      const filter = document.querySelector(`.dynamic-filter[data-field="${field}"]`);
+
+      if (filter) {
+        const exists = Array.from(filter.options).some(option => option.value === value);
+
+        if (!exists) {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = value;
+          filter.appendChild(option);
+        }
+
+        filter.value = value;
+      } else {
+        const searchBox = document.getElementById("search");
+        searchBox.value = value;
+      }
+
+      if (field === "start_point") activeQuickStart = value;
+      if (field === "terrain") activeQuickTerrain = value;
+
+      updateQuickButtonStates();
+      renderAllRouteViews();
+
+      const browsePanel = document.getElementById("browseRoutesPanel");
+      if (browsePanel) browsePanel.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     function displayRoutes(data, containerId, countId) {
@@ -1358,7 +1424,7 @@
 
           const routeValue = getRouteValue(route, field);
 
-          if (field === "tags") {
+          if (field === "tags" || field === "passes_through") {
             return splitMultiValues(routeValue).includes(selectedValue);
           }
 
