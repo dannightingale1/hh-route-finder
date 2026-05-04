@@ -635,6 +635,42 @@
 
     .modal-close:hover { background: #e7f0fb; }
 
+
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 8px;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .tab-button {
+      flex: 1;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 12px;
+      cursor: pointer;
+      font-weight: bold;
+      background: transparent;
+      color: var(--text);
+    }
+
+    .tab-button.active {
+      background: var(--hh-blue);
+      color: white;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
     @media (min-width: 700px) {
       .advanced-filters { grid-template-columns: repeat(3, 1fr); }
       .routes.tile-view { grid-template-columns: repeat(2, 1fr); }
@@ -740,84 +776,93 @@
   </header>
 
   <main>
-    <section class="filters" id="filters">
-      <div class="basic-search">
-        <div class="filter-control">
-          <label class="filter-label" for="search">Search</label>
-          <input type="text" id="search" placeholder="Search routes, areas, start points, tags..." />
-        </div>
+    <div class="tab-bar" role="tablist" aria-label="HH route tools">
+      <button class="tab-button active" id="routeFinderTab" type="button">Route Finder</button>
+      <button class="tab-button" id="maprunPlannerTab" type="button">MapRun Planner</button>
+    </div>
 
-        <div class="filter-control">
-          <label class="filter-label" for="sortBy">Sort</label>
-          <select id="sortBy">
-            <option value="default">Default order</option>
-            <option value="distance-asc">Distance: short to long</option>
-            <option value="distance-desc">Distance: long to short</option>
-            <option value="name-asc">Name: A to Z</option>
-            <option value="start-asc">Start point: A to Z</option>
-          </select>
-        </div>
-
-        <button class="advanced-search-button" id="advancedToggle" type="button">Advanced search ▾</button>
-      </div>
-
-      <div class="advanced-filters" id="advancedFilters">
-        <div class="filter-control distance-control">
-          <label class="filter-label">Distance range</label>
-
-          <div class="unit-toggle" aria-label="Distance unit">
-            <button type="button" id="milesButton" class="active">Miles</button>
-            <button type="button" id="kmButton">KM</button>
+    <section class="tab-panel active" id="routeFinderPanel">
+      <section class="filters" id="filters">
+        <div class="basic-search">
+          <div class="filter-control">
+            <label class="filter-label" for="search">Search</label>
+            <input type="text" id="search" placeholder="Search routes, areas, start points, tags..." />
           </div>
 
-          <div class="distance-row">
-            <input type="number" id="minDistance" min="0" step="0.1" placeholder="Min distance">
-            <input type="number" id="maxDistance" min="0" step="0.1" placeholder="Max distance">
+          <div class="filter-control">
+            <label class="filter-label" for="sortBy">Sort</label>
+            <select id="sortBy">
+              <option value="default">Default order</option>
+              <option value="distance-asc">Distance: short to long</option>
+              <option value="distance-desc">Distance: long to short</option>
+              <option value="name-asc">Name: A to Z</option>
+              <option value="start-asc">Start point: A to Z</option>
+            </select>
           </div>
+
+          <button class="advanced-search-button" id="advancedToggle" type="button">Advanced search ▾</button>
         </div>
-      </div>
-    </section>
 
-    <section class="panel compact-panel">
-      <button class="subtle-link-button" id="wizardToggle" type="button">Quick search</button>
+        <div class="advanced-filters" id="advancedFilters">
+          <div class="filter-control distance-control">
+            <label class="filter-label">Distance range</label>
 
-      <div class="wizard-panel" id="wizardPanel">
-        <p>Tap a few buttons and the route list will filter instantly.</p>
+            <div class="unit-toggle" aria-label="Distance unit">
+              <button type="button" id="milesButton" class="active">Miles</button>
+              <button type="button" id="kmButton">KM</button>
+            </div>
 
-        <div class="wizard-steps">
-          <div class="wizard-step">
-            <h3>1. Distance</h3>
-            <div class="quick-buttons">
-              <button class="quick-button distance-preset" data-min="0" data-max="3.5">Around 5k</button>
-              <button class="quick-button distance-preset" data-min="3.6" data-max="5.3">Around 7.5k</button>
-              <button class="quick-button distance-preset" data-min="5.4" data-max="6.8">Around 10k</button>
-              <button class="quick-button distance-preset" data-min="6.9" data-max="">Longer</button>
-              <button class="quick-button" id="clearDistancePreset">Any distance</button>
+            <div class="distance-row">
+              <input type="number" id="minDistance" min="0" step="0.1" placeholder="Min distance">
+              <input type="number" id="maxDistance" min="0" step="0.1" placeholder="Max distance">
             </div>
           </div>
+        </div>
+      </section>
 
-          <div class="wizard-step">
-            <h3>2. Start location</h3>
-            <div class="quick-buttons" id="startQuickButtons"></div>
-          </div>
+      <section class="panel compact-panel">
+        <button class="subtle-link-button" id="wizardToggle" type="button">Quick search</button>
 
-          <div class="wizard-step">
-            <h3>3. Terrain</h3>
-            <div class="quick-buttons" id="terrainQuickButtons"></div>
-          </div>
+        <div class="wizard-panel" id="wizardPanel">
+          <p>Tap a few buttons and the route list will filter instantly.</p>
 
-          <div class="wizard-actions">
-            <button class="button" id="clearWizard" type="button">Clear quick search</button>
+          <div class="wizard-steps">
+            <div class="wizard-step">
+              <h3>1. Distance</h3>
+              <div class="quick-buttons">
+                <button class="quick-button distance-preset" data-min="0" data-max="3.5">Around 5k</button>
+                <button class="quick-button distance-preset" data-min="3.6" data-max="5.3">Around 7.5k</button>
+                <button class="quick-button distance-preset" data-min="5.4" data-max="6.8">Around 10k</button>
+                <button class="quick-button distance-preset" data-min="6.9" data-max="">Longer</button>
+                <button class="quick-button" id="clearDistancePreset">Any distance</button>
+              </div>
+            </div>
+
+            <div class="wizard-step">
+              <h3>2. Start location</h3>
+              <div class="quick-buttons" id="startQuickButtons"></div>
+            </div>
+
+            <div class="wizard-step">
+              <h3>3. Terrain</h3>
+              <div class="quick-buttons" id="terrainQuickButtons"></div>
+            </div>
+
+            <div class="wizard-actions">
+              <button class="button" id="clearWizard" type="button">Clear quick search</button>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      <div class="count" id="count"></div>
+      <section class="routes tile-view" id="routes"></section>
     </section>
 
-    <section class="panel compact-panel">
-      <button class="subtle-link-button" id="plannerToggle" type="button">MapRun planner</button>
-
-      <div class="planner-panel" id="plannerPanel">
-        <p>Pick a start point and terrain, then browse possible 5k / 7.5k / 10k route sets.</p>
+    <section class="tab-panel" id="maprunPlannerPanel">
+      <section class="panel">
+        <h2>MapRun Planner</h2>
+        <p>Pick a start point and terrain, then browse possible Short / Medium / Long route sets. Use Previous / Next until you find the combination you want.</p>
 
         <div class="planner-grid">
           <div class="filter-control">
@@ -841,11 +886,8 @@
         </div>
 
         <div class="planner-result" id="plannerResult"></div>
-      </div>
+      </section>
     </section>
-
-    <div class="count" id="count"></div>
-    <section class="routes tile-view" id="routes"></section>
   </main>
 
   <div class="modal" id="imageModal" aria-hidden="true">
@@ -1287,14 +1329,20 @@
         button.classList.toggle("active", button.dataset.value === activeQuickTerrain);
       });
 
-      const min = document.getElementById("minDistance").value;
-      const max = document.getElementById("maxDistance").value;
+      const minMiles = inputDistanceToMiles(document.getElementById("minDistance").value);
+      const maxMiles = inputDistanceToMiles(document.getElementById("maxDistance").value);
 
       document.querySelectorAll(".distance-preset").forEach(button => {
-        const minMatch = button.dataset.min === min;
-        const maxMatch = button.dataset.max === max;
+        const presetMin = button.dataset.min ? parseFloat(button.dataset.min) : null;
+        const presetMax = button.dataset.max ? parseFloat(button.dataset.max) : null;
+
+        const minMatch = (presetMin === null && minMiles === null) || (presetMin !== null && minMiles !== null && Math.abs(presetMin - minMiles) < 0.05);
+        const maxMatch = (presetMax === null && maxMiles === null) || (presetMax !== null && maxMiles !== null && Math.abs(presetMax - maxMiles) < 0.05);
+
         button.classList.toggle("active", minMatch && maxMatch);
       });
+
+      document.getElementById("clearDistancePreset").classList.toggle("active", minMiles === null && maxMiles === null);
     }
 
     function clearWizard() {
@@ -1593,12 +1641,6 @@ ${longLink}`;
     });
 
     document.getElementById("clearWizard").addEventListener("click", clearWizard);
-    document.getElementById("plannerToggle").addEventListener("click", () => {
-      const panel = document.getElementById("plannerPanel");
-      const button = document.getElementById("plannerToggle");
-      const isOpen = panel.classList.toggle("open");
-      button.textContent = isOpen ? "Hide MapRun planner" : "MapRun planner";
-    });
 
     document.getElementById("generatePlanner").addEventListener("click", generatePlanner);
 
@@ -1622,6 +1664,26 @@ ${longLink}`;
     document.getElementById("milesButton").addEventListener("click", () => setDistanceUnit("miles"));
     document.getElementById("kmButton").addEventListener("click", () => setDistanceUnit("km"));
 
+
+    function setActiveTab(tabName) {
+      const routeTab = document.getElementById("routeFinderTab");
+      const maprunTab = document.getElementById("maprunPlannerTab");
+      const routePanel = document.getElementById("routeFinderPanel");
+      const maprunPanel = document.getElementById("maprunPlannerPanel");
+
+      const isMaprun = tabName === "maprun";
+
+      routeTab.classList.toggle("active", !isMaprun);
+      maprunTab.classList.toggle("active", isMaprun);
+      routePanel.classList.toggle("active", !isMaprun);
+      maprunPanel.classList.toggle("active", isMaprun);
+
+      localStorage.setItem("hh-active-tab", isMaprun ? "maprun" : "routes");
+    }
+
+    document.getElementById("routeFinderTab").addEventListener("click", () => setActiveTab("routes"));
+    document.getElementById("maprunPlannerTab").addEventListener("click", () => setActiveTab("maprun"));
+
     const savedTheme = localStorage.getItem("hh-theme");
     if (savedTheme) {
       setTheme(savedTheme);
@@ -1636,6 +1698,9 @@ ${longLink}`;
 
     const savedDistanceUnit = localStorage.getItem("hh-distance-unit") || "miles";
     setDistanceUnit(savedDistanceUnit);
+
+    const savedActiveTab = localStorage.getItem("hh-active-tab") || "routes";
+    setActiveTab(savedActiveTab);
   </script>
 </body>
 </html>
