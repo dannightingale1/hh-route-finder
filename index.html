@@ -141,6 +141,37 @@
       padding: 18px;
     }
 
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 8px;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .tab-button {
+      flex: 1;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 12px;
+      cursor: pointer;
+      font-weight: bold;
+      background: transparent;
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    .tab-button.active {
+      background: var(--hh-blue);
+      color: white;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
     .panel,
     .filters {
       background: var(--card);
@@ -161,24 +192,6 @@
       color: var(--muted);
       line-height: 1.4;
     }
-
-    .basic-search {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: 10px;
-      align-items: end;
-    }
-
-    .advanced-filters {
-      display: none;
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-      gap: 10px;
-      grid-template-columns: 1fr;
-    }
-
-    .advanced-filters.open { display: grid; }
 
     .filters input,
     .filters select,
@@ -203,6 +216,76 @@
       flex-direction: column;
     }
 
+    .find-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .find-step {
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+
+    .find-step:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .find-step h3 {
+      font-size: 16px;
+      margin: 0 0 8px;
+    }
+
+    .quick-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .quick-button {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 11px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .quick-button:hover,
+    .quick-button.active {
+      background: var(--hh-blue);
+      color: white;
+      border-color: var(--hh-blue);
+    }
+
+    .find-actions,
+    .planner-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+      align-items: center;
+    }
+
+    .basic-search {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .advanced-filters {
+      display: none;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      gap: 10px;
+      grid-template-columns: 1fr;
+    }
+
+    .advanced-filters.open { display: grid; }
+
     .advanced-search-button {
       padding: 10px 13px;
       border: 1px solid var(--border);
@@ -214,29 +297,7 @@
       height: 41px;
     }
 
-    .advanced-search-button:hover {
-      background: #004985;
-    }
-
-    .subtle-link-button {
-      background: none;
-      border: none;
-      color: var(--hh-blue);
-      cursor: pointer;
-      font-weight: bold;
-      padding: 0;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      font-size: 14px;
-    }
-
-    body.dark .subtle-link-button {
-      color: #d8eaff;
-    }
-
-    .subtle-link-button:hover {
-      opacity: 0.8;
-    }
+    .advanced-search-button:hover { background: #004985; }
 
     .distance-control {
       display: grid;
@@ -272,76 +333,6 @@
       color: white;
     }
 
-    .compact-panel {
-      padding: 10px 14px;
-    }
-
-    .wizard-panel,
-    .planner-panel {
-      display: none;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid var(--border);
-    }
-
-    .wizard-panel.open,
-    .planner-panel.open {
-      display: block;
-    }
-
-    .wizard-steps {
-      display: grid;
-      gap: 14px;
-    }
-
-    .wizard-step {
-      border-top: 1px solid var(--border);
-      padding-top: 12px;
-    }
-
-    .wizard-step:first-child {
-      border-top: none;
-      padding-top: 0;
-    }
-
-    .wizard-step h3 {
-      font-size: 15px;
-      margin: 0 0 8px;
-      color: var(--muted);
-    }
-
-    .quick-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .quick-button {
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 8px 11px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .quick-button:hover,
-    .quick-button.active {
-      background: var(--hh-blue);
-      color: white;
-      border-color: var(--hh-blue);
-    }
-
-    .wizard-actions,
-    .planner-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-      align-items: end;
-    }
-
     .planner-grid {
       display: grid;
       gap: 10px;
@@ -355,17 +346,13 @@
       border-top: 1px solid var(--border);
     }
 
-    .planner-result.open {
-      display: block;
-    }
+    .planner-result.open { display: block; }
 
-    .planner-result h3 {
-      margin: 0 0 10px;
-    }
+    .planner-result h3 { margin: 0 0 10px; }
 
     .planner-list {
       display: grid;
-      gap: 10px;
+      gap: 12px;
     }
 
     .planner-item {
@@ -384,6 +371,18 @@
       object-fit: contain;
       background: #eef3f8;
       border-radius: 8px;
+    }
+
+    body.dark .planner-item img { background: #111827; }
+
+    .planner-item strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .planner-item span {
+      color: var(--muted);
+      font-size: 13px;
     }
 
     .planner-nav {
@@ -405,20 +404,6 @@
       color: var(--muted);
       font-size: 13px;
       font-weight: bold;
-    }
-
-    body.dark .planner-item img {
-      background: #111827;
-    }
-
-    .planner-item strong {
-      display: block;
-      margin-bottom: 3px;
-    }
-
-    .planner-item span {
-      color: var(--muted);
-      font-size: 13px;
     }
 
     .count {
@@ -474,10 +459,7 @@
       transition: 0.2s ease;
     }
 
-    .image-wrap:hover::after {
-      opacity: 1;
-    }
-
+    .image-wrap:hover::after { opacity: 1; }
     body.dark .image-wrap { background: #111827; }
 
     .image-wrap img {
@@ -635,42 +617,6 @@
 
     .modal-close:hover { background: #e7f0fb; }
 
-
-    .tab-bar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 18px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 8px;
-      box-shadow: 0 2px 8px var(--shadow);
-    }
-
-    .tab-button {
-      flex: 1;
-      border: none;
-      border-radius: 10px;
-      padding: 11px 12px;
-      cursor: pointer;
-      font-weight: bold;
-      background: transparent;
-      color: var(--text);
-    }
-
-    .tab-button.active {
-      background: var(--hh-blue);
-      color: white;
-    }
-
-    .tab-panel {
-      display: none;
-    }
-
-    .tab-panel.active {
-      display: block;
-    }
-
     @media (min-width: 700px) {
       .advanced-filters { grid-template-columns: repeat(3, 1fr); }
       .routes.tile-view { grid-template-columns: repeat(2, 1fr); }
@@ -703,11 +649,12 @@
     }
 
     @media (max-width: 700px) {
-      .basic-search { grid-template-columns: 1fr; }
-
-      .advanced-search-button {
-        width: 100%;
+      .tab-bar {
+        flex-direction: column;
       }
+
+      .basic-search { grid-template-columns: 1fr; }
+      .advanced-search-button { width: 100%; }
 
       .list-view .card {
         display: grid;
@@ -777,11 +724,50 @@
 
   <main>
     <div class="tab-bar" role="tablist" aria-label="HH route tools">
-      <button class="tab-button active" id="routeFinderTab" type="button">Route Finder</button>
+      <button class="tab-button active" id="findRunTab" type="button">Find a Run</button>
+      <button class="tab-button" id="browseRoutesTab" type="button">Browse Routes</button>
       <button class="tab-button" id="maprunPlannerTab" type="button">MapRun Planner</button>
     </div>
 
-    <section class="tab-panel active" id="routeFinderPanel">
+    <section class="tab-panel active" id="findRunPanel">
+      <section class="panel">
+        <h2>Find a Run</h2>
+        <p>Choose a distance, start location and terrain to quickly narrow down the routes.</p>
+
+        <div class="find-grid">
+          <div class="find-step">
+            <h3>1. How far?</h3>
+            <div class="quick-buttons">
+              <button class="quick-button distance-preset" data-min="0" data-max="3.5">Around 5k</button>
+              <button class="quick-button distance-preset" data-min="3.6" data-max="5.3">Around 7.5k</button>
+              <button class="quick-button distance-preset" data-min="5.4" data-max="6.8">Around 10k</button>
+              <button class="quick-button distance-preset" data-min="6.9" data-max="">Longer</button>
+              <button class="quick-button" id="clearDistancePreset">Any distance</button>
+            </div>
+          </div>
+
+          <div class="find-step">
+            <h3>2. Where from?</h3>
+            <div class="quick-buttons" id="startQuickButtons"></div>
+          </div>
+
+          <div class="find-step">
+            <h3>3. What type?</h3>
+            <div class="quick-buttons" id="terrainQuickButtons"></div>
+          </div>
+
+          <div class="find-actions">
+            <button class="button" id="clearFindRun" type="button">Clear choices</button>
+            <button class="button copy-button" id="showAllRoutes" type="button">Show all routes</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="count" id="findCount"></div>
+      <section class="routes tile-view" id="findRoutes"></section>
+    </section>
+
+    <section class="tab-panel" id="browseRoutesPanel">
       <section class="filters" id="filters">
         <div class="basic-search">
           <div class="filter-control">
@@ -820,43 +806,8 @@
         </div>
       </section>
 
-      <section class="panel compact-panel">
-        <button class="subtle-link-button" id="wizardToggle" type="button">Quick search</button>
-
-        <div class="wizard-panel" id="wizardPanel">
-          <p>Tap a few buttons and the route list will filter instantly.</p>
-
-          <div class="wizard-steps">
-            <div class="wizard-step">
-              <h3>1. Distance</h3>
-              <div class="quick-buttons">
-                <button class="quick-button distance-preset" data-min="0" data-max="3.5">Around 5k</button>
-                <button class="quick-button distance-preset" data-min="3.6" data-max="5.3">Around 7.5k</button>
-                <button class="quick-button distance-preset" data-min="5.4" data-max="6.8">Around 10k</button>
-                <button class="quick-button distance-preset" data-min="6.9" data-max="">Longer</button>
-                <button class="quick-button" id="clearDistancePreset">Any distance</button>
-              </div>
-            </div>
-
-            <div class="wizard-step">
-              <h3>2. Start location</h3>
-              <div class="quick-buttons" id="startQuickButtons"></div>
-            </div>
-
-            <div class="wizard-step">
-              <h3>3. Terrain</h3>
-              <div class="quick-buttons" id="terrainQuickButtons"></div>
-            </div>
-
-            <div class="wizard-actions">
-              <button class="button" id="clearWizard" type="button">Clear quick search</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div class="count" id="count"></div>
-      <section class="routes tile-view" id="routes"></section>
+      <div class="count" id="browseCount"></div>
+      <section class="routes tile-view" id="browseRoutes"></section>
     </section>
 
     <section class="tab-panel" id="maprunPlannerPanel">
@@ -923,8 +874,10 @@
     let distanceUnit = "miles";
     let activeQuickStart = "";
     let activeQuickTerrain = "";
+    let quickDistance = { min: null, max: null };
     let plannerOptions = { short: [], medium: [], long: [] };
     let plannerIndexes = { short: 0, medium: 0, long: 0 };
+    let currentViewMode = "tile";
 
     function parseCSV(text) {
       const rows = [];
@@ -1104,7 +1057,7 @@
           if (field === "start_point") activeQuickStart = select.value;
           if (field === "terrain") activeQuickTerrain = select.value;
           updateQuickButtonStates();
-          filterRoutes();
+          renderAllRouteViews();
         });
 
         wrapper.appendChild(label);
@@ -1113,7 +1066,7 @@
       });
     }
 
-    function populateQuickWizard() {
+    function populateFindRunButtons() {
       const startContainer = document.getElementById("startQuickButtons");
       const terrainContainer = document.getElementById("terrainQuickButtons");
 
@@ -1130,7 +1083,7 @@
       anyStart.addEventListener("click", () => setQuickFilter("start_point", ""));
       startContainer.appendChild(anyStart);
 
-      starts.slice(0, 12).forEach(start => {
+      starts.slice(0, 14).forEach(start => {
         const button = document.createElement("button");
         button.className = "quick-button quick-start";
         button.textContent = start;
@@ -1190,67 +1143,84 @@
         }).filter(route => getRouteValue(route, "name"));
 
         createDynamicFilters();
-        populateQuickWizard();
+        populateFindRunButtons();
         populatePlanner();
-        displayRoutes(getSortedRoutes(routesData));
+        renderAllRouteViews();
       })
       .catch(error => {
-        document.getElementById("routes").innerHTML =
+        document.getElementById("findRoutes").innerHTML =
+          `<div class="empty">Sorry, the routes could not be loaded.</div>`;
+        document.getElementById("browseRoutes").innerHTML =
           `<div class="empty">Sorry, the routes could not be loaded.</div>`;
         console.error(error);
       });
 
-    function displayRoutes(data) {
-      const container = document.getElementById("routes");
-      const count = document.getElementById("count");
+    function routeCardHtml(route) {
+      const name = getRouteValue(route, "name");
+      const miles = getMiles(route);
+      const terrain = getRouteValue(route, "terrain");
+      const difficulty = getRouteValue(route, "difficulty");
+      const routeType = getRouteValue(route, "route_type");
+      const startPoint = getRouteValue(route, "start_point");
+      const area = getRouteValue(route, "area");
+      const description = getRouteValue(route, "description");
+      const link = getFirstAvailable(route, ["outdooractive_url", "route_url", "url", "link"]);
+      const image = getFirstAvailable(route, ["image_url", "image", "photo_url", "photo"]) || FALLBACK_IMAGE;
+      const tags = splitMultiValues(getRouteValue(route, "tags"));
+
+      const metaLineOne = [terrain, difficulty, routeType].filter(Boolean).join(" | ");
+      const metaLineTwo = [startPoint, area].filter(Boolean).join(" · ");
+
+      return `
+        <article class="card">
+          <div class="image-wrap" onclick="openImageModal('${escapeForAttribute(image)}', '${escapeForAttribute(name)}')">
+            <img src="${escapeForAttribute(image)}" alt="${escapeForAttribute(name)}" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'">
+          </div>
+          <div class="card-content">
+            <h2>${name}</h2>
+            ${miles ? `<p class="distance">${displayDistance(miles)}</p>` : ""}
+            ${metaLineOne ? `<p class="meta">${metaLineOne}</p>` : ""}
+            ${metaLineTwo ? `<p class="meta">${metaLineTwo}</p>` : ""}
+            ${description ? `<p class="description">${description}</p>` : ""}
+            ${tags.length ? `<div class="tags">${tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>` : ""}
+            <div class="button-row">
+              ${link ? `<a class="button" href="${escapeForAttribute(link)}" target="_blank" rel="noopener">View route</a>` : ""}
+              ${link ? `<button class="button copy-button" type="button" onclick="copyRouteUrl('${escapeForAttribute(link)}', this)">Copy URL</button>` : ""}
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function displayRoutes(data, containerId, countId) {
+      const container = document.getElementById(containerId);
+      const count = document.getElementById(countId);
 
       count.textContent = `${data.length} route${data.length === 1 ? "" : "s"} found`;
       container.innerHTML = "";
 
       if (!data.length) {
-        container.innerHTML = `<div class="empty">No routes match those filters.</div>`;
+        container.innerHTML = `<div class="empty">No routes match those choices.</div>`;
         return;
       }
 
-      data.forEach(route => {
-        const name = getRouteValue(route, "name");
-        const miles = getMiles(route);
-        const terrain = getRouteValue(route, "terrain");
-        const difficulty = getRouteValue(route, "difficulty");
-        const routeType = getRouteValue(route, "route_type");
-        const startPoint = getRouteValue(route, "start_point");
-        const area = getRouteValue(route, "area");
-        const description = getRouteValue(route, "description");
-        const link = getFirstAvailable(route, ["outdooractive_url", "route_url", "url", "link"]);
-        const image = getFirstAvailable(route, ["image_url", "image", "photo_url", "photo"]) || FALLBACK_IMAGE;
-        const tags = splitMultiValues(getRouteValue(route, "tags"));
+      container.innerHTML = data.map(routeCardHtml).join("");
+    }
 
-        const metaLineOne = [terrain, difficulty, routeType].filter(Boolean).join(" | ");
-        const metaLineTwo = [startPoint, area].filter(Boolean).join(" · ");
+    function getFindRunRoutes() {
+      return routesData.filter(route => {
+        const routeMiles = getMiles(route);
 
-        container.innerHTML += `
-          <article class="card">
-            <div class="image-wrap" onclick="openImageModal('${escapeForAttribute(image)}', '${escapeForAttribute(name)}')">
-              <img src="${escapeForAttribute(image)}" alt="${escapeForAttribute(name)}" loading="lazy" onerror="this.src='${FALLBACK_IMAGE}'">
-            </div>
-            <div class="card-content">
-              <h2>${name}</h2>
-              ${miles ? `<p class="distance">${displayDistance(miles)}</p>` : ""}
-              ${metaLineOne ? `<p class="meta">${metaLineOne}</p>` : ""}
-              ${metaLineTwo ? `<p class="meta">${metaLineTwo}</p>` : ""}
-              ${description ? `<p class="description">${description}</p>` : ""}
-              ${tags.length ? `<div class="tags">${tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>` : ""}
-              <div class="button-row">
-                ${link ? `<a class="button" href="${escapeForAttribute(link)}" target="_blank" rel="noopener">View route</a>` : ""}
-                ${link ? `<button class="button copy-button" type="button" onclick="copyRouteUrl('${escapeForAttribute(link)}', this)">Copy URL</button>` : ""}
-              </div>
-            </div>
-          </article>
-        `;
+        const matchesMin = quickDistance.min === null || routeMiles >= quickDistance.min;
+        const matchesMax = quickDistance.max === null || routeMiles <= quickDistance.max;
+        const matchesStart = !activeQuickStart || getRouteValue(route, "start_point") === activeQuickStart;
+        const matchesTerrain = !activeQuickTerrain || getRouteValue(route, "terrain") === activeQuickTerrain;
+
+        return matchesMin && matchesMax && matchesStart && matchesTerrain;
       });
     }
 
-    function getFilteredRoutes() {
+    function getBrowseRoutes() {
       const search = document.getElementById("search").value.toLowerCase();
       const dynamicFilters = Array.from(document.querySelectorAll(".dynamic-filter"));
       const minDistanceMiles = inputDistanceToMiles(document.getElementById("minDistance").value);
@@ -1305,8 +1275,15 @@
       return sorted;
     }
 
-    function filterRoutes() {
-      displayRoutes(getSortedRoutes(getFilteredRoutes()));
+    function renderAllRouteViews() {
+      displayRoutes(getSortedRoutes(getFindRunRoutes()), "findRoutes", "findCount");
+      displayRoutes(getSortedRoutes(getBrowseRoutes()), "browseRoutes", "browseCount");
+    }
+
+    function setQuickDistance(min, max) {
+      quickDistance = { min, max };
+      updateQuickButtonStates();
+      renderAllRouteViews();
     }
 
     function setQuickFilter(field, value) {
@@ -1317,7 +1294,7 @@
       if (field === "terrain") activeQuickTerrain = value;
 
       updateQuickButtonStates();
-      filterRoutes();
+      renderAllRouteViews();
     }
 
     function updateQuickButtonStates() {
@@ -1329,29 +1306,25 @@
         button.classList.toggle("active", button.dataset.value === activeQuickTerrain);
       });
 
-      const minMiles = inputDistanceToMiles(document.getElementById("minDistance").value);
-      const maxMiles = inputDistanceToMiles(document.getElementById("maxDistance").value);
-
       document.querySelectorAll(".distance-preset").forEach(button => {
         const presetMin = button.dataset.min ? parseFloat(button.dataset.min) : null;
         const presetMax = button.dataset.max ? parseFloat(button.dataset.max) : null;
 
-        const minMatch = (presetMin === null && minMiles === null) || (presetMin !== null && minMiles !== null && Math.abs(presetMin - minMiles) < 0.05);
-        const maxMatch = (presetMax === null && maxMiles === null) || (presetMax !== null && maxMiles !== null && Math.abs(presetMax - maxMiles) < 0.05);
+        const minMatch = (presetMin === null && quickDistance.min === null) || (presetMin !== null && quickDistance.min !== null && Math.abs(presetMin - quickDistance.min) < 0.05);
+        const maxMatch = (presetMax === null && quickDistance.max === null) || (presetMax !== null && quickDistance.max !== null && Math.abs(presetMax - quickDistance.max) < 0.05);
 
         button.classList.toggle("active", minMatch && maxMatch);
       });
 
-      document.getElementById("clearDistancePreset").classList.toggle("active", minMiles === null && maxMiles === null);
+      document.getElementById("clearDistancePreset").classList.toggle("active", quickDistance.min === null && quickDistance.max === null);
     }
 
-    function clearWizard() {
-      document.getElementById("minDistance").value = "";
-      document.getElementById("maxDistance").value = "";
+    function clearFindRun() {
+      quickDistance = { min: null, max: null };
       setQuickFilter("start_point", "");
       setQuickFilter("terrain", "");
       updateQuickButtonStates();
-      filterRoutes();
+      renderAllRouteViews();
     }
 
     function getPlannerBuckets(candidates) {
@@ -1570,12 +1543,16 @@ ${longLink}`;
     }
 
     function setViewMode(mode) {
-      const routes = document.getElementById("routes");
       const tileButton = document.getElementById("tileViewButton");
       const listButton = document.getElementById("listViewButton");
 
-      routes.classList.remove("tile-view", "list-view");
-      routes.classList.add(mode === "list" ? "list-view" : "tile-view");
+      currentViewMode = mode;
+
+      ["findRoutes", "browseRoutes"].forEach(id => {
+        const routes = document.getElementById(id);
+        routes.classList.remove("tile-view", "list-view");
+        routes.classList.add(mode === "list" ? "list-view" : "tile-view");
+      });
 
       tileButton.classList.toggle("active", mode !== "list");
       listButton.classList.toggle("active", mode === "list");
@@ -1602,13 +1579,37 @@ ${longLink}`;
       maxInput.placeholder = unit === "km" ? "Max km" : "Max miles";
 
       localStorage.setItem("hh-distance-unit", unit);
-      filterRoutes();
+      renderAllRouteViews();
     }
 
-    document.getElementById("search").addEventListener("input", filterRoutes);
-    document.getElementById("sortBy").addEventListener("change", filterRoutes);
-    document.getElementById("minDistance").addEventListener("input", () => { updateQuickButtonStates(); filterRoutes(); });
-    document.getElementById("maxDistance").addEventListener("input", () => { updateQuickButtonStates(); filterRoutes(); });
+    function setActiveTab(tabName) {
+      const tabs = {
+        find: {
+          button: document.getElementById("findRunTab"),
+          panel: document.getElementById("findRunPanel")
+        },
+        browse: {
+          button: document.getElementById("browseRoutesTab"),
+          panel: document.getElementById("browseRoutesPanel")
+        },
+        maprun: {
+          button: document.getElementById("maprunPlannerTab"),
+          panel: document.getElementById("maprunPlannerPanel")
+        }
+      };
+
+      Object.keys(tabs).forEach(key => {
+        tabs[key].button.classList.toggle("active", key === tabName);
+        tabs[key].panel.classList.toggle("active", key === tabName);
+      });
+
+      localStorage.setItem("hh-active-tab", tabName);
+    }
+
+    document.getElementById("search").addEventListener("input", renderAllRouteViews);
+    document.getElementById("sortBy").addEventListener("change", renderAllRouteViews);
+    document.getElementById("minDistance").addEventListener("input", renderAllRouteViews);
+    document.getElementById("maxDistance").addEventListener("input", renderAllRouteViews);
 
     document.getElementById("advancedToggle").addEventListener("click", () => {
       const panel = document.getElementById("advancedFilters");
@@ -1617,30 +1618,24 @@ ${longLink}`;
       button.textContent = isOpen ? "Advanced search ▴" : "Advanced search ▾";
     });
 
-    document.getElementById("wizardToggle").addEventListener("click", () => {
-      const panel = document.getElementById("wizardPanel");
-      const button = document.getElementById("wizardToggle");
-      const isOpen = panel.classList.toggle("open");
-      button.textContent = isOpen ? "Hide quick search" : "Quick search";
-    });
-
     document.querySelectorAll(".distance-preset").forEach(button => {
       button.addEventListener("click", () => {
-        document.getElementById("minDistance").value = button.dataset.min ? milesToCurrentUnit(parseFloat(button.dataset.min)) : "";
-        document.getElementById("maxDistance").value = button.dataset.max ? milesToCurrentUnit(parseFloat(button.dataset.max)) : "";
-        updateQuickButtonStates();
-        filterRoutes();
+        const min = button.dataset.min ? parseFloat(button.dataset.min) : null;
+        const max = button.dataset.max ? parseFloat(button.dataset.max) : null;
+        setQuickDistance(min, max);
       });
     });
 
     document.getElementById("clearDistancePreset").addEventListener("click", () => {
-      document.getElementById("minDistance").value = "";
-      document.getElementById("maxDistance").value = "";
-      updateQuickButtonStates();
-      filterRoutes();
+      setQuickDistance(null, null);
     });
 
-    document.getElementById("clearWizard").addEventListener("click", clearWizard);
+    document.getElementById("clearFindRun").addEventListener("click", clearFindRun);
+
+    document.getElementById("showAllRoutes").addEventListener("click", () => {
+      clearFindRun();
+      setActiveTab("browse");
+    });
 
     document.getElementById("generatePlanner").addEventListener("click", generatePlanner);
 
@@ -1664,24 +1659,8 @@ ${longLink}`;
     document.getElementById("milesButton").addEventListener("click", () => setDistanceUnit("miles"));
     document.getElementById("kmButton").addEventListener("click", () => setDistanceUnit("km"));
 
-
-    function setActiveTab(tabName) {
-      const routeTab = document.getElementById("routeFinderTab");
-      const maprunTab = document.getElementById("maprunPlannerTab");
-      const routePanel = document.getElementById("routeFinderPanel");
-      const maprunPanel = document.getElementById("maprunPlannerPanel");
-
-      const isMaprun = tabName === "maprun";
-
-      routeTab.classList.toggle("active", !isMaprun);
-      maprunTab.classList.toggle("active", isMaprun);
-      routePanel.classList.toggle("active", !isMaprun);
-      maprunPanel.classList.toggle("active", isMaprun);
-
-      localStorage.setItem("hh-active-tab", isMaprun ? "maprun" : "routes");
-    }
-
-    document.getElementById("routeFinderTab").addEventListener("click", () => setActiveTab("routes"));
+    document.getElementById("findRunTab").addEventListener("click", () => setActiveTab("find"));
+    document.getElementById("browseRoutesTab").addEventListener("click", () => setActiveTab("browse"));
     document.getElementById("maprunPlannerTab").addEventListener("click", () => setActiveTab("maprun"));
 
     const savedTheme = localStorage.getItem("hh-theme");
@@ -1699,7 +1678,7 @@ ${longLink}`;
     const savedDistanceUnit = localStorage.getItem("hh-distance-unit") || "miles";
     setDistanceUnit(savedDistanceUnit);
 
-    const savedActiveTab = localStorage.getItem("hh-active-tab") || "routes";
+    const savedActiveTab = localStorage.getItem("hh-active-tab") || "find";
     setActiveTab(savedActiveTab);
   </script>
 </body>
