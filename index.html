@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hucknall Harriers Running Routes</title>
+  <title>HH Route Finder</title>
 
   <style>
     :root {
@@ -91,9 +91,7 @@
       background: rgba(0,0,0,0.25);
     }
 
-    .title-block {
-      min-width: 0;
-    }
+    .title-block { min-width: 0; }
 
     header h1 {
       margin: 0 0 7px;
@@ -143,6 +141,7 @@
       padding: 18px;
     }
 
+    .panel,
     .filters {
       background: var(--card);
       padding: 14px;
@@ -152,9 +151,20 @@
       border: 1px solid var(--border);
     }
 
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
     .basic-search {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr auto auto;
       gap: 10px;
       align-items: end;
     }
@@ -168,12 +178,11 @@
       grid-template-columns: 1fr;
     }
 
-    .advanced-filters.open {
-      display: grid;
-    }
+    .advanced-filters.open { display: grid; }
 
     .filters input,
-    .filters select {
+    .filters select,
+    .panel select {
       padding: 10px;
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -194,7 +203,8 @@
       flex-direction: column;
     }
 
-    .advanced-search-button {
+    .advanced-search-button,
+    .wizard-toggle-button {
       padding: 10px 13px;
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -205,7 +215,8 @@
       height: 41px;
     }
 
-    .advanced-search-button:hover {
+    .advanced-search-button:hover,
+    .wizard-toggle-button:hover {
       background: #004985;
     }
 
@@ -243,6 +254,126 @@
       color: white;
     }
 
+    .wizard-panel {
+      display: none;
+    }
+
+    .wizard-panel.open {
+      display: block;
+    }
+
+    .wizard-steps {
+      display: grid;
+      gap: 14px;
+    }
+
+    .wizard-step {
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+
+    .wizard-step:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .wizard-step h3 {
+      font-size: 15px;
+      margin: 0 0 8px;
+      color: var(--muted);
+    }
+
+    .quick-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .quick-button {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 11px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .quick-button:hover,
+    .quick-button.active {
+      background: var(--hh-blue);
+      color: white;
+      border-color: var(--hh-blue);
+    }
+
+    .wizard-actions,
+    .planner-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      align-items: end;
+    }
+
+    .planner-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr;
+    }
+
+    .planner-result {
+      display: none;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .planner-result.open {
+      display: block;
+    }
+
+    .planner-result h3 {
+      margin: 0 0 10px;
+    }
+
+    .planner-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .planner-item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      background: var(--bg);
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .planner-item img {
+      width: 72px;
+      aspect-ratio: 4/3;
+      object-fit: contain;
+      background: #eef3f8;
+      border-radius: 8px;
+    }
+
+    body.dark .planner-item img {
+      background: #111827;
+    }
+
+    .planner-item strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .planner-item span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
     .count {
       color: var(--muted);
       margin-bottom: 12px;
@@ -254,13 +385,8 @@
       gap: 16px;
     }
 
-    .routes.tile-view {
-      grid-template-columns: 1fr;
-    }
-
-    .routes.list-view {
-      grid-template-columns: 1fr;
-    }
+    .routes.tile-view { grid-template-columns: 1fr; }
+    .routes.list-view { grid-template-columns: 1fr; }
 
     .card {
       background: var(--card);
@@ -271,9 +397,7 @@
       transition: 0.2s ease;
     }
 
-    .card:hover {
-      transform: translateY(-2px);
-    }
+    .card:hover { transform: translateY(-2px); }
 
     .image-wrap {
       width: 100%;
@@ -286,11 +410,28 @@
       overflow: hidden;
       cursor: zoom-in;
       flex-shrink: 0;
+      position: relative;
     }
 
-    body.dark .image-wrap {
-      background: #111827;
+    .image-wrap::after {
+      content: "Preview map";
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      background: rgba(0,0,0,0.65);
+      color: white;
+      padding: 4px 7px;
+      border-radius: 999px;
+      font-size: 11px;
+      opacity: 0;
+      transition: 0.2s ease;
     }
+
+    .image-wrap:hover::after {
+      opacity: 1;
+    }
+
+    body.dark .image-wrap { background: #111827; }
 
     .image-wrap img {
       width: 100%;
@@ -300,9 +441,7 @@
       display: block;
     }
 
-    .card-content {
-      padding: 14px;
-    }
+    .card-content { padding: 14px; }
 
     .card h2 {
       margin: 0 0 8px;
@@ -326,9 +465,7 @@
       line-height: 1.4;
     }
 
-    .tags {
-      margin-bottom: 12px;
-    }
+    .tags { margin-bottom: 12px; }
 
     .tag {
       display: inline-block;
@@ -360,9 +497,7 @@
       cursor: pointer;
     }
 
-    .button:hover {
-      background: #004985;
-    }
+    .button:hover { background: #004985; }
 
     .copy-button {
       background: transparent;
@@ -370,9 +505,7 @@
       border: 1px solid var(--hh-blue);
     }
 
-    .copy-button:hover {
-      background: var(--chip-bg);
-    }
+    .copy-button:hover { background: var(--chip-bg); }
 
     body.dark .copy-button {
       color: #d8eaff;
@@ -408,9 +541,7 @@
       min-width: 0;
     }
 
-    .list-view .card h2 {
-      font-size: 21px;
-    }
+    .list-view .card h2 { font-size: 21px; }
 
     .modal {
       display: none;
@@ -423,9 +554,7 @@
       justify-content: center;
     }
 
-    .modal.open {
-      display: flex;
-    }
+    .modal.open { display: flex; }
 
     .modal-content {
       max-width: min(95vw, 1100px);
@@ -457,38 +586,23 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.35);
     }
 
-    .modal-close:hover {
-      background: #e7f0fb;
-    }
+    .modal-close:hover { background: #e7f0fb; }
 
     @media (min-width: 700px) {
-      .advanced-filters {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
-      .routes.tile-view {
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .advanced-filters { grid-template-columns: repeat(3, 1fr); }
+      .routes.tile-view { grid-template-columns: repeat(2, 1fr); }
+      .planner-grid { grid-template-columns: repeat(3, 1fr); }
+      .planner-list { grid-template-columns: repeat(3, 1fr); }
     }
 
     @media (min-width: 1000px) {
-      .advanced-filters {
-        grid-template-columns: repeat(4, 1fr);
-      }
-
-      .distance-control {
-        grid-column: span 2;
-      }
-
-      .routes.tile-view {
-        grid-template-columns: repeat(3, 1fr);
-      }
+      .advanced-filters { grid-template-columns: repeat(4, 1fr); }
+      .distance-control { grid-column: span 2; }
+      .routes.tile-view { grid-template-columns: repeat(3, 1fr); }
     }
 
     @media (max-width: 760px) {
-      header {
-        min-height: 190px;
-      }
+      header { min-height: 190px; }
 
       .header-inner {
         flex-direction: column;
@@ -501,21 +615,15 @@
         gap: 10px;
       }
 
-      .logo {
-        height: 50px;
-      }
-
-      .top-buttons {
-        justify-content: flex-start;
-      }
+      .logo { height: 50px; }
+      .top-buttons { justify-content: flex-start; }
     }
 
     @media (max-width: 700px) {
-      .basic-search {
-        grid-template-columns: 1fr;
-      }
+      .basic-search { grid-template-columns: 1fr; }
 
-      .advanced-search-button {
+      .advanced-search-button,
+      .wizard-toggle-button {
         width: 100%;
       }
 
@@ -534,45 +642,26 @@
         border-bottom: none;
       }
 
-      .list-view .card-content {
-        padding: 12px;
-      }
-
-      .list-view .card h2 {
-        font-size: 16px;
-      }
-
-      .list-view .description {
-        font-size: 14px;
-      }
-
+      .list-view .card-content { padding: 12px; }
+      .list-view .card h2 { font-size: 16px; }
+      .list-view .description { font-size: 14px; }
       .list-view .meta,
-      .list-view .distance {
-        font-size: 13px;
-      }
-
-      .list-view .tags {
-        display: none;
-      }
+      .list-view .distance { font-size: 13px; }
+      .list-view .tags { display: none; }
+      .image-wrap::after { display: none; }
     }
 
     @media (max-width: 520px) {
-      .distance-row {
-        grid-template-columns: 1fr;
-      }
+      .distance-row { grid-template-columns: 1fr; }
 
-      .list-view .card {
-        grid-template-columns: 96px 1fr;
-      }
+      .list-view .card { grid-template-columns: 96px 1fr; }
 
       .list-view .image-wrap {
         width: 96px;
         min-height: 145px;
       }
 
-      .button-row {
-        gap: 6px;
-      }
+      .button-row { gap: 6px; }
 
       .button {
         padding: 8px 10px;
@@ -592,7 +681,7 @@
 
         <div class="title-block">
           <h1>HH Route Finder</h1>
-          <p>Find route inspiration for your next run 💙</p>
+          <p>Find route inspiration for your next run</p>
         </div>
       </div>
 
@@ -610,6 +699,17 @@
         <div class="filter-control">
           <label class="filter-label" for="search">Search</label>
           <input type="text" id="search" placeholder="Search routes, areas, start points, tags..." />
+        </div>
+
+        <div class="filter-control">
+          <label class="filter-label" for="sortBy">Sort</label>
+          <select id="sortBy">
+            <option value="default">Default order</option>
+            <option value="distance-asc">Distance: short to long</option>
+            <option value="distance-desc">Distance: long to short</option>
+            <option value="name-asc">Name: A to Z</option>
+            <option value="start-asc">Start point: A to Z</option>
+          </select>
         </div>
 
         <button class="advanced-search-button" id="advancedToggle" type="button">Advanced search ▾</button>
@@ -630,6 +730,69 @@
           </div>
         </div>
       </div>
+    </section>
+
+    <section class="panel">
+      <button class="wizard-toggle-button" id="wizardToggle" type="button">Quick route wizard ▾</button>
+
+      <div class="wizard-panel" id="wizardPanel">
+        <p>Tap a few buttons and the route list will filter instantly.</p>
+
+        <div class="wizard-steps">
+          <div class="wizard-step">
+            <h3>1. Distance</h3>
+            <div class="quick-buttons">
+              <button class="quick-button distance-preset" data-min="0" data-max="3.5">Around 5k</button>
+              <button class="quick-button distance-preset" data-min="3.6" data-max="5.3">Around 7.5k</button>
+              <button class="quick-button distance-preset" data-min="5.4" data-max="6.8">Around 10k</button>
+              <button class="quick-button distance-preset" data-min="6.9" data-max="">Longer</button>
+              <button class="quick-button" id="clearDistancePreset">Any distance</button>
+            </div>
+          </div>
+
+          <div class="wizard-step">
+            <h3>2. Start location</h3>
+            <div class="quick-buttons" id="startQuickButtons"></div>
+          </div>
+
+          <div class="wizard-step">
+            <h3>3. Terrain</h3>
+            <div class="quick-buttons" id="terrainQuickButtons"></div>
+          </div>
+
+          <div class="wizard-actions">
+            <button class="button" id="clearWizard" type="button">Clear wizard</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>MapRun planner</h2>
+      <p>Pick a start point and terrain, then generate a simple 5k / 7.5k / 10k set from matching routes.</p>
+
+      <div class="planner-grid">
+        <div class="filter-control">
+          <label class="filter-label" for="plannerStart">Start location</label>
+          <select id="plannerStart">
+            <option value="">Choose start location</option>
+          </select>
+        </div>
+
+        <div class="filter-control">
+          <label class="filter-label" for="plannerTerrain">Terrain</label>
+          <select id="plannerTerrain">
+            <option value="">Any terrain</option>
+          </select>
+        </div>
+
+        <div class="filter-control">
+          <label class="filter-label">&nbsp;</label>
+          <button class="button" id="generatePlanner" type="button">Generate MapRun set</button>
+        </div>
+      </div>
+
+      <div class="planner-result" id="plannerResult"></div>
     </section>
 
     <div class="count" id="count"></div>
@@ -667,6 +830,8 @@
     let routesData = [];
     let headers = [];
     let distanceUnit = "miles";
+    let activeQuickStart = "";
+    let activeQuickTerrain = "";
 
     function parseCSV(text) {
       const rows = [];
@@ -750,6 +915,10 @@
       return distanceUnit === "km" ? number / 1.60934 : number;
     }
 
+    function milesToCurrentUnit(miles) {
+      return distanceUnit === "km" ? (miles * 1.60934).toFixed(1) : miles.toFixed(1);
+    }
+
     function getFirstAvailable(route, keys) {
       for (const key of keys) {
         const value = getRouteValue(route, key);
@@ -765,6 +934,11 @@
         .filter(Boolean);
     }
 
+    function uniqueValues(field) {
+      return Array.from(new Set(routesData.map(route => getRouteValue(route, field)).filter(Boolean)))
+        .sort((a, b) => a.localeCompare(b));
+    }
+
     function createDynamicFilters() {
       const filtersContainer = document.getElementById("advancedFilters");
 
@@ -775,16 +949,16 @@
           .map(route => getRouteValue(route, header))
           .filter(Boolean);
 
-        const uniqueValues = new Set();
+        const uniqueValuesSet = new Set();
         values.forEach(value => {
           if (header === "tags") {
-            splitMultiValues(value).forEach(tag => uniqueValues.add(tag));
+            splitMultiValues(value).forEach(tag => uniqueValuesSet.add(tag));
           } else {
-            uniqueValues.add(value);
+            uniqueValuesSet.add(value);
           }
         });
 
-        return uniqueValues.size > 0 && uniqueValues.size <= 30;
+        return uniqueValuesSet.size > 0 && uniqueValuesSet.size <= 30;
       });
 
       filterFields.forEach(field => {
@@ -833,11 +1007,78 @@
           select.appendChild(option);
         });
 
-        select.addEventListener("change", filterRoutes);
+        select.addEventListener("change", () => {
+          if (field === "start_point") activeQuickStart = select.value;
+          if (field === "terrain") activeQuickTerrain = select.value;
+          updateQuickButtonStates();
+          filterRoutes();
+        });
 
         wrapper.appendChild(label);
         wrapper.appendChild(select);
         filtersContainer.appendChild(wrapper);
+      });
+    }
+
+    function populateQuickWizard() {
+      const startContainer = document.getElementById("startQuickButtons");
+      const terrainContainer = document.getElementById("terrainQuickButtons");
+
+      startContainer.innerHTML = "";
+      terrainContainer.innerHTML = "";
+
+      const starts = uniqueValues("start_point");
+      const terrains = uniqueValues("terrain");
+
+      const anyStart = document.createElement("button");
+      anyStart.className = "quick-button quick-start active";
+      anyStart.textContent = "Any start";
+      anyStart.dataset.value = "";
+      anyStart.addEventListener("click", () => setQuickFilter("start_point", ""));
+      startContainer.appendChild(anyStart);
+
+      starts.slice(0, 12).forEach(start => {
+        const button = document.createElement("button");
+        button.className = "quick-button quick-start";
+        button.textContent = start;
+        button.dataset.value = start;
+        button.addEventListener("click", () => setQuickFilter("start_point", start));
+        startContainer.appendChild(button);
+      });
+
+      const anyTerrain = document.createElement("button");
+      anyTerrain.className = "quick-button quick-terrain active";
+      anyTerrain.textContent = "Any terrain";
+      anyTerrain.dataset.value = "";
+      anyTerrain.addEventListener("click", () => setQuickFilter("terrain", ""));
+      terrainContainer.appendChild(anyTerrain);
+
+      terrains.forEach(terrain => {
+        const button = document.createElement("button");
+        button.className = "quick-button quick-terrain";
+        button.textContent = terrain;
+        button.dataset.value = terrain;
+        button.addEventListener("click", () => setQuickFilter("terrain", terrain));
+        terrainContainer.appendChild(button);
+      });
+    }
+
+    function populatePlanner() {
+      const startSelect = document.getElementById("plannerStart");
+      const terrainSelect = document.getElementById("plannerTerrain");
+
+      uniqueValues("start_point").forEach(start => {
+        const option = document.createElement("option");
+        option.value = start;
+        option.textContent = start;
+        startSelect.appendChild(option);
+      });
+
+      uniqueValues("terrain").forEach(terrain => {
+        const option = document.createElement("option");
+        option.value = terrain;
+        option.textContent = terrain;
+        terrainSelect.appendChild(option);
       });
     }
 
@@ -856,7 +1097,9 @@
         }).filter(route => getRouteValue(route, "name"));
 
         createDynamicFilters();
-        displayRoutes(routesData);
+        populateQuickWizard();
+        populatePlanner();
+        displayRoutes(getSortedRoutes(routesData));
       })
       .catch(error => {
         document.getElementById("routes").innerHTML =
@@ -914,13 +1157,13 @@
       });
     }
 
-    function filterRoutes() {
+    function getFilteredRoutes() {
       const search = document.getElementById("search").value.toLowerCase();
       const dynamicFilters = Array.from(document.querySelectorAll(".dynamic-filter"));
       const minDistanceMiles = inputDistanceToMiles(document.getElementById("minDistance").value);
       const maxDistanceMiles = inputDistanceToMiles(document.getElementById("maxDistance").value);
 
-      const filtered = routesData.filter(route => {
+      return routesData.filter(route => {
         const searchableText = headers
           .filter(header => !["image_url", "image", "photo_url", "photo"].includes(header))
           .map(header => getRouteValue(route, header))
@@ -950,8 +1193,135 @@
 
         return matchesSearch && matchesMinDistance && matchesMaxDistance && matchesDynamicFilters;
       });
+    }
 
-      displayRoutes(filtered);
+    function getSortedRoutes(data) {
+      const sortBy = document.getElementById("sortBy").value;
+      const sorted = [...data];
+
+      if (sortBy === "distance-asc") {
+        sorted.sort((a, b) => getMiles(a) - getMiles(b));
+      } else if (sortBy === "distance-desc") {
+        sorted.sort((a, b) => getMiles(b) - getMiles(a));
+      } else if (sortBy === "name-asc") {
+        sorted.sort((a, b) => getRouteValue(a, "name").localeCompare(getRouteValue(b, "name")));
+      } else if (sortBy === "start-asc") {
+        sorted.sort((a, b) => getRouteValue(a, "start_point").localeCompare(getRouteValue(b, "start_point")));
+      }
+
+      return sorted;
+    }
+
+    function filterRoutes() {
+      displayRoutes(getSortedRoutes(getFilteredRoutes()));
+    }
+
+    function setQuickFilter(field, value) {
+      const select = document.querySelector(`.dynamic-filter[data-field="${field}"]`);
+      if (select) select.value = value;
+
+      if (field === "start_point") activeQuickStart = value;
+      if (field === "terrain") activeQuickTerrain = value;
+
+      updateQuickButtonStates();
+      filterRoutes();
+    }
+
+    function updateQuickButtonStates() {
+      document.querySelectorAll(".quick-start").forEach(button => {
+        button.classList.toggle("active", button.dataset.value === activeQuickStart);
+      });
+
+      document.querySelectorAll(".quick-terrain").forEach(button => {
+        button.classList.toggle("active", button.dataset.value === activeQuickTerrain);
+      });
+
+      const min = document.getElementById("minDistance").value;
+      const max = document.getElementById("maxDistance").value;
+
+      document.querySelectorAll(".distance-preset").forEach(button => {
+        const minMatch = button.dataset.min === min;
+        const maxMatch = button.dataset.max === max;
+        button.classList.toggle("active", minMatch && maxMatch);
+      });
+    }
+
+    function clearWizard() {
+      document.getElementById("minDistance").value = "";
+      document.getElementById("maxDistance").value = "";
+      setQuickFilter("start_point", "");
+      setQuickFilter("terrain", "");
+      updateQuickButtonStates();
+      filterRoutes();
+    }
+
+    function generatePlanner() {
+      const start = document.getElementById("plannerStart").value;
+      const terrain = document.getElementById("plannerTerrain").value;
+      const result = document.getElementById("plannerResult");
+
+      if (!start) {
+        result.className = "planner-result open";
+        result.innerHTML = `<div class="empty">Choose a start location first.</div>`;
+        return;
+      }
+
+      const candidates = routesData.filter(route => {
+        const startMatches = getRouteValue(route, "start_point") === start;
+        const terrainMatches = !terrain || getRouteValue(route, "terrain") === terrain;
+        return startMatches && terrainMatches;
+      });
+
+      const targets = [
+        { label: "5k", miles: 3.1 },
+        { label: "7.5k", miles: 4.7 },
+        { label: "10k", miles: 6.2 }
+      ];
+
+      const chosen = [];
+      targets.forEach(target => {
+        const available = candidates
+          .filter(route => !chosen.includes(route))
+          .map(route => ({ route, diff: Math.abs(getMiles(route) - target.miles) }))
+          .sort((a, b) => a.diff - b.diff);
+
+        if (available.length) {
+          chosen.push(available[0].route);
+        }
+      });
+
+      if (!chosen.length) {
+        result.className = "planner-result open";
+        result.innerHTML = `<div class="empty">No matching routes found for that start location and terrain.</div>`;
+        return;
+      }
+
+      result.className = "planner-result open";
+      result.innerHTML = `
+        <h3>Suggested MapRun set from ${start}</h3>
+        <div class="planner-list">
+          ${chosen.map((route, index) => {
+            const target = targets[index];
+            const name = getRouteValue(route, "name");
+            const miles = getMiles(route);
+            const link = getFirstAvailable(route, ["outdooractive_url", "route_url", "url", "link"]);
+            const image = getFirstAvailable(route, ["image_url", "image", "photo_url", "photo"]) || FALLBACK_IMAGE;
+
+            return `
+              <div class="planner-item">
+                <img src="${escapeForAttribute(image)}" alt="${escapeForAttribute(name)}">
+                <div>
+                  <strong>${target ? target.label : "Route"} · ${name}</strong>
+                  <span>${displayDistance(miles)}</span>
+                  <div style="margin-top:6px;">
+                    ${link ? `<a class="button" href="${escapeForAttribute(link)}" target="_blank" rel="noopener">View</a>` : ""}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
     }
 
     function escapeForAttribute(value) {
@@ -984,9 +1354,7 @@
       navigator.clipboard.writeText(url).then(() => {
         const originalText = button.textContent;
         button.textContent = "Copied!";
-        setTimeout(() => {
-          button.textContent = originalText;
-        }, 1400);
+        setTimeout(() => { button.textContent = originalText; }, 1400);
       }).catch(() => {
         const textArea = document.createElement("textarea");
         textArea.value = url;
@@ -997,9 +1365,7 @@
 
         const originalText = button.textContent;
         button.textContent = "Copied!";
-        setTimeout(() => {
-          button.textContent = originalText;
-        }, 1400);
+        setTimeout(() => { button.textContent = originalText; }, 1400);
       });
     }
 
@@ -1032,13 +1398,19 @@
     }
 
     function setDistanceUnit(unit) {
+      const oldUnit = distanceUnit;
       distanceUnit = unit;
-
-      document.getElementById("milesButton").classList.toggle("active", unit === "miles");
-      document.getElementById("kmButton").classList.toggle("active", unit === "km");
 
       const minInput = document.getElementById("minDistance");
       const maxInput = document.getElementById("maxDistance");
+
+      if (oldUnit !== unit) {
+        if (minInput.value) minInput.value = milesToCurrentUnit(inputDistanceToMiles(minInput.value));
+        if (maxInput.value) maxInput.value = milesToCurrentUnit(inputDistanceToMiles(maxInput.value));
+      }
+
+      document.getElementById("milesButton").classList.toggle("active", unit === "miles");
+      document.getElementById("kmButton").classList.toggle("active", unit === "km");
 
       minInput.placeholder = unit === "km" ? "Min km" : "Min miles";
       maxInput.placeholder = unit === "km" ? "Max km" : "Max miles";
@@ -1048,8 +1420,9 @@
     }
 
     document.getElementById("search").addEventListener("input", filterRoutes);
-    document.getElementById("minDistance").addEventListener("input", filterRoutes);
-    document.getElementById("maxDistance").addEventListener("input", filterRoutes);
+    document.getElementById("sortBy").addEventListener("change", filterRoutes);
+    document.getElementById("minDistance").addEventListener("input", () => { updateQuickButtonStates(); filterRoutes(); });
+    document.getElementById("maxDistance").addEventListener("input", () => { updateQuickButtonStates(); filterRoutes(); });
 
     document.getElementById("advancedToggle").addEventListener("click", () => {
       const panel = document.getElementById("advancedFilters");
@@ -1057,6 +1430,32 @@
       const isOpen = panel.classList.toggle("open");
       button.textContent = isOpen ? "Advanced search ▴" : "Advanced search ▾";
     });
+
+    document.getElementById("wizardToggle").addEventListener("click", () => {
+      const panel = document.getElementById("wizardPanel");
+      const button = document.getElementById("wizardToggle");
+      const isOpen = panel.classList.toggle("open");
+      button.textContent = isOpen ? "Quick route wizard ▴" : "Quick route wizard ▾";
+    });
+
+    document.querySelectorAll(".distance-preset").forEach(button => {
+      button.addEventListener("click", () => {
+        document.getElementById("minDistance").value = button.dataset.min ? milesToCurrentUnit(parseFloat(button.dataset.min)) : "";
+        document.getElementById("maxDistance").value = button.dataset.max ? milesToCurrentUnit(parseFloat(button.dataset.max)) : "";
+        updateQuickButtonStates();
+        filterRoutes();
+      });
+    });
+
+    document.getElementById("clearDistancePreset").addEventListener("click", () => {
+      document.getElementById("minDistance").value = "";
+      document.getElementById("maxDistance").value = "";
+      updateQuickButtonStates();
+      filterRoutes();
+    });
+
+    document.getElementById("clearWizard").addEventListener("click", clearWizard);
+    document.getElementById("generatePlanner").addEventListener("click", generatePlanner);
 
     document.getElementById("modalClose").addEventListener("click", closeImageModal);
 
