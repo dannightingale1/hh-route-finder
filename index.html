@@ -931,18 +931,18 @@
           </div>
 
           <div class="find-step">
-            <h3>2. Where from?</h3>
+            <h3>2. What type?</h3>
+            <div class="quick-buttons" id="terrainQuickButtons"></div>
+          </div>
+
+          <div class="find-step">
+            <h3>3. Where from?</h3>
             <div class="quick-buttons" id="startQuickButtons"></div>
           </div>
 
           <div class="find-step">
-            <h3>3. Passes through?</h3>
+            <h3>4. Passes through?</h3>
             <div class="quick-buttons" id="passesThroughQuickButtons"></div>
-          </div>
-
-          <div class="find-step">
-            <h3>4. What type?</h3>
-            <div class="quick-buttons" id="terrainQuickButtons"></div>
           </div>
 
           <div class="find-actions">
@@ -1884,12 +1884,6 @@
     function setPage(tabName, newPage) {
       getTabState(tabName).page = newPage;
       renderAllRouteViews();
-
-      const panelId = tabName === "browse" ? "browseRoutesPanel" : tabName === "find" ? "findRunPanel" : tabName === "strava" ? "stravaArtPanel" : "awayDayRunPanel";
-      const panel = document.getElementById(panelId);
-      if (panel && panel.classList.contains("active")) {
-        panel.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
     }
 
     function setPageSize(tabName, value) {
