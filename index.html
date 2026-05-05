@@ -1510,6 +1510,30 @@
       });
     }
 
+    function getQuickSearchOptionRoutes() {
+      return routesData.filter(route => {
+        if (!isStandardRoute(route)) return false;
+
+        const routeMiles = getMiles(route);
+        const matchesMin = quickDistance.min === null || routeMiles >= quickDistance.min;
+        const matchesMax = quickDistance.max === null || routeMiles <= quickDistance.max;
+        const matchesStart = !activeQuickStart || getRouteValue(route, "start_point") === activeQuickStart;
+        const matchesPassesThrough = !activeQuickPassesThrough || splitMultiValues(getRouteValue(route, "passes_through")).includes(activeQuickPassesThrough);
+        const matchesTerrain = !activeQuickTerrain || getRouteValue(route, "terrain") === activeQuickTerrain;
+
+        return matchesMin && matchesMax && matchesStart && matchesPassesThrough && matchesTerrain;
+      });
+    }
+
+    function makeQuickChip(container, className, label, value, field, isActive) {
+      const button = document.createElement("button");
+      button.className = `quick-button ${className}${isActive ? " active" : ""}`;
+      button.textContent = label;
+      button.dataset.value = value;
+      button.addEventListener("click", () => setQuickFilter(field, value));
+      container.appendChild(button);
+    }
+
     function populateFindRunButtons() {
       const startContainer = document.getElementById("startQuickButtons");
       const passesThroughContainer = document.getElementById("passesThroughQuickButtons");
@@ -1519,59 +1543,31 @@
       if (passesThroughContainer) passesThroughContainer.innerHTML = "";
       terrainContainer.innerHTML = "";
 
-      const quickSearchRoutes = routesData.filter(route => !getRouteValue(route, "run_category"));
-      const starts = uniqueValuesFromRoutes(quickSearchRoutes, "start_point");
-      const passesThroughValues = uniqueMultiValuesFromRoutes(quickSearchRoutes, "passes_through");
-      const terrains = uniqueValuesFromRoutes(quickSearchRoutes, "terrain");
+      const allQuickSearchRoutes = routesData.filter(route => isStandardRoute(route));
+      const optionRoutes = getQuickSearchOptionRoutes();
 
-      const anyStart = document.createElement("button");
-      anyStart.className = "quick-button quick-start active";
-      anyStart.textContent = "Any start";
-      anyStart.dataset.value = "";
-      anyStart.addEventListener("click", () => setQuickFilter("start_point", ""));
-      startContainer.appendChild(anyStart);
+      // If the current combination has no matches, keep the active chips visible so the user can clear them.
+      const routesForChips = optionRoutes.length ? optionRoutes : allQuickSearchRoutes;
 
+      const starts = uniqueValuesFromRoutes(routesForChips, "start_point");
+      const passesThroughValues = uniqueMultiValuesFromRoutes(routesForChips, "passes_through");
+      const terrains = uniqueValuesFromRoutes(allQuickSearchRoutes, "terrain");
+
+      makeQuickChip(startContainer, "quick-start", "Any start", "", "start_point", !activeQuickStart);
       starts.forEach(start => {
-        const button = document.createElement("button");
-        button.className = "quick-button quick-start";
-        button.textContent = start;
-        button.dataset.value = start;
-        button.addEventListener("click", () => setQuickFilter("start_point", start));
-        startContainer.appendChild(button);
+        makeQuickChip(startContainer, "quick-start", start, start, "start_point", start === activeQuickStart);
       });
 
       if (passesThroughContainer) {
-        const anyPassesThrough = document.createElement("button");
-        anyPassesThrough.className = "quick-button quick-passes-through active";
-        anyPassesThrough.textContent = "Anywhere";
-        anyPassesThrough.dataset.value = "";
-        anyPassesThrough.addEventListener("click", () => setQuickFilter("passes_through", ""));
-        passesThroughContainer.appendChild(anyPassesThrough);
-
+        makeQuickChip(passesThroughContainer, "quick-passes-through", "Anywhere", "", "passes_through", !activeQuickPassesThrough);
         passesThroughValues.forEach(value => {
-          const button = document.createElement("button");
-          button.className = "quick-button quick-passes-through";
-          button.textContent = value;
-          button.dataset.value = value;
-          button.addEventListener("click", () => setQuickFilter("passes_through", value));
-          passesThroughContainer.appendChild(button);
+          makeQuickChip(passesThroughContainer, "quick-passes-through", value, value, "passes_through", value === activeQuickPassesThrough);
         });
       }
 
-      const anyTerrain = document.createElement("button");
-      anyTerrain.className = "quick-button quick-terrain active";
-      anyTerrain.textContent = "Any terrain";
-      anyTerrain.dataset.value = "";
-      anyTerrain.addEventListener("click", () => setQuickFilter("terrain", ""));
-      terrainContainer.appendChild(anyTerrain);
-
+      makeQuickChip(terrainContainer, "quick-terrain", "Any terrain", "", "terrain", !activeQuickTerrain);
       terrains.forEach(terrain => {
-        const button = document.createElement("button");
-        button.className = "quick-button quick-terrain";
-        button.textContent = terrain;
-        button.dataset.value = terrain;
-        button.addEventListener("click", () => setQuickFilter("terrain", terrain));
-        terrainContainer.appendChild(button);
+        makeQuickChip(terrainContainer, "quick-terrain", terrain, terrain, "terrain", terrain === activeQuickTerrain);
       });
     }
 
@@ -1922,6 +1918,7 @@
 
     function setQuickDistance(min, max) {
       quickDistance = { min, max };
+      populateFindRunButtons();
       updateQuickButtonStates();
       renderAllRouteViews();
     }
@@ -1934,6 +1931,7 @@
       if (field === "passes_through") activeQuickPassesThrough = value;
       if (field === "terrain") activeQuickTerrain = value;
 
+      populateFindRunButtons();
       updateQuickButtonStates();
       renderAllRouteViews();
     }
