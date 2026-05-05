@@ -467,11 +467,7 @@
       font-weight: bold;
     }
 
-    .count {
-      color: var(--muted);
-      margin-bottom: 12px;
-      font-size: 14px;
-    }
+    .count { display: none !important; }
 
     .routes {
       display: grid;
@@ -910,13 +906,15 @@
 
   <main>
     <div class="tab-bar" role="tablist" aria-label="HH route tools">
-      <button class="tab-button active" id="findRunTab" type="button">Find a Run</button>
-      <button class="tab-button" id="browseRoutesTab" type="button">Browse Routes</button>
+      <button class="tab-button active" id="findRunTab" type="button">Quick Search</button>
+      <button class="tab-button" id="browseRoutesTab" type="button">Advanced Search</button>
+      <button class="tab-button" id="stravaArtTab" type="button">Strava Art</button>
+      <button class="tab-button" id="awayDayRunTab" type="button">Away Day Runs</button>
     </div>
 
     <section class="tab-panel active" id="findRunPanel">
       <section class="panel">
-        <h2>Find a Run</h2>
+        <h2>Quick Search</h2>
         <p>Choose a distance, start location and terrain to quickly narrow down the routes.</p>
 
         <div class="find-grid">
@@ -954,7 +952,50 @@
       </section>
 
       <div class="count" id="findCount"></div>
+      <div class="pagination-bar" id="findPaginationTop">
+        <div class="pagination-left">
+          <div class="pagination-controls">
+            <button type="button" id="firstPageFindTop">Start</button>
+            <button type="button" id="prevPageFindTop">Back</button>
+            <button type="button" id="nextPageFindTop">Forward</button>
+            <button type="button" id="lastPageFindTop">End</button>
+          </div>
+          <div class="pagination-info" id="pageInfoFindTop">Page 1 of 1</div>
+        </div>
+        <label class="page-size-wrap">
+          Per page
+          <select id="pageSizeSelectFindTop" class="page-size-select">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="all">All</option>
+          </select>
+        </label>
+      </div>
       <section class="routes tile-view" id="findRoutes"></section>
+      <div class="pagination-bar" id="findBottomPaginationTop">
+        <div class="pagination-left">
+          <div class="pagination-controls">
+            <button type="button" id="firstPageFindBottomTop">Start</button>
+            <button type="button" id="prevPageFindBottomTop">Back</button>
+            <button type="button" id="nextPageFindBottomTop">Forward</button>
+            <button type="button" id="lastPageFindBottomTop">End</button>
+          </div>
+          <div class="pagination-info" id="pageInfoFindBottomTop">Page 1 of 1</div>
+        </div>
+        <label class="page-size-wrap">
+          Per page
+          <select id="pageSizeSelectFindBottomTop" class="page-size-select">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="all">All</option>
+          </select>
+        </label>
+      </div>
+
     </section>
 
     <section class="tab-panel" id="browseRoutesPanel">
@@ -1054,6 +1095,103 @@
 
     </section>
 
+
+    <section class="tab-panel" id="stravaArtPanel">
+      <div class="count" id="stravaArtCount"></div>
+
+      <div class="pagination-bar" id="stravaArtPaginationTop">
+        <div class="pagination-left">
+          <div class="pagination-controls">
+            <button type="button" id="firstPageStravaArtTop">Start</button>
+            <button type="button" id="prevPageStravaArtTop">Back</button>
+            <button type="button" id="nextPageStravaArtTop">Forward</button>
+            <button type="button" id="lastPageStravaArtTop">End</button>
+          </div>
+          <div class="pagination-info" id="pageInfoStravaArtTop">Page 1 of 1</div>
+        </div>
+        <label class="page-size-wrap">
+          Per page
+          <select id="pageSizeSelectStravaArtTop" class="page-size-select">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="all">All</option>
+          </select>
+        </label>
+      </div>
+      <section class="routes tile-view" id="stravaArtRoutes"></section>
+      <div class="pagination-bar" id="stravaArtBottomPaginationTop">
+        <div class="pagination-left">
+          <div class="pagination-controls">
+            <button type="button" id="firstPageStravaArtBottomTop">Start</button>
+            <button type="button" id="prevPageStravaArtBottomTop">Back</button>
+            <button type="button" id="nextPageStravaArtBottomTop">Forward</button>
+            <button type="button" id="lastPageStravaArtBottomTop">End</button>
+          </div>
+          <div class="pagination-info" id="pageInfoStravaArtBottomTop">Page 1 of 1</div>
+        </div>
+        <label class="page-size-wrap">
+          Per page
+          <select id="pageSizeSelectStravaArtBottomTop" class="page-size-select">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="all">All</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="awayDayRunPanel">
+      <div class="count" id="awayDayRunCount"></div>
+
+      <div class="pagination-bar" id="awayDayRunPaginationTop">
+        <div class="pagination-left">
+          <div class="pagination-controls">
+            <button type="button" id="firstPageAwayDayRunTop">Start</button>
+            <button type="button" id="prevPageAwayDayRunTop">Back</button>
+            <button type="button" id="nextPageAwayDayRunTop">Forward</button>
+            <button type="button" id="lastPageAwayDayRunTop">End</button>
+          </div>
+          <div class="pagination-info" id="pageInfoAwayDayRunTop">Page 1 of 1</div>
+        </div>
+        <label class="page-size-wrap">
+          Per page
+          <select id="pageSizeSelectAwayDayRunTop" class="page-size-select">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="all">All</option>
+          </select>
+        </label>
+      </div>
+      <section class="routes tile-view" id="awayDayRunRoutes"></section>
+      <div class="pagination-bar" id="awayDayRunBottomPaginationTop">
+        <div class="pagination-left">
+          <div class="pagination-controls">
+            <button type="button" id="firstPageAwayDayRunBottomTop">Start</button>
+            <button type="button" id="prevPageAwayDayRunBottomTop">Back</button>
+            <button type="button" id="nextPageAwayDayRunBottomTop">Forward</button>
+            <button type="button" id="lastPageAwayDayRunBottomTop">End</button>
+          </div>
+          <div class="pagination-info" id="pageInfoAwayDayRunBottomTop">Page 1 of 1</div>
+        </div>
+        <label class="page-size-wrap">
+          Per page
+          <select id="pageSizeSelectAwayDayRunBottomTop" class="page-size-select">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="all">All</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
     <section class="tab-panel" id="maprunPlannerPanel">
       <section class="panel">
         <h2>MapRun Planner</h2>
@@ -1111,13 +1249,19 @@
       "image_url",
       "image",
       "photo",
-      "photo_url"
+      "photo_url",
+      "run_category"
     ];
 
     let routesData = [];
     let headers = [];
-    let currentPage = 1;
-    let pageSize = 25;
+    let currentTab = "find";
+    let paginationState = {
+      find: { page: 1, pageSize: 25 },
+      browse: { page: 1, pageSize: 25 },
+      strava: { page: 1, pageSize: 25 },
+      away: { page: 1, pageSize: 25 }
+    };
     let distanceUnit = "miles";
     let activeQuickStart = "";
     let activeQuickPassesThrough = "";
@@ -1572,8 +1716,18 @@
       container.innerHTML = data.map(routeCardHtml).join("");
     }
 
+    function normaliseCategory(route) {
+      return getRouteValue(route, "run_category").trim().toLowerCase();
+    }
+
+    function isStandardRoute(route) {
+      return !normaliseCategory(route);
+    }
+
     function getFindRunRoutes() {
       return routesData.filter(route => {
+        if (!isStandardRoute(route)) return false;
+
         const routeMiles = getMiles(route);
 
         const matchesMin = quickDistance.min === null || routeMiles >= quickDistance.min;
@@ -1584,6 +1738,11 @@
 
         return matchesMin && matchesMax && matchesStart && matchesPassesThrough && matchesTerrain;
       });
+    }
+
+    function getCategoryRoutes(categoryName) {
+      const target = categoryName.trim().toLowerCase();
+      return routesData.filter(route => normaliseCategory(route) === target);
     }
 
     function getBrowseRoutes() {
@@ -1650,85 +1809,98 @@
       return sorted;
     }
 
-    function getPageSizeValue() {
-      return pageSize === "all" ? "all" : Number(pageSize || 25);
+    function getTabState(tabName) {
+      return paginationState[tabName] || paginationState.browse;
     }
 
-    function getTotalPages(totalItems) {
-      const size = getPageSizeValue();
+    function getPageSizeValue(tabName) {
+      const state = getTabState(tabName);
+      return state.pageSize === "all" ? "all" : Number(state.pageSize || 25);
+    }
+
+    function getTotalPagesForTab(totalItems, tabName) {
+      const size = getPageSizeValue(tabName);
       if (size === "all") return 1;
       return Math.max(1, Math.ceil(totalItems / size));
     }
 
-    function getPaginatedRoutes(routes) {
-      const size = getPageSizeValue();
+    function getPaginatedRoutesForTab(routes, tabName) {
+      const state = getTabState(tabName);
+      const size = getPageSizeValue(tabName);
       if (size === "all") return routes;
 
-      const totalPages = getTotalPages(routes.length);
-      currentPage = Math.min(Math.max(1, currentPage), totalPages);
+      const totalPages = getTotalPagesForTab(routes.length, tabName);
+      state.page = Math.min(Math.max(1, state.page), totalPages);
 
-      const start = (currentPage - 1) * size;
+      const start = (state.page - 1) * size;
       return routes.slice(start, start + size);
     }
 
-    function updatePaginationControls(totalItems) {
-      const totalPages = getTotalPages(totalItems);
-      currentPage = Math.min(Math.max(1, currentPage), totalPages);
+    function updatePaginationControlsForTab(totalItems, tabName, suffixes) {
+      const state = getTabState(tabName);
+      const totalPages = getTotalPagesForTab(totalItems, tabName);
+      state.page = Math.min(Math.max(1, state.page), totalPages);
 
-      const info = totalItems
-        ? `Page ${currentPage} of ${totalPages}`
-        : "No routes found";
+      const info = totalItems ? `Page ${state.page} of ${totalPages}` : "No routes found";
 
-      ["Top", "Bottom"].forEach(pos => {
-        const infoEl = document.getElementById(`pageInfo${pos}`);
+      suffixes.forEach(suffix => {
+        const infoEl = document.getElementById(`pageInfo${suffix}`);
         if (infoEl) infoEl.textContent = info;
 
-        const first = document.getElementById(`firstPage${pos}`);
-        const prev = document.getElementById(`prevPage${pos}`);
-        const next = document.getElementById(`nextPage${pos}`);
-        const last = document.getElementById(`lastPage${pos}`);
+        const first = document.getElementById(`firstPage${suffix}`);
+        const prev = document.getElementById(`prevPage${suffix}`);
+        const next = document.getElementById(`nextPage${suffix}`);
+        const last = document.getElementById(`lastPage${suffix}`);
 
-        if (first) first.disabled = currentPage <= 1 || totalItems === 0;
-        if (prev) prev.disabled = currentPage <= 1 || totalItems === 0;
-        if (next) next.disabled = currentPage >= totalPages || totalItems === 0;
-        if (last) last.disabled = currentPage >= totalPages || totalItems === 0;
+        if (first) first.disabled = state.page <= 1 || totalItems === 0;
+        if (prev) prev.disabled = state.page <= 1 || totalItems === 0;
+        if (next) next.disabled = state.page >= totalPages || totalItems === 0;
+        if (last) last.disabled = state.page >= totalPages || totalItems === 0;
 
-        const select = document.getElementById(`pageSizeSelect${pos}`);
-        if (select) select.value = String(pageSize);
+        const select = document.getElementById(`pageSizeSelect${suffix}`);
+        if (select) select.value = String(state.pageSize);
       });
     }
 
-    function setPage(newPage) {
-      currentPage = newPage;
+    function setPage(tabName, newPage) {
+      getTabState(tabName).page = newPage;
       renderAllRouteViews();
 
-      const browsePanel = document.getElementById("browseRoutesPanel");
-      if (browsePanel && browsePanel.classList.contains("active")) {
-        browsePanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      const panelId = tabName === "browse" ? "browseRoutesPanel" : tabName === "find" ? "findRunPanel" : tabName === "strava" ? "stravaArtPanel" : "awayDayRunPanel";
+      const panel = document.getElementById(panelId);
+      if (panel && panel.classList.contains("active")) {
+        panel.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }
 
-    function setPageSize(value) {
-      pageSize = value === "all" ? "all" : Number(value);
-      currentPage = 1;
-      localStorage.setItem("hh-page-size", String(pageSize));
+    function setPageSize(tabName, value) {
+      const state = getTabState(tabName);
+      state.pageSize = value === "all" ? "all" : Number(value);
+      state.page = 1;
+      localStorage.setItem(`hh-page-size-${tabName}`, String(state.pageSize));
       renderAllRouteViews();
     }
 
     function resetPaginationAndRender() {
-      currentPage = 1;
+      getTabState("browse").page = 1;
       renderAllRouteViews();
     }
 
-function renderAllRouteViews() {
-      displayRoutes(getSortedRoutes(getFindRunRoutes()), "findRoutes", "findCount");
+    function displayPaginatedRoutes(data, containerId, countId, tabName, suffixes) {
+      const paginated = getPaginatedRoutesForTab(data, tabName);
+      displayRoutes(paginated, containerId, countId);
+      updatePaginationControlsForTab(data.length, tabName, suffixes);
+    }
+
+    function renderAllRouteViews() {
+      displayPaginatedRoutes(getSortedRoutes(getFindRunRoutes()), "findRoutes", "findCount", "find", ["FindTop", "FindBottomTop"]);
 
       const browseRoutes = getSortedRoutes(getBrowseRoutes());
-      const paginatedBrowseRoutes = getPaginatedRoutes(browseRoutes);
+      displayPaginatedRoutes(browseRoutes, "browseRoutes", "browseCount", "browse", ["Top", "Bottom"]);
 
-      displayRoutes(paginatedBrowseRoutes, "browseRoutes", "browseCount");
-      document.getElementById("browseCount").textContent = `${browseRoutes.length} routes found`;
-      updatePaginationControls(browseRoutes.length);
+      displayPaginatedRoutes(getSortedRoutes(getCategoryRoutes("Strava Art")), "stravaArtRoutes", "stravaArtCount", "strava", ["StravaArtTop", "StravaArtBottomTop"]);
+
+      displayPaginatedRoutes(getSortedRoutes(getCategoryRoutes("Away Day Run")), "awayDayRunRoutes", "awayDayRunCount", "away", ["AwayDayRunTop", "AwayDayRunBottomTop"]);
     }
 
     function setQuickDistance(min, max) {
@@ -2007,7 +2179,7 @@ ${longLink}`;
 
       currentViewMode = mode;
 
-      ["findRoutes", "browseRoutes"].forEach(id => {
+      ["findRoutes", "browseRoutes", "stravaArtRoutes", "awayDayRunRoutes"].forEach(id => {
         const routes = document.getElementById(id);
         routes.classList.remove("tile-view", "list-view");
         routes.classList.add(mode === "list" ? "list-view" : "tile-view");
@@ -2051,11 +2223,21 @@ ${longLink}`;
           button: document.getElementById("browseRoutesTab"),
           panel: document.getElementById("browseRoutesPanel")
         },
+        strava: {
+          button: document.getElementById("stravaArtTab"),
+          panel: document.getElementById("stravaArtPanel")
+        },
+        away: {
+          button: document.getElementById("awayDayRunTab"),
+          panel: document.getElementById("awayDayRunPanel")
+        },
         maprun: {
           button: document.getElementById("maprunPlannerMenuItem"),
           panel: document.getElementById("maprunPlannerPanel")
         }
       };
+
+      currentTab = tabName;
 
       Object.keys(tabs).forEach(key => {
         if (tabs[key].button) {
@@ -2141,6 +2323,8 @@ ${longLink}`;
 
     document.getElementById("findRunTab").addEventListener("click", () => setActiveTab("find"));
     document.getElementById("browseRoutesTab").addEventListener("click", () => setActiveTab("browse"));
+    document.getElementById("stravaArtTab").addEventListener("click", () => setActiveTab("strava"));
+    document.getElementById("awayDayRunTab").addEventListener("click", () => setActiveTab("away"));
     document.getElementById("kebabButton").addEventListener("click", event => {
       event.stopPropagation();
       toggleKebabMenu();
@@ -2150,23 +2334,40 @@ ${longLink}`;
       if (!event.target.closest(".kebab-menu")) closeKebabMenu();
     });
 
-    function addPaginationListeners(position) {
-      const suffix = position;
+    function getRoutesForTab(tabName) {
+      if (tabName === "find") return getSortedRoutes(getFindRunRoutes());
+      if (tabName === "strava") return getSortedRoutes(getCategoryRoutes("Strava Art"));
+      if (tabName === "away") return getSortedRoutes(getCategoryRoutes("Away Day Run"));
+      return getSortedRoutes(getBrowseRoutes());
+    }
+
+    function addPaginationListeners(tabName, suffix) {
       const first = document.getElementById(`firstPage${suffix}`);
       const prev = document.getElementById(`prevPage${suffix}`);
       const next = document.getElementById(`nextPage${suffix}`);
       const last = document.getElementById(`lastPage${suffix}`);
       const select = document.getElementById(`pageSizeSelect${suffix}`);
 
-      if (first) first.addEventListener("click", () => setPage(1));
-      if (prev) prev.addEventListener("click", () => setPage(currentPage - 1));
-      if (next) next.addEventListener("click", () => setPage(currentPage + 1));
-      if (last) last.addEventListener("click", () => setPage(getTotalPages(getBrowseRoutes().length)));
-      if (select) select.addEventListener("change", event => setPageSize(event.target.value));
+      if (first) first.addEventListener("click", () => setPage(tabName, 1));
+      if (prev) prev.addEventListener("click", () => setPage(tabName, getTabState(tabName).page - 1));
+      if (next) next.addEventListener("click", () => setPage(tabName, getTabState(tabName).page + 1));
+      if (last) last.addEventListener("click", () => setPage(tabName, getTotalPagesForTab(getRoutesForTab(tabName).length, tabName)));
+      if (select) select.addEventListener("change", event => setPageSize(tabName, event.target.value));
     }
 
-    addPaginationListeners("Top");
-    addPaginationListeners("Bottom");
+    addPaginationListeners("browse", "Top");
+    addPaginationListeners("browse", "Bottom");
+    addPaginationListeners("find", "FindTop");
+    addPaginationListeners("find", "FindBottomTop");
+    addPaginationListeners("strava", "StravaArtTop");
+    addPaginationListeners("strava", "StravaArtBottomTop");
+    addPaginationListeners("away", "AwayDayRunTop");
+    addPaginationListeners("away", "AwayDayRunBottomTop");
+
+    ["find", "browse", "strava", "away"].forEach(tabName => {
+      const savedSize = localStorage.getItem(`hh-page-size-${tabName}`);
+      if (savedSize) paginationState[tabName].pageSize = savedSize === "all" ? "all" : Number(savedSize);
+    });
 
     const savedTheme = localStorage.getItem("hh-theme");
     if (savedTheme) {
