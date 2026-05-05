@@ -1146,6 +1146,44 @@
     </section>
 
     <section class="tab-panel" id="awayDayRunPanel">
+      <section class="panel">
+        <h2>Away Day Runs</h2>
+        <p>Use the chips to narrow the away day routes by distance, terrain, start location and places they pass through.</p>
+
+        <div class="find-grid">
+          <div class="find-step">
+            <h3>1. How far?</h3>
+            <div class="quick-buttons">
+              <button class="quick-button away-distance-preset" data-min="0" data-max="3.1">Under 5k</button>
+              <button class="quick-button away-distance-preset" data-min="0" data-max="3.5">Around 5k</button>
+              <button class="quick-button away-distance-preset" data-min="3.6" data-max="5.3">Around 7.5k</button>
+              <button class="quick-button away-distance-preset" data-min="5.4" data-max="6.8">Around 10k</button>
+              <button class="quick-button away-distance-preset" data-min="6.9" data-max="">Longer</button>
+              <button class="quick-button" id="clearAwayDistancePreset" type="button">Any distance</button>
+            </div>
+          </div>
+
+          <div class="find-step">
+            <h3>2. What type?</h3>
+            <div class="quick-buttons" id="awayTerrainQuickButtons"></div>
+          </div>
+
+          <div class="find-step">
+            <h3>3. Where from?</h3>
+            <div class="quick-buttons" id="awayStartQuickButtons"></div>
+          </div>
+
+          <div class="find-step">
+            <h3>4. Passes through?</h3>
+            <div class="quick-buttons" id="awayPassesThroughQuickButtons"></div>
+          </div>
+
+          <div class="find-actions">
+            <button class="button" id="clearAwayRun" type="button">Clear choices</button>
+          </div>
+        </div>
+      </section>
+
       <div class="count" id="awayDayRunCount"></div>
 
       <div class="pagination-bar" id="awayDayRunPaginationTop">
@@ -1268,6 +1306,10 @@
     let activeQuickPassesThrough = [];
     let activeQuickTerrain = "";
     let quickDistance = { min: null, max: null };
+    let activeAwayStart = "";
+    let activeAwayPassesThrough = [];
+    let activeAwayTerrain = "";
+    let awayDistance = { min: null, max: null };
     let plannerOptions = { short: [], medium: [], long: [] };
     let plannerIndexes = { short: 0, medium: 0, long: 0 };
     let currentViewMode = "tile";
@@ -1589,6 +1631,83 @@
       });
     }
 
+    function routeMatchesAwayFilters(route, options = {}) {
+      if (normaliseCategory(route) !== "away day run") return false;
+
+      const ignoreStart = options.ignoreStart || false;
+      const ignorePassesThrough = options.ignorePassesThrough || false;
+      const ignoreTerrain = options.ignoreTerrain || false;
+      const ignoreDistance = options.ignoreDistance || false;
+
+      const routeMiles = getMiles(route);
+      const routePassesThrough = splitMultiValues(getRouteValue(route, "passes_through"));
+
+      const matchesMin = ignoreDistance || awayDistance.min === null || routeMiles >= awayDistance.min;
+      const matchesMax = ignoreDistance || awayDistance.max === null || routeMiles <= awayDistance.max;
+      const matchesStart = ignoreStart || !activeAwayStart || getRouteValue(route, "start_point") === activeAwayStart;
+      const matchesPassesThrough = ignorePassesThrough || !activeAwayPassesThrough.length || activeAwayPassesThrough.every(value => routePassesThrough.includes(value));
+      const matchesTerrain = ignoreTerrain || !activeAwayTerrain || getRouteValue(route, "terrain") === activeAwayTerrain;
+
+      return matchesMin && matchesMax && matchesStart && matchesPassesThrough && matchesTerrain;
+    }
+
+    function getAwayDayRunRoutes() {
+      return routesData.filter(route => routeMatchesAwayFilters(route));
+    }
+
+    function getAwayOptionRoutes() {
+      return routesData.filter(route => routeMatchesAwayFilters(route));
+    }
+
+    function makeAwayChip(container, className, label, value, field, isActive) {
+      const button = document.createElement("button");
+      button.className = `quick-button ${className}${isActive ? " active" : ""}`;
+      button.textContent = label;
+      button.dataset.value = value;
+      button.addEventListener("click", () => setAwayFilter(field, value));
+      container.appendChild(button);
+    }
+
+    function populateAwayRunButtons() {
+      const startContainer = document.getElementById("awayStartQuickButtons");
+      const passesThroughContainer = document.getElementById("awayPassesThroughQuickButtons");
+      const terrainContainer = document.getElementById("awayTerrainQuickButtons");
+      if (!startContainer || !passesThroughContainer || !terrainContainer) return;
+
+      startContainer.innerHTML = "";
+      passesThroughContainer.innerHTML = "";
+      terrainContainer.innerHTML = "";
+
+      const allAwayRoutes = routesData.filter(route => normaliseCategory(route) === "away day run");
+      const routesForStartChips = routesData.filter(route => routeMatchesAwayFilters(route, { ignoreStart: true }));
+      const routesForPassesThroughChips = getAwayOptionRoutes();
+
+      const starts = uniqueValuesFromRoutes(routesForStartChips.length ? routesForStartChips : allAwayRoutes, "start_point");
+      let passesThroughValues = uniqueMultiValuesFromRoutes(routesForPassesThroughChips, "passes_through");
+
+      activeAwayPassesThrough.forEach(value => {
+        if (!passesThroughValues.includes(value)) passesThroughValues.push(value);
+      });
+      passesThroughValues = passesThroughValues.sort((a, b) => a.localeCompare(b));
+
+      const terrains = uniqueValuesFromRoutes(allAwayRoutes, "terrain");
+
+      makeAwayChip(terrainContainer, "away-terrain", "Any terrain", "", "terrain", !activeAwayTerrain);
+      terrains.forEach(terrain => {
+        makeAwayChip(terrainContainer, "away-terrain", terrain, terrain, "terrain", terrain === activeAwayTerrain);
+      });
+
+      makeAwayChip(startContainer, "away-start", "Any start", "", "start_point", !activeAwayStart);
+      starts.forEach(start => {
+        makeAwayChip(startContainer, "away-start", start, start, "start_point", start === activeAwayStart);
+      });
+
+      makeAwayChip(passesThroughContainer, "away-passes-through", "Anywhere", "", "passes_through", activeAwayPassesThrough.length === 0);
+      passesThroughValues.forEach(value => {
+        makeAwayChip(passesThroughContainer, "away-passes-through", value, value, "passes_through", activeAwayPassesThrough.includes(value));
+      });
+    }
+
     function populatePlanner() {
       const startSelect = document.getElementById("plannerStart");
       const terrainSelect = document.getElementById("plannerTerrain");
@@ -1624,6 +1743,7 @@
 
         createDynamicFilters();
         populateFindRunButtons();
+        populateAwayRunButtons();
         populatePlanner();
         renderAllRouteViews();
       })
@@ -1913,7 +2033,7 @@
 
       displayPaginatedRoutes(getSortedRoutes(getCategoryRoutes("Strava Art")), "stravaArtRoutes", "stravaArtCount", "strava", ["StravaArtTop", "StravaArtBottomTop"]);
 
-      displayPaginatedRoutes(getSortedRoutes(getCategoryRoutes("Away Day Run")), "awayDayRunRoutes", "awayDayRunCount", "away", ["AwayDayRunTop", "AwayDayRunBottomTop"]);
+      displayPaginatedRoutes(getSortedRoutes(getAwayDayRunRoutes()), "awayDayRunRoutes", "awayDayRunCount", "away", ["AwayDayRunTop", "AwayDayRunBottomTop"]);
     }
 
     function setQuickDistance(min, max) {
@@ -1993,6 +2113,78 @@
       getTabState("find").page = 1;
       populateFindRunButtons();
       updateQuickButtonStates();
+      renderAllRouteViews();
+    }
+
+    function setAwayDistance(min, max) {
+      awayDistance = { min, max };
+      getTabState("away").page = 1;
+      populateAwayRunButtons();
+      updateAwayButtonStates();
+      renderAllRouteViews();
+    }
+
+    function setAwayFilter(field, value) {
+      if (field === "start_point") {
+        activeAwayStart = value;
+      }
+
+      if (field === "passes_through") {
+        if (!value) {
+          activeAwayPassesThrough = [];
+        } else if (activeAwayPassesThrough.includes(value)) {
+          activeAwayPassesThrough = activeAwayPassesThrough.filter(item => item !== value);
+        } else {
+          activeAwayPassesThrough = [...activeAwayPassesThrough, value];
+        }
+      }
+
+      if (field === "terrain") {
+        activeAwayTerrain = value;
+      }
+
+      getTabState("away").page = 1;
+      populateAwayRunButtons();
+      updateAwayButtonStates();
+      renderAllRouteViews();
+    }
+
+    function updateAwayButtonStates() {
+      document.querySelectorAll(".away-start").forEach(button => {
+        button.classList.toggle("active", button.dataset.value === activeAwayStart);
+      });
+
+      document.querySelectorAll(".away-passes-through").forEach(button => {
+        const value = button.dataset.value;
+        button.classList.toggle("active", value ? activeAwayPassesThrough.includes(value) : activeAwayPassesThrough.length === 0);
+      });
+
+      document.querySelectorAll(".away-terrain").forEach(button => {
+        button.classList.toggle("active", button.dataset.value === activeAwayTerrain);
+      });
+
+      document.querySelectorAll(".away-distance-preset").forEach(button => {
+        const presetMin = button.dataset.min ? parseFloat(button.dataset.min) : null;
+        const presetMax = button.dataset.max ? parseFloat(button.dataset.max) : null;
+
+        const minMatch = (presetMin === null && awayDistance.min === null) || (presetMin !== null && awayDistance.min !== null && Math.abs(presetMin - awayDistance.min) < 0.05);
+        const maxMatch = (presetMax === null && awayDistance.max === null) || (presetMax !== null && awayDistance.max !== null && Math.abs(presetMax - awayDistance.max) < 0.05);
+
+        button.classList.toggle("active", minMatch && maxMatch);
+      });
+
+      const clearDistance = document.getElementById("clearAwayDistancePreset");
+      if (clearDistance) clearDistance.classList.toggle("active", awayDistance.min === null && awayDistance.max === null);
+    }
+
+    function clearAwayRun() {
+      awayDistance = { min: null, max: null };
+      activeAwayStart = "";
+      activeAwayPassesThrough = [];
+      activeAwayTerrain = "";
+      getTabState("away").page = 1;
+      populateAwayRunButtons();
+      updateAwayButtonStates();
       renderAllRouteViews();
     }
 
@@ -2334,6 +2526,20 @@ ${longLink}`;
 
     document.getElementById("clearFindRun").addEventListener("click", clearFindRun);
 
+    document.querySelectorAll(".away-distance-preset").forEach(button => {
+      button.addEventListener("click", () => {
+        const min = button.dataset.min ? parseFloat(button.dataset.min) : null;
+        const max = button.dataset.max ? parseFloat(button.dataset.max) : null;
+        setAwayDistance(min, max);
+      });
+    });
+
+    document.getElementById("clearAwayDistancePreset").addEventListener("click", () => {
+      setAwayDistance(null, null);
+    });
+
+    document.getElementById("clearAwayRun").addEventListener("click", clearAwayRun);
+
     document.getElementById("showAllRoutes").addEventListener("click", () => {
       clearFindRun();
       setActiveTab("browse");
@@ -2377,7 +2583,7 @@ ${longLink}`;
     function getRoutesForTab(tabName) {
       if (tabName === "find") return getSortedRoutes(getFindRunRoutes());
       if (tabName === "strava") return getSortedRoutes(getCategoryRoutes("Strava Art"));
-      if (tabName === "away") return getSortedRoutes(getCategoryRoutes("Away Day Run"));
+      if (tabName === "away") return getSortedRoutes(getAwayDayRunRoutes());
       return getSortedRoutes(getBrowseRoutes());
     }
 
