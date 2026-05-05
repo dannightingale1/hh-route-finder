@@ -784,6 +784,104 @@
         font-size: 13px;
       }
     }
+      .pagination-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin: 16px 0;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, rgba(39, 96, 184, 0.12), rgba(151, 210, 54, 0.08));
+      border: 1px solid rgba(39, 96, 184, 0.28);
+      border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(39, 96, 184, 0.10);
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .pagination-controls button {
+      border: 1px solid rgba(39, 96, 184, 0.45);
+      background: var(--hh-blue);
+      color: #fff;
+      padding: 9px 13px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 800;
+      box-shadow: 0 3px 8px rgba(39, 96, 184, 0.22);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+    }
+
+    .pagination-controls button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 12px rgba(39, 96, 184, 0.28);
+    }
+
+    .pagination-controls button:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      background: var(--muted);
+      border-color: var(--border);
+    }
+
+    .pagination-info {
+      color: var(--hh-blue);
+      font-size: 14px;
+      font-weight: 900;
+      background: rgba(255,255,255,0.75);
+      border: 1px solid rgba(39, 96, 184, 0.18);
+      padding: 8px 12px;
+      border-radius: 999px;
+    }
+
+    .page-size-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--hh-blue);
+      font-size: 14px;
+      font-weight: 900;
+      background: rgba(255,255,255,0.75);
+      border: 1px solid rgba(39, 96, 184, 0.18);
+      padding: 6px 8px 6px 12px;
+      border-radius: 999px;
+    }
+
+    .page-size-select {
+      border: 1px solid rgba(39, 96, 184, 0.45);
+      background: #fff;
+      color: var(--hh-blue);
+      padding: 7px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    [data-theme="dark"] .pagination-bar {
+      background: linear-gradient(135deg, rgba(39, 96, 184, 0.28), rgba(151, 210, 54, 0.10));
+      border-color: rgba(255,255,255,0.16);
+    }
+
+    [data-theme="dark"] .pagination-info,
+    [data-theme="dark"] .page-size-wrap {
+      background: rgba(15, 23, 42, 0.72);
+      color: #dbeafe;
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    [data-theme="dark"] .page-size-select {
+      background: #0f172a;
+      color: #dbeafe;
+      border-color: rgba(255,255,255,0.22);
+    }
+
   </style>
 </head>
 
@@ -918,10 +1016,10 @@
 
       <div class="pagination-bar" id="browsePaginationTop">
         <div class="pagination-controls">
-          <button type="button" id="firstPageTop">⏮ Start</button>
-          <button type="button" id="prevPageTop">◀ Back</button>
-          <button type="button" id="nextPageTop">Forward ▶</button>
-          <button type="button" id="lastPageTop">End ⏭</button>
+          <button type="button" id="firstPageTop">Start</button>
+          <button type="button" id="prevPageTop">Back</button>
+          <button type="button" id="nextPageTop">Forward</button>
+          <button type="button" id="lastPageTop">End</button>
         </div>
         <div class="pagination-info" id="pageInfoTop"></div>
         <label class="page-size-wrap">
@@ -940,10 +1038,10 @@
 
       <div class="pagination-bar" id="browsePaginationBottom">
         <div class="pagination-controls">
-          <button type="button" id="firstPageBottom">⏮ Start</button>
-          <button type="button" id="prevPageBottom">◀ Back</button>
-          <button type="button" id="nextPageBottom">Forward ▶</button>
-          <button type="button" id="lastPageBottom">End ⏭</button>
+          <button type="button" id="firstPageBottom">Start</button>
+          <button type="button" id="prevPageBottom">Back</button>
+          <button type="button" id="nextPageBottom">Forward</button>
+          <button type="button" id="lastPageBottom">End</button>
         </div>
         <div class="pagination-info" id="pageInfoBottom"></div>
         <label class="page-size-wrap">
