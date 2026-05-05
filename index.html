@@ -921,6 +921,7 @@
           <div class="find-step">
             <h3>1. How far?</h3>
             <div class="quick-buttons">
+              <button class="quick-button distance-preset" data-min="0" data-max="3.1">Under 5k</button>
               <button class="quick-button distance-preset" data-min="0" data-max="3.5">Around 5k</button>
               <button class="quick-button distance-preset" data-min="3.6" data-max="5.3">Around 7.5k</button>
               <button class="quick-button distance-preset" data-min="5.4" data-max="6.8">Around 10k</button>
@@ -1413,6 +1414,21 @@
       return Array.from(values).sort((a, b) => a.localeCompare(b));
     }
 
+    function uniqueValuesFromRoutes(routes, field) {
+      return Array.from(new Set(routes.map(route => getRouteValue(route, field)).filter(Boolean)))
+        .sort((a, b) => a.localeCompare(b));
+    }
+
+    function uniqueMultiValuesFromRoutes(routes, field) {
+      const values = new Set();
+
+      routes.forEach(route => {
+        splitMultiValues(getRouteValue(route, field)).forEach(value => values.add(value));
+      });
+
+      return Array.from(values).sort((a, b) => a.localeCompare(b));
+    }
+
     function createDynamicFilters() {
       const filtersContainer = document.getElementById("advancedFilters");
 
@@ -1503,9 +1519,10 @@
       if (passesThroughContainer) passesThroughContainer.innerHTML = "";
       terrainContainer.innerHTML = "";
 
-      const starts = uniqueValues("start_point");
-      const passesThroughValues = uniqueMultiValues("passes_through");
-      const terrains = uniqueValues("terrain");
+      const quickSearchRoutes = routesData.filter(route => !getRouteValue(route, "run_category"));
+      const starts = uniqueValuesFromRoutes(quickSearchRoutes, "start_point");
+      const passesThroughValues = uniqueMultiValuesFromRoutes(quickSearchRoutes, "passes_through");
+      const terrains = uniqueValuesFromRoutes(quickSearchRoutes, "terrain");
 
       const anyStart = document.createElement("button");
       anyStart.className = "quick-button quick-start active";
@@ -2387,8 +2404,8 @@ ${longLink}`;
     const savedDistanceUnit = localStorage.getItem("hh-distance-unit") || "miles";
     setDistanceUnit(savedDistanceUnit);
 
-    const savedActiveTab = localStorage.getItem("hh-active-tab") || "find";
-    setActiveTab(savedActiveTab);
+    localStorage.setItem("hh-active-tab", "find");
+    setActiveTab("find");
   </script>
 </body>
 </html>
