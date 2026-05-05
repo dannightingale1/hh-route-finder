@@ -1051,6 +1051,47 @@
           </select>
         </label>
       </div>
+
+    </section>
+
+    <section class="tab-panel" id="maprunPlannerPanel">
+      <section class="panel">
+        <h2>MapRun Planner</h2>
+        <p>Pick a start location and optional terrain, then generate a short, medium and long route set.</p>
+
+        <div class="planner-grid">
+          <div class="filter-control">
+            <label class="filter-label" for="plannerStart">Start location</label>
+            <select id="plannerStart">
+              <option value="">Choose a start location</option>
+            </select>
+          </div>
+
+          <div class="filter-control">
+            <label class="filter-label" for="plannerTerrain">Terrain</label>
+            <select id="plannerTerrain">
+              <option value="">Any terrain</option>
+            </select>
+          </div>
+
+          <div class="filter-control">
+            <label class="filter-label">&nbsp;</label>
+            <button class="button" id="generatePlanner" type="button">Generate route set</button>
+          </div>
+        </div>
+
+        <div class="planner-result" id="plannerResult"></div>
+      </section>
+    </section>
+  </main>
+
+  <div class="modal" id="imageModal" aria-hidden="true" role="dialog" aria-label="Route image preview">
+    <button class="modal-close" id="modalClose" type="button">Close ×</button>
+    <div class="modal-content">
+      <img id="modalImage" src="" alt="Expanded route image">
+    </div>
+  </div>
+
 <script>
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRfoX7-jgCe8kdf4nb9voLj57OvH6GSg7nSRuOVuwHptiaeRGinIS4ZLZTvXxE3NRtaLX8RU2naHtyV/pub?gid=0&single=true&output=csv";
 
@@ -2109,6 +2150,24 @@ ${longLink}`;
       if (!event.target.closest(".kebab-menu")) closeKebabMenu();
     });
 
+    function addPaginationListeners(position) {
+      const suffix = position;
+      const first = document.getElementById(`firstPage${suffix}`);
+      const prev = document.getElementById(`prevPage${suffix}`);
+      const next = document.getElementById(`nextPage${suffix}`);
+      const last = document.getElementById(`lastPage${suffix}`);
+      const select = document.getElementById(`pageSizeSelect${suffix}`);
+
+      if (first) first.addEventListener("click", () => setPage(1));
+      if (prev) prev.addEventListener("click", () => setPage(currentPage - 1));
+      if (next) next.addEventListener("click", () => setPage(currentPage + 1));
+      if (last) last.addEventListener("click", () => setPage(getTotalPages(getBrowseRoutes().length)));
+      if (select) select.addEventListener("change", event => setPageSize(event.target.value));
+    }
+
+    addPaginationListeners("Top");
+    addPaginationListeners("Bottom");
+
     const savedTheme = localStorage.getItem("hh-theme");
     if (savedTheme) {
       setTheme(savedTheme);
@@ -2120,6 +2179,9 @@ ${longLink}`;
 
     const savedViewMode = localStorage.getItem("hh-view-mode") || "tile";
     setViewMode(savedViewMode);
+
+    const savedPageSize = localStorage.getItem("hh-page-size") || "25";
+    pageSize = savedPageSize === "all" ? "all" : Number(savedPageSize);
 
     const savedDistanceUnit = localStorage.getItem("hh-distance-unit") || "miles";
     setDistanceUnit(savedDistanceUnit);
