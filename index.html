@@ -320,6 +320,45 @@
       border-color: var(--hh-blue);
     }
 
+
+    .quick-button.hidden-distance-chip {
+      display: none;
+    }
+
+    .advanced-clear-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .active-filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--hh-blue);
+      background: var(--chip-bg);
+      color: var(--chip-text);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .active-filter-chip button {
+      border: none;
+      background: var(--hh-blue);
+      color: white;
+      border-radius: 999px;
+      width: 20px;
+      height: 20px;
+      line-height: 18px;
+      cursor: pointer;
+      font-weight: bold;
+      padding: 0;
+    }
+
     .find-actions,
     .planner-controls {
       display: flex;
@@ -1021,7 +1060,10 @@
           </div>
 
           <button class="advanced-search-button" id="advancedToggle" type="button">Advanced search ▾</button>
+          <button class="advanced-search-button" id="clearAdvancedSearch" type="button">Clear search</button>
         </div>
+
+        <div class="advanced-clear-row" id="advancedActiveFilters"></div>
 
         <div class="advanced-filters" id="advancedFilters">
           <div class="filter-control distance-control">
@@ -1668,6 +1710,24 @@
       container.appendChild(button);
     }
 
+    function presetRangeHasAwayRoutes(min, max) {
+      return routesData.some(route => {
+        if (normaliseCategory(route) !== "away day run") return false;
+        const miles = getMiles(route);
+        const matchesMin = min === null || miles >= min;
+        const matchesMax = max === null || miles <= max;
+        return matchesMin && matchesMax;
+      });
+    }
+
+    function updateAwayDistanceChipVisibility() {
+      document.querySelectorAll(".away-distance-preset").forEach(button => {
+        const min = button.dataset.min ? parseFloat(button.dataset.min) : null;
+        const max = button.dataset.max ? parseFloat(button.dataset.max) : null;
+        button.classList.toggle("hidden-distance-chip", !presetRangeHasAwayRoutes(min, max));
+      });
+    }
+
     function populateAwayRunButtons() {
       const startContainer = document.getElementById("awayStartQuickButtons");
       const passesThroughContainer = document.getElementById("awayPassesThroughQuickButtons");
@@ -1706,6 +1766,8 @@
       passesThroughValues.forEach(value => {
         makeAwayChip(passesThroughContainer, "away-passes-through", value, value, "passes_through", activeAwayPassesThrough.includes(value));
       });
+
+      updateAwayDistanceChipVisibility();
     }
 
     function populatePlanner() {
@@ -1927,6 +1989,77 @@
       });
     }
 
+    function hasAdvancedSearchActive() {
+      const search = document.getElementById("search").value.trim();
+      const sortBy = document.getElementById("sortBy").value;
+      const minDistance = document.getElementById("minDistance").value.trim();
+      const maxDistance = document.getElementById("maxDistance").value.trim();
+      const minAscent = document.getElementById("minAscent").value.trim();
+      const maxAscent = document.getElementById("maxAscent").value.trim();
+      const dynamicActive = Array.from(document.querySelectorAll(".dynamic-filter")).some(filter => filter.value);
+      return Boolean(search || sortBy !== "default" || minDistance || maxDistance || minAscent || maxAscent || dynamicActive);
+    }
+
+    function clearAdvancedSearch() {
+      document.getElementById("search").value = "";
+      document.getElementById("sortBy").value = "default";
+      document.getElementById("minDistance").value = "";
+      document.getElementById("maxDistance").value = "";
+      document.getElementById("minAscent").value = "";
+      document.getElementById("maxAscent").value = "";
+      document.querySelectorAll(".dynamic-filter").forEach(filter => { filter.value = ""; });
+      getTabState("browse").page = 1;
+      renderAllRouteViews();
+    }
+
+    function clearAdvancedField(field) {
+      if (field === "search") document.getElementById("search").value = "";
+      if (field === "sortBy") document.getElementById("sortBy").value = "default";
+      if (field === "minDistance") document.getElementById("minDistance").value = "";
+      if (field === "maxDistance") document.getElementById("maxDistance").value = "";
+      if (field === "minAscent") document.getElementById("minAscent").value = "";
+      if (field === "maxAscent") document.getElementById("maxAscent").value = "";
+      if (field.startsWith("dynamic:")) {
+        const filterField = field.replace("dynamic:", "");
+        const filter = document.querySelector(`.dynamic-filter[data-field="${filterField}"]`);
+        if (filter) filter.value = "";
+      }
+      getTabState("browse").page = 1;
+      renderAllRouteViews();
+    }
+
+    function advancedChip(label, field) {
+      return `<span class="active-filter-chip">${label}<button type="button" aria-label="Clear ${escapeForAttribute(label)}" onclick="clearAdvancedField('${escapeForAttribute(field)}')">×</button></span>`;
+    }
+
+    function renderAdvancedActiveFilters() {
+      const container = document.getElementById("advancedActiveFilters");
+      if (!container) return;
+
+      const chips = [];
+      const search = document.getElementById("search").value.trim();
+      const sortBy = document.getElementById("sortBy");
+      const minDistance = document.getElementById("minDistance").value.trim();
+      const maxDistance = document.getElementById("maxDistance").value.trim();
+      const minAscent = document.getElementById("minAscent").value.trim();
+      const maxAscent = document.getElementById("maxAscent").value.trim();
+
+      if (search) chips.push(advancedChip(`Search: ${search}`, "search"));
+      if (sortBy.value !== "default") chips.push(advancedChip(`Sort: ${sortBy.options[sortBy.selectedIndex].text}`, "sortBy"));
+      if (minDistance) chips.push(advancedChip(`Min distance: ${minDistance}`, "minDistance"));
+      if (maxDistance) chips.push(advancedChip(`Max distance: ${maxDistance}`, "maxDistance"));
+      if (minAscent) chips.push(advancedChip(`Min ascent: ${minAscent} ft`, "minAscent"));
+      if (maxAscent) chips.push(advancedChip(`Max ascent: ${maxAscent} ft`, "maxAscent"));
+
+      document.querySelectorAll(".dynamic-filter").forEach(filter => {
+        if (!filter.value) return;
+        chips.push(advancedChip(`${labelFromHeader(filter.dataset.field)}: ${filter.value}`, `dynamic:${filter.dataset.field}`));
+      });
+
+      container.innerHTML = chips.join("");
+      container.style.display = chips.length ? "flex" : "none";
+    }
+
     function getSortedRoutes(data) {
       const sortBy = document.getElementById("sortBy").value;
       const sorted = [...data];
@@ -2034,6 +2167,8 @@
       displayPaginatedRoutes(getSortedRoutes(getCategoryRoutes("Strava Art")), "stravaArtRoutes", "stravaArtCount", "strava", ["StravaArtTop", "StravaArtBottomTop"]);
 
       displayPaginatedRoutes(getSortedRoutes(getAwayDayRunRoutes()), "awayDayRunRoutes", "awayDayRunCount", "away", ["AwayDayRunTop", "AwayDayRunBottomTop"]);
+      renderAdvancedActiveFilters();
+      updateAwayDistanceChipVisibility();
     }
 
     function setQuickDistance(min, max) {
@@ -2499,11 +2634,13 @@ ${longLink}`;
     }
 
     document.getElementById("search").addEventListener("input", resetPaginationAndRender);
-    document.getElementById("sortBy").addEventListener("change", renderAllRouteViews);
+    document.getElementById("sortBy").addEventListener("change", resetPaginationAndRender);
     document.getElementById("minDistance").addEventListener("input", resetPaginationAndRender);
     document.getElementById("maxDistance").addEventListener("input", resetPaginationAndRender);
     document.getElementById("minAscent").addEventListener("input", resetPaginationAndRender);
     document.getElementById("maxAscent").addEventListener("input", resetPaginationAndRender);
+
+    document.getElementById("clearAdvancedSearch").addEventListener("click", clearAdvancedSearch);
 
     document.getElementById("advancedToggle").addEventListener("click", () => {
       const panel = document.getElementById("advancedFilters");
