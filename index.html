@@ -2411,7 +2411,16 @@
     }
 
     function resetPaginationAndRender() {
-      getTabState("browse").page = 1;
+      const browseState = getTabState("browse");
+      browseState.page = 1;
+
+      // Keep Advanced Search paginated when filters change.
+      // Older saved settings, or the previous All option, can leave the tab showing everything on one page.
+      if (browseState.pageSize === "all") {
+        browseState.pageSize = 25;
+        localStorage.setItem("hh-page-size-browse", "25");
+      }
+
       renderAllRouteViews();
     }
 
@@ -3014,7 +3023,15 @@ ${longLink}`;
 
     ["find", "browse", "strava", "away"].forEach(tabName => {
       const savedSize = localStorage.getItem(`hh-page-size-${tabName}`);
-      if (savedSize) paginationState[tabName].pageSize = savedSize === "all" ? "all" : Number(savedSize);
+      if (savedSize) {
+        // Advanced Search should default to a real page size so unpublished routes do not all appear on one page.
+        if (tabName === "browse" && savedSize === "all") {
+          paginationState[tabName].pageSize = 25;
+          localStorage.setItem(`hh-page-size-${tabName}`, "25");
+        } else {
+          paginationState[tabName].pageSize = savedSize === "all" ? "all" : Number(savedSize);
+        }
+      }
     });
 
     const savedTheme = localStorage.getItem("hh-theme");
