@@ -359,6 +359,25 @@
       padding: 0;
     }
 
+    .published-filter-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--text);
+      font-weight: bold;
+    }
+
+    .published-filter-row input {
+      width: auto;
+      margin: 0;
+    }
+
+
     .find-actions,
     .planner-controls {
       display: flex;
@@ -1066,6 +1085,14 @@
         <div class="advanced-clear-row" id="advancedActiveFilters"></div>
 
         <div class="advanced-filters" id="advancedFilters">
+          <div class="filter-control">
+            <label class="filter-label" for="showUnpublishedRoutes">Published status</label>
+            <label class="published-filter-row">
+              <input type="checkbox" id="showUnpublishedRoutes">
+              Show unpublished routes
+            </label>
+          </div>
+
           <div class="filter-control distance-control">
             <label class="filter-label">Distance range</label>
 
@@ -1331,7 +1358,8 @@
       "image",
       "photo",
       "photo_url",
-      "run_category"
+      "run_category",
+      "published"
     ];
 
     let routesData = [];
@@ -1674,7 +1702,7 @@
     }
 
     function routeMatchesAwayFilters(route, options = {}) {
-      if (normaliseCategory(route) !== "away day run") return false;
+      if (!isPublishedRoute(route) || normaliseCategory(route) !== "away day run") return false;
 
       const ignoreStart = options.ignoreStart || false;
       const ignorePassesThrough = options.ignorePassesThrough || false;
@@ -1712,7 +1740,7 @@
 
     function presetRangeHasAwayRoutes(min, max) {
       return routesData.some(route => {
-        if (normaliseCategory(route) !== "away day run") return false;
+        if (!isPublishedRoute(route) || normaliseCategory(route) !== "away day run") return false;
         const miles = getMiles(route);
         const matchesMin = min === null || miles >= min;
         const matchesMax = max === null || miles <= max;
@@ -1738,7 +1766,7 @@
       passesThroughContainer.innerHTML = "";
       terrainContainer.innerHTML = "";
 
-      const allAwayRoutes = routesData.filter(route => normaliseCategory(route) === "away day run");
+      const allAwayRoutes = routesData.filter(route => isPublishedRoute(route) && normaliseCategory(route) === "away day run");
       const routesForStartChips = routesData.filter(route => routeMatchesAwayFilters(route, { ignoreStart: true }));
       const routesForPassesThroughChips = getAwayOptionRoutes();
 
@@ -1933,8 +1961,13 @@
       return getRouteValue(route, "run_category").trim().toLowerCase();
     }
 
+    function isPublishedRoute(route) {
+      const value = getRouteValue(route, "published").trim().toLowerCase();
+      return ["yes", "y", "true", "published", "1", "live"].includes(value);
+    }
+
     function isStandardRoute(route) {
-      return !normaliseCategory(route);
+      return isPublishedRoute(route) && !normaliseCategory(route);
     }
 
     function getFindRunRoutes() {
@@ -1943,7 +1976,7 @@
 
     function getCategoryRoutes(categoryName) {
       const target = categoryName.trim().toLowerCase();
-      return routesData.filter(route => normaliseCategory(route) === target);
+      return routesData.filter(route => isPublishedRoute(route) && normaliseCategory(route) === target);
     }
 
     function getBrowseRoutes() {
@@ -1953,8 +1986,11 @@
       const maxDistanceMiles = inputDistanceToMiles(document.getElementById("maxDistance").value);
       const minAscent = parseFloat(document.getElementById("minAscent").value.replace(/,/g, ""));
       const maxAscent = parseFloat(document.getElementById("maxAscent").value.replace(/,/g, ""));
+      const showUnpublished = document.getElementById("showUnpublishedRoutes")?.checked || false;
 
       return routesData.filter(route => {
+        if (!showUnpublished && !isPublishedRoute(route)) return false;
+
         const searchableText = headers
           .filter(header => !["image_url", "image", "photo_url", "photo"].includes(header))
           .map(header => getRouteValue(route, header))
@@ -1997,7 +2033,8 @@
       const minAscent = document.getElementById("minAscent").value.trim();
       const maxAscent = document.getElementById("maxAscent").value.trim();
       const dynamicActive = Array.from(document.querySelectorAll(".dynamic-filter")).some(filter => filter.value);
-      return Boolean(search || sortBy !== "default" || minDistance || maxDistance || minAscent || maxAscent || dynamicActive);
+      const showUnpublished = document.getElementById("showUnpublishedRoutes")?.checked || false;
+      return Boolean(search || sortBy !== "default" || minDistance || maxDistance || minAscent || maxAscent || dynamicActive || showUnpublished);
     }
 
     function clearAdvancedSearch() {
@@ -2008,6 +2045,8 @@
       document.getElementById("minAscent").value = "";
       document.getElementById("maxAscent").value = "";
       document.querySelectorAll(".dynamic-filter").forEach(filter => { filter.value = ""; });
+      const showUnpublished = document.getElementById("showUnpublishedRoutes");
+      if (showUnpublished) showUnpublished.checked = false;
       getTabState("browse").page = 1;
       renderAllRouteViews();
     }
@@ -2019,6 +2058,7 @@
       if (field === "maxDistance") document.getElementById("maxDistance").value = "";
       if (field === "minAscent") document.getElementById("minAscent").value = "";
       if (field === "maxAscent") document.getElementById("maxAscent").value = "";
+      if (field === "showUnpublished") document.getElementById("showUnpublishedRoutes").checked = false;
       if (field.startsWith("dynamic:")) {
         const filterField = field.replace("dynamic:", "");
         const filter = document.querySelector(`.dynamic-filter[data-field="${filterField}"]`);
@@ -2050,6 +2090,7 @@
       if (maxDistance) chips.push(advancedChip(`Max distance: ${maxDistance}`, "maxDistance"));
       if (minAscent) chips.push(advancedChip(`Min ascent: ${minAscent} ft`, "minAscent"));
       if (maxAscent) chips.push(advancedChip(`Max ascent: ${maxAscent} ft`, "maxAscent"));
+      if (document.getElementById("showUnpublishedRoutes")?.checked) chips.push(advancedChip("Including unpublished routes", "showUnpublished"));
 
       document.querySelectorAll(".dynamic-filter").forEach(filter => {
         if (!filter.value) return;
@@ -2639,6 +2680,7 @@ ${longLink}`;
     document.getElementById("maxDistance").addEventListener("input", resetPaginationAndRender);
     document.getElementById("minAscent").addEventListener("input", resetPaginationAndRender);
     document.getElementById("maxAscent").addEventListener("input", resetPaginationAndRender);
+    document.getElementById("showUnpublishedRoutes").addEventListener("change", resetPaginationAndRender);
 
     document.getElementById("clearAdvancedSearch").addEventListener("click", clearAdvancedSearch);
 
