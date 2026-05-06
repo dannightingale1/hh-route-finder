@@ -359,25 +359,6 @@
       padding: 0;
     }
 
-    .published-filter-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--bg);
-      color: var(--text);
-      font-weight: bold;
-    }
-
-    .published-filter-row input {
-      width: auto;
-      margin: 0;
-    }
-
-
     .find-actions,
     .planner-controls {
       display: flex;
@@ -930,6 +911,55 @@
       font-weight: 900;
     }
 
+
+    .advanced-filters {
+      align-items: start;
+    }
+
+    .published-control {
+      min-height: 78px;
+    }
+
+    .published-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 42px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .published-checkbox input {
+      width: auto !important;
+      min-width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: var(--hh-blue);
+    }
+
+    .advanced-chip-control-wide {
+      grid-column: 1 / -1;
+    }
+
+    .advanced-chip-panel {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(0, 92, 171, 0.04);
+    }
+
+    body.dark .advanced-chip-panel {
+      background: rgba(216, 234, 255, 0.04);
+    }
+
+    .advanced-chip-panel .quick-buttons {
+      margin-top: 8px;
+    }
+
 </style>
 </head>
 
@@ -1085,9 +1115,9 @@
         <div class="advanced-clear-row" id="advancedActiveFilters"></div>
 
         <div class="advanced-filters" id="advancedFilters">
-          <div class="filter-control">
+          <div class="filter-control published-control">
             <label class="filter-label" for="showUnpublishedRoutes">Published status</label>
-            <label class="published-filter-row">
+            <label class="published-checkbox">
               <input type="checkbox" id="showUnpublishedRoutes">
               Show unpublished routes
             </label>
@@ -1112,6 +1142,20 @@
             <div class="distance-row">
               <input type="number" id="minAscent" min="0" step="1" placeholder="Min ascent">
               <input type="number" id="maxAscent" min="0" step="1" placeholder="Max ascent">
+            </div>
+          </div>
+
+          <div class="filter-control advanced-chip-control-wide">
+            <div class="advanced-chip-panel">
+              <label class="filter-label">Starts from</label>
+              <div class="quick-buttons" id="advancedStartQuickButtons"></div>
+            </div>
+          </div>
+
+          <div class="filter-control advanced-chip-control-wide">
+            <div class="advanced-chip-panel">
+              <label class="filter-label">Passes through</label>
+              <div class="quick-buttons" id="advancedPassesThroughQuickButtons"></div>
             </div>
           </div>
         </div>
@@ -1359,7 +1403,9 @@
       "photo",
       "photo_url",
       "run_category",
-      "published"
+      "published",
+      "start_point",
+      "passes_through"
     ];
 
     let routesData = [];
@@ -1380,6 +1426,8 @@
     let activeAwayPassesThrough = [];
     let activeAwayTerrain = "";
     let awayDistance = { min: null, max: null };
+    let activeAdvancedStarts = [];
+    let activeAdvancedPassesThrough = [];
     let plannerOptions = { short: [], medium: [], long: [] };
     let plannerIndexes = { short: 0, medium: 0, long: 0 };
     let currentViewMode = "tile";
@@ -1610,9 +1658,7 @@
         });
 
         select.addEventListener("change", () => {
-          if (field === "start_point") activeQuickStart = select.value;
-          if (field === "terrain") activeQuickTerrain = select.value;
-          updateQuickButtonStates();
+          getTabState("browse").page = 1;
           renderAllRouteViews();
         });
 
@@ -1702,7 +1748,7 @@
     }
 
     function routeMatchesAwayFilters(route, options = {}) {
-      if (!isPublishedRoute(route) || normaliseCategory(route) !== "away day run") return false;
+      if (normaliseCategory(route) !== "away day run" || !isRoutePublished(route)) return false;
 
       const ignoreStart = options.ignoreStart || false;
       const ignorePassesThrough = options.ignorePassesThrough || false;
@@ -1740,7 +1786,7 @@
 
     function presetRangeHasAwayRoutes(min, max) {
       return routesData.some(route => {
-        if (!isPublishedRoute(route) || normaliseCategory(route) !== "away day run") return false;
+        if (normaliseCategory(route) !== "away day run" || !isRoutePublished(route)) return false;
         const miles = getMiles(route);
         const matchesMin = min === null || miles >= min;
         const matchesMax = max === null || miles <= max;
@@ -1766,7 +1812,7 @@
       passesThroughContainer.innerHTML = "";
       terrainContainer.innerHTML = "";
 
-      const allAwayRoutes = routesData.filter(route => isPublishedRoute(route) && normaliseCategory(route) === "away day run");
+      const allAwayRoutes = routesData.filter(route => normaliseCategory(route) === "away day run" && isRoutePublished(route));
       const routesForStartChips = routesData.filter(route => routeMatchesAwayFilters(route, { ignoreStart: true }));
       const routesForPassesThroughChips = getAwayOptionRoutes();
 
@@ -1915,7 +1961,11 @@
 
       const filter = document.querySelector(`.dynamic-filter[data-field="${field}"]`);
 
-      if (filter) {
+      if (field === "start_point") {
+        activeAdvancedStarts = value ? [value] : [];
+      } else if (field === "passes_through") {
+        activeAdvancedPassesThrough = value ? [value] : [];
+      } else if (filter) {
         const exists = Array.from(filter.options).some(option => option.value === value);
 
         if (!exists) {
@@ -1931,11 +1981,7 @@
         searchBox.value = value;
       }
 
-      if (field === "start_point") activeQuickStart = value;
-      if (field === "passes_through") activeQuickPassesThrough = value ? [value] : [];
-      if (field === "terrain") activeQuickTerrain = value;
-
-      updateQuickButtonStates();
+      getTabState("browse").page = 1;
       renderAllRouteViews();
 
       const browsePanel = document.getElementById("browseRoutesPanel");
@@ -1961,13 +2007,14 @@
       return getRouteValue(route, "run_category").trim().toLowerCase();
     }
 
-    function isPublishedRoute(route) {
-      const value = getRouteValue(route, "published").trim().toLowerCase();
-      return ["yes", "y", "true", "published", "1", "live"].includes(value);
+    function isRoutePublished(route) {
+      if (!headers.includes("published")) return true;
+      const value = getRouteValue(route, "published").toLowerCase();
+      return ["published", "yes", "y", "true", "1", "live"].includes(value);
     }
 
     function isStandardRoute(route) {
-      return isPublishedRoute(route) && !normaliseCategory(route);
+      return !normaliseCategory(route) && isRoutePublished(route);
     }
 
     function getFindRunRoutes() {
@@ -1976,53 +2023,135 @@
 
     function getCategoryRoutes(categoryName) {
       const target = categoryName.trim().toLowerCase();
-      return routesData.filter(route => isPublishedRoute(route) && normaliseCategory(route) === target);
+      return routesData.filter(route => normaliseCategory(route) === target && isRoutePublished(route));
     }
 
-    function getBrowseRoutes() {
+    function advancedPublishedMatches(route) {
+      const showUnpublished = document.getElementById("showUnpublishedRoutes")?.checked;
+      return isRoutePublished(route) || showUnpublished;
+    }
+
+    function routeMatchesAdvancedFilters(route, options = {}) {
+      const ignoreStart = options.ignoreStart || false;
+      const ignorePassesThrough = options.ignorePassesThrough || false;
+
+      if (!advancedPublishedMatches(route)) return false;
+
       const search = document.getElementById("search").value.toLowerCase();
       const dynamicFilters = Array.from(document.querySelectorAll(".dynamic-filter"));
       const minDistanceMiles = inputDistanceToMiles(document.getElementById("minDistance").value);
       const maxDistanceMiles = inputDistanceToMiles(document.getElementById("maxDistance").value);
       const minAscent = parseFloat(document.getElementById("minAscent").value.replace(/,/g, ""));
       const maxAscent = parseFloat(document.getElementById("maxAscent").value.replace(/,/g, ""));
-      const showUnpublished = document.getElementById("showUnpublishedRoutes")?.checked || false;
 
-      return routesData.filter(route => {
-        if (!showUnpublished && !isPublishedRoute(route)) return false;
+      const searchableText = headers
+        .filter(header => !["image_url", "image", "photo_url", "photo"].includes(header))
+        .map(header => getRouteValue(route, header))
+        .join(" ")
+        .toLowerCase();
 
-        const searchableText = headers
-          .filter(header => !["image_url", "image", "photo_url", "photo"].includes(header))
-          .map(header => getRouteValue(route, header))
-          .join(" ")
-          .toLowerCase();
+      const routeMiles = getMiles(route);
+      const routeAscent = getAscent(route);
+      const routePassesThrough = splitMultiValues(getRouteValue(route, "passes_through"));
 
-        const matchesSearch = searchableText.includes(search);
+      const matchesSearch = searchableText.includes(search);
+      const matchesMinDistance = minDistanceMiles === null || routeMiles >= minDistanceMiles;
+      const matchesMaxDistance = maxDistanceMiles === null || routeMiles <= maxDistanceMiles;
+      const matchesMinAscent = isNaN(minAscent) || routeAscent >= minAscent;
+      const matchesMaxAscent = isNaN(maxAscent) || routeAscent <= maxAscent;
 
-        const routeMiles = getMiles(route);
-        const routeAscent = getAscent(route);
-        const matchesMinDistance = minDistanceMiles === null || routeMiles >= minDistanceMiles;
-        const matchesMaxDistance = maxDistanceMiles === null || routeMiles <= maxDistanceMiles;
-        const matchesMinAscent = isNaN(minAscent) || routeAscent >= minAscent;
-        const matchesMaxAscent = isNaN(maxAscent) || routeAscent <= maxAscent;
+      const matchesStarts = ignoreStart || !activeAdvancedStarts.length || activeAdvancedStarts.includes(getRouteValue(route, "start_point"));
+      const matchesPassesThrough = ignorePassesThrough || !activeAdvancedPassesThrough.length || activeAdvancedPassesThrough.every(value => routePassesThrough.includes(value));
 
-        const matchesDynamicFilters = dynamicFilters.every(filter => {
-          const field = filter.dataset.field;
-          const selectedValue = filter.value;
+      const matchesDynamicFilters = dynamicFilters.every(filter => {
+        const field = filter.dataset.field;
+        const selectedValue = filter.value;
 
-          if (!selectedValue) return true;
+        if (!selectedValue) return true;
 
-          const routeValue = getRouteValue(route, field);
+        const routeValue = getRouteValue(route, field);
 
-          if (field === "tags" || field === "passes_through") {
-            return splitMultiValues(routeValue).includes(selectedValue);
-          }
+        if (field === "tags") {
+          return splitMultiValues(routeValue).includes(selectedValue);
+        }
 
-          return routeValue === selectedValue;
-        });
-
-        return matchesSearch && matchesMinDistance && matchesMaxDistance && matchesMinAscent && matchesMaxAscent && matchesDynamicFilters;
+        return routeValue === selectedValue;
       });
+
+      return matchesSearch && matchesMinDistance && matchesMaxDistance && matchesMinAscent && matchesMaxAscent && matchesStarts && matchesPassesThrough && matchesDynamicFilters;
+    }
+
+    function makeAdvancedChip(container, className, label, value, field, isActive) {
+      const button = document.createElement("button");
+      button.className = `quick-button ${className}${isActive ? " active" : ""}`;
+      button.textContent = label;
+      button.dataset.value = value;
+      button.addEventListener("click", () => setAdvancedChipFilter(field, value));
+      container.appendChild(button);
+    }
+
+    function populateAdvancedChips() {
+      const startContainer = document.getElementById("advancedStartQuickButtons");
+      const passesThroughContainer = document.getElementById("advancedPassesThroughQuickButtons");
+      if (!startContainer || !passesThroughContainer) return;
+
+      startContainer.innerHTML = "";
+      passesThroughContainer.innerHTML = "";
+
+      const fallbackRoutes = routesData.filter(route => advancedPublishedMatches(route));
+      const routesForStartChips = routesData.filter(route => routeMatchesAdvancedFilters(route, { ignoreStart: true }));
+      const routesForPassesThroughChips = routesData.filter(route => routeMatchesAdvancedFilters(route));
+
+      let starts = uniqueValuesFromRoutes(routesForStartChips.length ? routesForStartChips : fallbackRoutes, "start_point");
+      activeAdvancedStarts.forEach(value => {
+        if (value && !starts.includes(value)) starts.push(value);
+      });
+      starts = starts.sort((a, b) => a.localeCompare(b));
+
+      let passesThroughValues = uniqueMultiValuesFromRoutes(routesForPassesThroughChips, "passes_through");
+      activeAdvancedPassesThrough.forEach(value => {
+        if (value && !passesThroughValues.includes(value)) passesThroughValues.push(value);
+      });
+      passesThroughValues = passesThroughValues.sort((a, b) => a.localeCompare(b));
+
+      makeAdvancedChip(startContainer, "advanced-start", "Any start", "", "start_point", activeAdvancedStarts.length === 0);
+      starts.forEach(start => {
+        makeAdvancedChip(startContainer, "advanced-start", start, start, "start_point", activeAdvancedStarts.includes(start));
+      });
+
+      makeAdvancedChip(passesThroughContainer, "advanced-passes-through", "Anywhere", "", "passes_through", activeAdvancedPassesThrough.length === 0);
+      passesThroughValues.forEach(value => {
+        makeAdvancedChip(passesThroughContainer, "advanced-passes-through", value, value, "passes_through", activeAdvancedPassesThrough.includes(value));
+      });
+    }
+
+    function setAdvancedChipFilter(field, value) {
+      if (field === "start_point") {
+        if (!value) {
+          activeAdvancedStarts = [];
+        } else if (activeAdvancedStarts.includes(value)) {
+          activeAdvancedStarts = activeAdvancedStarts.filter(item => item !== value);
+        } else {
+          activeAdvancedStarts = [...activeAdvancedStarts, value];
+        }
+      }
+
+      if (field === "passes_through") {
+        if (!value) {
+          activeAdvancedPassesThrough = [];
+        } else if (activeAdvancedPassesThrough.includes(value)) {
+          activeAdvancedPassesThrough = activeAdvancedPassesThrough.filter(item => item !== value);
+        } else {
+          activeAdvancedPassesThrough = [...activeAdvancedPassesThrough, value];
+        }
+      }
+
+      getTabState("browse").page = 1;
+      renderAllRouteViews();
+    }
+
+    function getBrowseRoutes() {
+      return routesData.filter(route => routeMatchesAdvancedFilters(route));
     }
 
     function hasAdvancedSearchActive() {
@@ -2033,8 +2162,8 @@
       const minAscent = document.getElementById("minAscent").value.trim();
       const maxAscent = document.getElementById("maxAscent").value.trim();
       const dynamicActive = Array.from(document.querySelectorAll(".dynamic-filter")).some(filter => filter.value);
-      const showUnpublished = document.getElementById("showUnpublishedRoutes")?.checked || false;
-      return Boolean(search || sortBy !== "default" || minDistance || maxDistance || minAscent || maxAscent || dynamicActive || showUnpublished);
+      const showUnpublished = document.getElementById("showUnpublishedRoutes")?.checked;
+      return Boolean(search || sortBy !== "default" || minDistance || maxDistance || minAscent || maxAscent || dynamicActive || showUnpublished || activeAdvancedStarts.length || activeAdvancedPassesThrough.length);
     }
 
     function clearAdvancedSearch() {
@@ -2044,9 +2173,11 @@
       document.getElementById("maxDistance").value = "";
       document.getElementById("minAscent").value = "";
       document.getElementById("maxAscent").value = "";
-      document.querySelectorAll(".dynamic-filter").forEach(filter => { filter.value = ""; });
       const showUnpublished = document.getElementById("showUnpublishedRoutes");
       if (showUnpublished) showUnpublished.checked = false;
+      activeAdvancedStarts = [];
+      activeAdvancedPassesThrough = [];
+      document.querySelectorAll(".dynamic-filter").forEach(filter => { filter.value = ""; });
       getTabState("browse").page = 1;
       renderAllRouteViews();
     }
@@ -2058,7 +2189,15 @@
       if (field === "maxDistance") document.getElementById("maxDistance").value = "";
       if (field === "minAscent") document.getElementById("minAscent").value = "";
       if (field === "maxAscent") document.getElementById("maxAscent").value = "";
-      if (field === "showUnpublished") document.getElementById("showUnpublishedRoutes").checked = false;
+      if (field === "showUnpublishedRoutes") document.getElementById("showUnpublishedRoutes").checked = false;
+      if (field.startsWith("advancedStart:")) {
+        const value = field.replace("advancedStart:", "");
+        activeAdvancedStarts = activeAdvancedStarts.filter(item => item !== value);
+      }
+      if (field.startsWith("advancedPassesThrough:")) {
+        const value = field.replace("advancedPassesThrough:", "");
+        activeAdvancedPassesThrough = activeAdvancedPassesThrough.filter(item => item !== value);
+      }
       if (field.startsWith("dynamic:")) {
         const filterField = field.replace("dynamic:", "");
         const filter = document.querySelector(`.dynamic-filter[data-field="${filterField}"]`);
@@ -2090,7 +2229,9 @@
       if (maxDistance) chips.push(advancedChip(`Max distance: ${maxDistance}`, "maxDistance"));
       if (minAscent) chips.push(advancedChip(`Min ascent: ${minAscent} ft`, "minAscent"));
       if (maxAscent) chips.push(advancedChip(`Max ascent: ${maxAscent} ft`, "maxAscent"));
-      if (document.getElementById("showUnpublishedRoutes")?.checked) chips.push(advancedChip("Including unpublished routes", "showUnpublished"));
+      if (document.getElementById("showUnpublishedRoutes")?.checked) chips.push(advancedChip("Including unpublished", "showUnpublishedRoutes"));
+      activeAdvancedStarts.forEach(value => chips.push(advancedChip(`Starts from: ${value}`, `advancedStart:${value}`)));
+      activeAdvancedPassesThrough.forEach(value => chips.push(advancedChip(`Passes through: ${value}`, `advancedPassesThrough:${value}`)));
 
       document.querySelectorAll(".dynamic-filter").forEach(filter => {
         if (!filter.value) return;
@@ -2200,6 +2341,7 @@
     }
 
     function renderAllRouteViews() {
+      populateAdvancedChips();
       displayPaginatedRoutes(getSortedRoutes(getFindRunRoutes()), "findRoutes", "findCount", "find", ["FindTop", "FindBottomTop"]);
 
       const browseRoutes = getSortedRoutes(getBrowseRoutes());
