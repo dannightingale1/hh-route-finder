@@ -1113,6 +1113,48 @@
       }
     }
 
+
+    /* Final Advanced Search polish */
+    .range-with-unit .unit-toggle button {
+      min-width: 62px;
+      text-transform: none;
+    }
+
+    .advanced-footer-row {
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .clear-search-link {
+      border: none;
+      background: transparent;
+      color: var(--text);
+      padding: 4px 0;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: underline;
+      opacity: 0.82;
+      font-weight: normal;
+    }
+
+    body.dark .clear-search-link {
+      color: #ffffff;
+      opacity: 0.86;
+    }
+
+    .clear-search-link:hover {
+      opacity: 1;
+      text-decoration-thickness: 2px;
+    }
+
+    @media (max-width: 700px) {
+      .advanced-footer-row {
+        align-items: flex-start;
+        gap: 12px;
+        flex-direction: column-reverse;
+      }
+    }
+
 </style>
 </head>
 
@@ -1262,8 +1304,7 @@
           </div>
 
           <button class="advanced-search-button" id="advancedToggle" type="button">Advanced search ▾</button>
-          <button class="advanced-search-button" id="clearAdvancedSearch" type="button">Clear search</button>
-        </div>
+          </div>
 
         <div class="advanced-clear-row" id="advancedActiveFilters"></div>
 
@@ -1275,8 +1316,8 @@
                 <input type="number" id="minDistance" min="0" step="0.1" placeholder="Min miles">
                 <input type="number" id="maxDistance" min="0" step="0.1" placeholder="Max miles">
                 <div class="unit-toggle" aria-label="Distance unit">
-                  <button type="button" id="milesButton" class="active">M</button>
-                  <button type="button" id="kmButton">KM</button>
+                  <button type="button" id="milesButton" class="active">miles</button>
+                  <button type="button" id="kmButton">km</button>
                 </div>
               </div>
             </div>
@@ -1287,30 +1328,31 @@
                 <input type="number" id="minAscent" min="0" step="1" placeholder="Min ft">
                 <input type="number" id="maxAscent" min="0" step="1" placeholder="Max ft">
                 <div class="unit-toggle" aria-label="Ascent unit">
-                  <button type="button" id="feetButton" class="active">FT</button>
-                  <button type="button" id="metresButton">M</button>
+                  <button type="button" id="feetButton" class="active">ft</button>
+                  <button type="button" id="metresButton">metres</button>
                 </div>
               </div>
             </div>
           </div>
 
+          <div class="advanced-dynamic-filters" id="advancedDynamicFilters"></div>
+
           <div class="filter-control advanced-chip-control-wide">
-            <details class="advanced-chip-panel collapsible-chip-panel" open>
+            <details class="advanced-chip-panel collapsible-chip-panel">
               <summary>Starts from</summary>
               <div class="quick-buttons" id="advancedStartQuickButtons"></div>
             </details>
           </div>
 
           <div class="filter-control advanced-chip-control-wide">
-            <details class="advanced-chip-panel collapsible-chip-panel" open>
+            <details class="advanced-chip-panel collapsible-chip-panel">
               <summary>Passes through</summary>
               <div class="quick-buttons" id="advancedPassesThroughQuickButtons"></div>
             </details>
           </div>
 
-          <div class="advanced-dynamic-filters" id="advancedDynamicFilters"></div>
-
-          <div class="advanced-published-row">
+          <div class="advanced-published-row advanced-footer-row">
+            <button class="clear-search-link" id="clearAdvancedSearch" type="button">Clear search</button>
             <label class="published-checkbox subtle-published-checkbox" title="Admin option for reviewing unpublished route records">
               <input type="checkbox" id="showUnpublishedRoutes">
               Show unpublished routes
