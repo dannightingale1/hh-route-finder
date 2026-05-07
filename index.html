@@ -1064,6 +1064,39 @@
       }
     }
 
+
+    .published-footer-row {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .show-unpublished-checkbox {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .show-unpublished-checkbox input {
+      width: auto !important;
+      min-width: 14px;
+      height: 14px;
+      margin: 0;
+      accent-color: var(--hh-blue);
+    }
+
+    @media (max-width: 700px) {
+      .published-footer-row {
+        justify-content: flex-start;
+      }
+    }
+
 </style>
 </head>
 
@@ -1239,6 +1272,13 @@
               <input type="number" id="minAscent" min="0" step="1" placeholder="Min ascent">
               <input type="number" id="maxAscent" min="0" step="1" placeholder="Max ascent">
             </div>
+          </div>
+
+          <div class="published-footer-row">
+            <label class="show-unpublished-checkbox" title="Admin option for reviewing unpublished route records">
+              <input type="checkbox" id="showUnpublishedRoutes">
+              Show unpublished routes
+            </label>
           </div>
         </div>
       </section>
@@ -1484,7 +1524,8 @@
       "image",
       "photo",
       "photo_url",
-      "run_category"
+      "run_category",
+      "published"
     ];
 
     let routesData = [];
@@ -1827,7 +1868,7 @@
     }
 
     function routeMatchesAwayFilters(route, options = {}) {
-      if (normaliseCategory(route) !== "away day run") return false;
+      if (normaliseCategory(route) !== "away day run" || !isRoutePublished(route)) return false;
 
       const ignoreStart = options.ignoreStart || false;
       const ignorePassesThrough = options.ignorePassesThrough || false;
@@ -1865,7 +1906,7 @@
 
     function presetRangeHasAwayRoutes(min, max) {
       return routesData.some(route => {
-        if (normaliseCategory(route) !== "away day run") return false;
+        if (normaliseCategory(route) !== "away day run" || !isRoutePublished(route)) return false;
         const miles = getMiles(route);
         const matchesMin = min === null || miles >= min;
         const matchesMax = max === null || miles <= max;
@@ -2086,8 +2127,13 @@
       return getRouteValue(route, "run_category").trim().toLowerCase();
     }
 
+    function isRoutePublished(route) {
+      const value = getRouteValue(route, "published").trim().toLowerCase();
+      return ["yes", "y", "true", "1", "published", "publish", "live"].includes(value);
+    }
+
     function isStandardRoute(route) {
-      return !normaliseCategory(route);
+      return !normaliseCategory(route) && isRoutePublished(route);
     }
 
     function getFindRunRoutes() {
@@ -2096,7 +2142,7 @@
 
     function getCategoryRoutes(categoryName) {
       const target = categoryName.trim().toLowerCase();
-      return routesData.filter(route => normaliseCategory(route) === target);
+      return routesData.filter(route => normaliseCategory(route) === target && isRoutePublished(route));
     }
 
     function getBrowseRoutes() {
@@ -2106,8 +2152,10 @@
       const maxDistanceMiles = inputDistanceToMiles(document.getElementById("maxDistance").value);
       const minAscent = parseFloat(document.getElementById("minAscent").value.replace(/,/g, ""));
       const maxAscent = parseFloat(document.getElementById("maxAscent").value.replace(/,/g, ""));
+      const showUnpublished = document.getElementById("showUnpublishedRoutes")?.checked || false;
 
       return routesData.filter(route => {
+        const matchesPublished = isRoutePublished(route) || showUnpublished;
         const searchableText = headers
           .filter(header => !["image_url", "image", "photo_url", "photo"].includes(header))
           .map(header => getRouteValue(route, header))
@@ -2138,7 +2186,7 @@
           return routeValue === selectedValue;
         });
 
-        return matchesSearch && matchesMinDistance && matchesMaxDistance && matchesMinAscent && matchesMaxAscent && matchesDynamicFilters;
+        return matchesPublished && matchesSearch && matchesMinDistance && matchesMaxDistance && matchesMinAscent && matchesMaxAscent && matchesDynamicFilters;
       });
     }
 
@@ -2150,7 +2198,8 @@
       const minAscent = document.getElementById("minAscent").value.trim();
       const maxAscent = document.getElementById("maxAscent").value.trim();
       const dynamicActive = Array.from(document.querySelectorAll(".dynamic-filter")).some(filter => filter.value);
-      return Boolean(search || sortBy !== "default" || minDistance || maxDistance || minAscent || maxAscent || dynamicActive);
+      const showUnpublished = document.getElementById("showUnpublishedRoutes")?.checked || false;
+      return Boolean(search || sortBy !== "default" || minDistance || maxDistance || minAscent || maxAscent || dynamicActive || showUnpublished);
     }
 
     function clearAdvancedSearch() {
@@ -2161,6 +2210,8 @@
       document.getElementById("minAscent").value = "";
       document.getElementById("maxAscent").value = "";
       document.querySelectorAll(".dynamic-filter").forEach(filter => { filter.value = ""; });
+      const showUnpublished = document.getElementById("showUnpublishedRoutes");
+      if (showUnpublished) showUnpublished.checked = false;
       getTabState("browse").page = 1;
       renderAllRouteViews();
     }
@@ -2792,6 +2843,7 @@ ${longLink}`;
     document.getElementById("maxDistance").addEventListener("input", resetPaginationAndRender);
     document.getElementById("minAscent").addEventListener("input", resetPaginationAndRender);
     document.getElementById("maxAscent").addEventListener("input", resetPaginationAndRender);
+    document.getElementById("showUnpublishedRoutes")?.addEventListener("change", resetPaginationAndRender);
 
     document.getElementById("clearAdvancedSearch").addEventListener("click", clearAdvancedSearch);
 
