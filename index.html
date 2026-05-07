@@ -8,9 +8,10 @@
 
   <style>
     :root {
-      --hh-blue: #005cab;
-      --hh-blue-dark: #073b72;
+      --hh-blue: #005f66;
+      --hh-blue-dark: #003f45;
       --hh-green: #c8ff00;
+      --hh-teal: #005f66;
       --bg: #f3f7fb;
       --text: #102033;
       --card: #ffffff;
@@ -1456,6 +1457,81 @@
       .view-toggle,
       .theme-toggle,
       .kebab-button { font-size: 11px !important; padding: 6px 6px !important; }
+    }
+
+
+    /* HH colour theme: dark teal buttons with HH yellow/green text */
+    .button,
+    .advanced-search-button,
+    .pagination-controls button,
+    .tab-button.active,
+    .quick-button.active,
+    .quick-button:hover,
+    .unit-toggle button.active,
+    .view-toggle.active,
+    .kebab-button.active {
+      background: var(--hh-teal);
+      color: var(--hh-green);
+      border-color: var(--hh-teal);
+    }
+
+    .button:hover,
+    .advanced-search-button:hover,
+    .pagination-controls button:hover:not(:disabled) {
+      background: var(--hh-blue-dark);
+      color: var(--hh-green);
+      border-color: var(--hh-blue-dark);
+      filter: none;
+    }
+
+    .copy-button {
+      background: transparent;
+      color: var(--hh-teal);
+      border-color: var(--hh-teal);
+    }
+
+    .copy-button:hover {
+      background: var(--hh-teal);
+      color: var(--hh-green);
+    }
+
+    .pagination-info,
+    .page-size-wrap {
+      background: var(--hh-teal);
+      color: var(--hh-green);
+      border-color: rgba(200, 255, 0, 0.25);
+    }
+
+    .page-size-select {
+      color: var(--hh-teal);
+    }
+
+    .active-filter-chip button {
+      background: var(--hh-teal);
+      color: var(--hh-green);
+    }
+
+    .tag.clickable:hover,
+    .tag.clickable.active-filter {
+      background: var(--hh-teal);
+      color: var(--hh-green);
+    }
+
+    .kebab-dropdown button:hover {
+      background: var(--hh-teal);
+      color: var(--hh-green);
+    }
+
+    .pagination-bar {
+      background: linear-gradient(135deg, rgba(0, 95, 102, 0.18), rgba(200, 255, 0, 0.10));
+      border-color: rgba(0, 95, 102, 0.38);
+      box-shadow: 0 6px 18px rgba(0, 95, 102, 0.12);
+    }
+
+    .pagination-controls button:disabled {
+      background: #64748b;
+      color: #ffffff;
+      border-color: #64748b;
     }
 
 </style>
