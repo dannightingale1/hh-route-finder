@@ -8,9 +8,10 @@
 
   <style>
     :root {
-      --hh-blue: #005cab;
-      --hh-blue-dark: #073b72;
+      --hh-blue: #005f66;
+      --hh-blue-dark: #003f45;
       --hh-green: #c8ff00;
+      --hh-teal: #005f66;
       --bg: #f3f7fb;
       --text: #102033;
       --card: #ffffff;
@@ -74,7 +75,7 @@
     .brand-area {
       display: flex;
       align-items: center;
-      gap: 0;
+      gap: 16px;
       min-width: 0;
     }
 
@@ -96,7 +97,7 @@
 
     header h1 {
       margin: 0 0 7px;
-      font-size: clamp(28px, 5vw, 48px);
+      font-size: clamp(24px, 4vw, 38px);
       line-height: 1.05;
       color: var(--hh-green);
       text-shadow: 0 2px 8px rgba(0,0,0,0.65);
@@ -104,7 +105,7 @@
 
     header p {
       margin: 0;
-      font-size: clamp(16px, 2.5vw, 20px);
+      font-size: 16px;
       color: white;
       text-shadow: 0 2px 6px rgba(0,0,0,0.65);
     }
@@ -279,7 +280,7 @@
 
     .find-grid {
       display: grid;
-      gap: 0;
+      gap: 16px;
     }
 
     .find-step {
@@ -510,7 +511,7 @@
 
     .routes {
       display: grid;
-      gap: 0;
+      gap: 16px;
     }
 
     .routes.tile-view { grid-template-columns: 1fr; }
@@ -964,14 +965,14 @@
     /* Advanced Search tidy layout */
     .advanced-filters {
       align-items: start;
-      gap: 0;
+      gap: 16px;
     }
 
     .advanced-range-row {
       grid-column: 1 / -1;
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 0;
+      gap: 16px;
       align-items: end;
     }
 
@@ -1155,6 +1156,609 @@
       }
     }
 
+
+
+    /* Mobile header and pagination tidy-up - kept against uploaded base version */
+    @media (max-width: 760px) {
+      header {
+        min-height: 118px !important;
+        padding: 12px 12px !important;
+        align-items: center;
+        overflow: visible !important;
+      }
+
+      .header-inner {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 10px !important;
+        overflow: visible !important;
+      }
+
+      .brand-area {
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 9px !important;
+        min-width: 0;
+        flex: 1 1 auto;
+      }
+
+      .logo {
+        height: 42px !important;
+        max-width: 42px;
+        object-fit: contain;
+      }
+
+      .title-block {
+        min-width: 0;
+      }
+
+      header h1 {
+        font-size: 20px !important;
+        margin-bottom: 2px !important;
+        white-space: nowrap;
+      }
+
+      header p {
+        font-size: 12px !important;
+        line-height: 1.15;
+      }
+
+      .top-buttons {
+        flex: 0 0 auto;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 5px !important;
+        overflow: visible !important;
+      }
+
+      .view-toggle,
+      .theme-toggle,
+      .kebab-button {
+        padding: 6px 7px !important;
+        font-size: 12px !important;
+        line-height: 1.1;
+        min-height: 32px;
+      }
+
+      .kebab-button {
+        min-width: 32px !important;
+      }
+
+      .kebab-menu {
+        position: relative !important;
+        overflow: visible !important;
+        z-index: 10001 !important;
+      }
+
+      .kebab-dropdown {
+        position: absolute !important;
+        right: 0 !important;
+        top: calc(100% + 8px) !important;
+        min-width: 190px !important;
+        max-width: calc(100vw - 24px);
+        z-index: 10002 !important;
+      }
+
+      .kebab-dropdown.open {
+        display: block !important;
+      }
+
+      .pagination-bar {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+        padding: 10px !important;
+      }
+
+      .pagination-left {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+        width: 100%;
+      }
+
+      .pagination-controls {
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px !important;
+        width: 100%;
+      }
+
+      .pagination-controls button {
+        padding: 8px 4px !important;
+        font-size: 12px !important;
+        min-width: 0;
+      }
+
+      .pagination-info,
+      .page-size-wrap {
+        min-width: 0;
+        width: 100%;
+        justify-content: center;
+        font-size: 13px !important;
+        padding: 8px 10px !important;
+      }
+
+      .page-size-wrap {
+        display: grid !important;
+        grid-template-columns: auto auto;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 430px) {
+      header h1 { font-size: 18px !important; }
+      header p { display: none; }
+      .logo { height: 38px !important; max-width: 38px; }
+      .view-toggle,
+      .theme-toggle,
+      .kebab-button { font-size: 11px !important; padding: 6px 6px !important; }
+    }
+
+
+    /* Mobile header fix: two clean rows, not everything squeezed onto one line */
+    @media (max-width: 760px) {
+      header {
+        min-height: 132px !important;
+        padding: 12px !important;
+        align-items: center !important;
+        overflow: visible !important;
+      }
+
+      .header-inner {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        justify-content: center !important;
+        gap: 10px !important;
+        overflow: visible !important;
+      }
+
+      .brand-area {
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 10px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+      }
+
+      .logo-link {
+        flex: 0 0 auto !important;
+      }
+
+      .logo {
+        height: 42px !important;
+        max-width: 42px !important;
+        object-fit: contain !important;
+      }
+
+      .title-block {
+        min-width: 0 !important;
+        flex: 1 1 auto !important;
+      }
+
+      header h1 {
+        font-size: 21px !important;
+        line-height: 1.05 !important;
+        margin: 0 0 2px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+
+      header p {
+        font-size: 12px !important;
+        line-height: 1.15 !important;
+        margin: 0 !important;
+      }
+
+      .top-buttons {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 6px !important;
+        overflow: visible !important;
+      }
+
+      .view-toggle,
+      .theme-toggle,
+      .kebab-button {
+        padding: 7px 8px !important;
+        font-size: 12px !important;
+        line-height: 1.1 !important;
+        min-height: 32px !important;
+      }
+
+      .view-toggle,
+      .theme-toggle {
+        flex: 1 1 auto !important;
+        text-align: center !important;
+      }
+
+      .kebab-menu {
+        flex: 0 0 auto !important;
+        margin-left: 0 !important;
+        position: relative !important;
+        overflow: visible !important;
+        z-index: 10001 !important;
+      }
+
+      .kebab-button {
+        min-width: 36px !important;
+      }
+
+      .kebab-dropdown {
+        position: absolute !important;
+        right: 0 !important;
+        top: calc(100% + 8px) !important;
+        min-width: 190px !important;
+        max-width: calc(100vw - 24px) !important;
+        z-index: 10002 !important;
+      }
+
+      .kebab-dropdown.open {
+        display: block !important;
+      }
+
+      .pagination-bar {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+        padding: 10px !important;
+      }
+
+      .pagination-left {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+        width: 100% !important;
+      }
+
+      .pagination-controls {
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 6px !important;
+        width: 100% !important;
+      }
+
+      .pagination-controls button {
+        padding: 8px 4px !important;
+        font-size: 12px !important;
+        min-width: 0 !important;
+      }
+
+      .pagination-info,
+      .page-size-wrap {
+        min-width: 0 !important;
+        width: 100% !important;
+        justify-content: center !important;
+        font-size: 13px !important;
+        padding: 8px 10px !important;
+      }
+
+      .page-size-wrap {
+        display: grid !important;
+        grid-template-columns: auto auto !important;
+        justify-content: center !important;
+      }
+    }
+
+    @media (max-width: 430px) {
+      header { min-height: 122px !important; }
+      header h1 { font-size: 19px !important; }
+      header p { display: none !important; }
+      .logo { height: 38px !important; max-width: 38px !important; }
+      .view-toggle,
+      .theme-toggle,
+      .kebab-button { font-size: 11px !important; padding: 6px 6px !important; }
+    }
+
+
+    /* HH colour theme: dark teal buttons with HH yellow/green text */
+    .button,
+    .advanced-search-button,
+    .pagination-controls button,
+    .tab-button.active,
+    .quick-button.active,
+    .quick-button:hover,
+    .unit-toggle button.active,
+    .view-toggle.active,
+    .kebab-button.active {
+      background: var(--hh-teal);
+      color: var(--hh-green);
+      border-color: var(--hh-teal);
+    }
+
+    .button:hover,
+    .advanced-search-button:hover,
+    .pagination-controls button:hover:not(:disabled) {
+      background: var(--hh-blue-dark);
+      color: var(--hh-green);
+      border-color: var(--hh-blue-dark);
+      filter: none;
+    }
+
+    .copy-button {
+      background: transparent;
+      color: var(--hh-teal);
+      border-color: var(--hh-teal);
+    }
+
+    .copy-button:hover {
+      background: var(--hh-teal);
+      color: var(--hh-green);
+    }
+
+    .pagination-info,
+    .page-size-wrap {
+      background: var(--hh-teal);
+      color: var(--hh-green);
+      border-color: rgba(200, 255, 0, 0.25);
+    }
+
+    .page-size-select {
+      color: var(--hh-teal);
+    }
+
+    .active-filter-chip button {
+      background: var(--hh-teal);
+      color: var(--hh-green);
+    }
+
+    .tag.clickable:hover,
+    .tag.clickable.active-filter {
+      background: var(--hh-teal);
+      color: var(--hh-green);
+    }
+
+    .kebab-dropdown button:hover {
+      background: var(--hh-teal);
+      color: var(--hh-green);
+    }
+
+    .pagination-bar {
+      background: linear-gradient(135deg, rgba(0, 95, 102, 0.18), rgba(200, 255, 0, 0.10));
+      border-color: rgba(0, 95, 102, 0.38);
+      box-shadow: 0 6px 18px rgba(0, 95, 102, 0.12);
+    }
+
+    .pagination-controls button:disabled {
+      background: #64748b;
+      color: #ffffff;
+      border-color: #64748b;
+    }
+
+
+    /* HH theme refinement: larger mobile logo, compact pagination row, darker teal buttons */
+    :root {
+      --hh-teal: #003f45;
+      --hh-blue: #003f45;
+      --hh-blue-dark: #002f34;
+      --hh-green: #c8ff00;
+    }
+
+    .button,
+    .advanced-search-button,
+    .pagination-controls button,
+    .tab-button.active,
+    .quick-button.active,
+    .quick-button:hover,
+    .unit-toggle button.active,
+    .view-toggle.active,
+    .kebab-button.active,
+    .theme-toggle:hover,
+    .view-toggle:hover,
+    .kebab-button:hover {
+      background: var(--hh-teal) !important;
+      color: var(--hh-green) !important;
+      border: 1px solid var(--hh-green) !important;
+    }
+
+    .button:hover,
+    .advanced-search-button:hover,
+    .pagination-controls button:hover:not(:disabled) {
+      background: var(--hh-blue-dark) !important;
+      color: var(--hh-green) !important;
+      border: 1px solid var(--hh-green) !important;
+      filter: none !important;
+    }
+
+    .copy-button {
+      background: transparent !important;
+      color: var(--hh-teal) !important;
+      border: 1px solid var(--hh-green) !important;
+    }
+
+    .copy-button:hover {
+      background: var(--hh-teal) !important;
+      color: var(--hh-green) !important;
+      border: 1px solid var(--hh-green) !important;
+    }
+
+    .pagination-info,
+    .page-size-wrap {
+      background: var(--hh-teal) !important;
+      color: var(--hh-green) !important;
+      border: 1px solid var(--hh-green) !important;
+    }
+
+    .page-size-select {
+      color: var(--hh-teal) !important;
+      border: 1px solid rgba(0,0,0,0.15) !important;
+    }
+
+    .pagination-controls button:disabled {
+      background: #64748b !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(200, 255, 0, 0.5) !important;
+    }
+
+    .pagination-bar {
+      background: linear-gradient(135deg, rgba(0, 63, 69, 0.18), rgba(200, 255, 0, 0.10)) !important;
+      border-color: rgba(0, 63, 69, 0.38) !important;
+      box-shadow: 0 6px 18px rgba(0, 63, 69, 0.12) !important;
+    }
+
+    @media (max-width: 760px) {
+      header {
+        min-height: 142px !important;
+      }
+
+      .logo {
+        height: 56px !important;
+        max-width: 56px !important;
+      }
+
+      .pagination-bar {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        grid-template-areas:
+          "controls controls"
+          "info size" !important;
+        gap: 8px !important;
+        align-items: center !important;
+      }
+
+      .pagination-left {
+        display: contents !important;
+      }
+
+      .pagination-controls {
+        grid-area: controls !important;
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 6px !important;
+        width: 100% !important;
+      }
+
+      .pagination-info {
+        grid-area: info !important;
+      }
+
+      .page-size-wrap {
+        grid-area: size !important;
+      }
+
+      .pagination-info,
+      .page-size-wrap {
+        width: auto !important;
+        min-width: 0 !important;
+        justify-content: center !important;
+        font-size: 12px !important;
+        padding: 7px 9px !important;
+        white-space: nowrap !important;
+      }
+
+      .page-size-wrap {
+        display: flex !important;
+        gap: 6px !important;
+      }
+
+      .page-size-select {
+        padding: 5px 7px !important;
+        font-size: 12px !important;
+      }
+    }
+
+    @media (max-width: 430px) {
+      header {
+        min-height: 132px !important;
+      }
+
+      .logo {
+        height: 52px !important;
+        max-width: 52px !important;
+      }
+    }
+
+
+
+    /* Final header update: logo removed, larger title/subtitle, HH button theme retained */
+    .brand-area {
+      gap: 0 !important;
+    }
+
+    header h1 {
+      font-size: clamp(30px, 5vw, 52px) !important;
+      margin-bottom: 7px !important;
+    }
+
+    header p {
+      font-size: clamp(16px, 2.4vw, 21px) !important;
+    }
+
+    .button,
+    .advanced-search-button,
+    .pagination-controls button,
+    .tab-button.active,
+    .quick-button.active,
+    .quick-button:hover,
+    .unit-toggle button.active,
+    .view-toggle.active,
+    .view-toggle:hover,
+    .theme-toggle:hover,
+    .kebab-button:hover,
+    .kebab-button.active {
+      background: var(--hh-teal) !important;
+      color: var(--hh-green) !important;
+      border: 1px solid var(--hh-green) !important;
+    }
+
+    .copy-button,
+    .clear-search-link {
+      background: transparent !important;
+      color: var(--hh-teal) !important;
+      border-color: var(--hh-green) !important;
+    }
+
+    .page-size-wrap,
+    .pagination-info {
+      background: var(--hh-teal) !important;
+      color: var(--hh-green) !important;
+      border: 1px solid var(--hh-green) !important;
+    }
+
+    @media (max-width: 760px) {
+      header {
+        min-height: 130px !important;
+        padding: 16px !important;
+      }
+
+      .header-inner {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+      }
+
+      .brand-area {
+        flex-direction: row !important;
+        align-items: center !important;
+      }
+
+      .title-block h1 {
+        font-size: 32px !important;
+      }
+
+      .title-block p {
+        font-size: 16px !important;
+      }
+
+      .top-buttons {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        justify-content: flex-start !important;
+        gap: 8px !important;
+      }
+    }
+
 </style>
 </head>
 
@@ -1162,8 +1766,6 @@
   <header>
     <div class="header-inner">
       <div class="brand-area">
-        
-
         <div class="title-block">
           <h1>HH Route Finder</h1>
           <p>Find route inspiration for your next run</p>
