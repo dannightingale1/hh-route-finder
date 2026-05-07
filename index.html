@@ -912,246 +912,155 @@
     }
 
 
-    .advanced-filters {
-      align-items: start;
-    }
-
-    .published-control {
-      min-height: 78px;
-    }
-
-    .published-checkbox {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-height: 42px;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--card);
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .published-checkbox input {
-      width: auto !important;
-      min-width: 18px;
-      height: 18px;
-      margin: 0;
-      accent-color: var(--hh-blue);
-    }
-
-    .advanced-chip-control-wide {
-      grid-column: 1 / -1;
-    }
-
-    .advanced-chip-panel {
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: rgba(0, 92, 171, 0.04);
-    }
-
-    body.dark .advanced-chip-panel {
-      background: rgba(216, 234, 255, 0.04);
-    }
-
-    .advanced-chip-panel .quick-buttons {
-      margin-top: 8px;
-    }
-
-
-    /* Advanced Search tidy layout */
-    .advanced-filters {
-      align-items: start;
-      gap: 16px;
-    }
-
-    .advanced-range-row {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 16px;
-      align-items: end;
-    }
-
-    .advanced-range-row .distance-control {
-      grid-column: auto !important;
-      min-width: 0;
-    }
-
-    .advanced-range-row .unit-toggle {
-      margin-bottom: 8px;
-    }
-
-    .advanced-range-row .ascent-input-row {
-      margin-top: 35px;
-    }
-
-    .advanced-dynamic-filters {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 10px;
-    }
-
-    .advanced-published-row {
-      grid-column: 1 / -1;
-      display: flex;
-      justify-content: flex-end;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
-    }
-
-    .published-control {
-      min-height: 0;
-    }
-
-    .published-checkbox.subtle-published-checkbox {
-      min-height: 0;
-      padding: 0;
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: normal;
-      box-shadow: none;
-    }
-
-    .published-checkbox.subtle-published-checkbox input {
-      width: auto !important;
-      min-width: 14px;
-      height: 14px;
-    }
-
-    @media (max-width: 700px) {
-      .advanced-range-row {
-        grid-template-columns: 1fr;
+    /* Mobile header and pagination tidy-up: keep brand row compact and pagination on one line */
+    @media (max-width: 760px) {
+      header {
+        min-height: 132px;
+        padding: 14px 12px;
       }
 
-      .advanced-range-row .ascent-input-row {
-        margin-top: 0;
-      }
-
-      .advanced-published-row {
-        justify-content: flex-start;
-      }
-    }
-
-
-    /* Advanced Search final tidy controls */
-    .range-with-unit {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .range-with-unit .unit-toggle {
-      margin: 0;
-      align-self: stretch;
-      height: 36px;
-    }
-
-    .range-with-unit .unit-toggle button {
-      padding: 7px 10px;
-      min-width: 42px;
-    }
-
-    .advanced-range-row .unit-toggle {
-      margin-bottom: 0;
-    }
-
-    .advanced-range-row .ascent-input-row {
-      margin-top: 0;
-    }
-
-    .advanced-chip-panel.collapsible-chip-panel {
-      padding: 0;
-      overflow: hidden;
-    }
-
-    .collapsible-chip-panel > summary {
-      list-style: none;
-      cursor: pointer;
-      padding: 12px 14px;
-      font-weight: 800;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      user-select: none;
-    }
-
-    .collapsible-chip-panel > summary::-webkit-details-marker {
-      display: none;
-    }
-
-    .collapsible-chip-panel > summary::after {
-      content: "▾";
-      color: var(--muted);
-      transition: transform 0.2s ease;
-    }
-
-    .collapsible-chip-panel:not([open]) > summary::after {
-      transform: rotate(-90deg);
-    }
-
-    .collapsible-chip-panel .quick-buttons {
-      margin: 0;
-      padding: 0 12px 12px;
-    }
-
-    @media (max-width: 700px) {
-      .range-with-unit {
-        grid-template-columns: 1fr;
-      }
-
-      .range-with-unit .unit-toggle {
-        width: fit-content;
-      }
-    }
-
-
-    /* Final Advanced Search polish */
-    .range-with-unit .unit-toggle button {
-      min-width: 62px;
-      text-transform: none;
-    }
-
-    .advanced-footer-row {
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .clear-search-link {
-      border: none;
-      background: transparent;
-      color: var(--text);
-      padding: 4px 0;
-      font-size: 13px;
-      cursor: pointer;
-      text-decoration: underline;
-      opacity: 0.82;
-      font-weight: normal;
-    }
-
-    body.dark .clear-search-link {
-      color: #ffffff;
-      opacity: 0.86;
-    }
-
-    .clear-search-link:hover {
-      opacity: 1;
-      text-decoration-thickness: 2px;
-    }
-
-    @media (max-width: 700px) {
-      .advanced-footer-row {
-        align-items: flex-start;
+      .header-inner {
+        flex-direction: column;
+        align-items: stretch;
         gap: 12px;
-        flex-direction: column-reverse;
+      }
+
+      .brand-area {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .logo-link {
+        flex-shrink: 0;
+      }
+
+      .logo {
+        height: 46px;
+        max-width: 145px;
+        object-fit: contain;
+      }
+
+      .title-block {
+        min-width: 0;
+        flex: 1;
+      }
+
+      header h1 {
+        font-size: clamp(23px, 7vw, 32px);
+        margin-bottom: 4px;
+      }
+
+      header p {
+        font-size: 13px;
+        line-height: 1.25;
+      }
+
+      .top-buttons {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 7px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 2px;
+      }
+
+      .view-toggle,
+      .theme-toggle,
+      .kebab-button {
+        flex: 0 0 auto;
+        padding: 8px 10px;
+        font-size: 13px;
+      }
+
+      .kebab-menu {
+        flex: 0 0 auto;
+      }
+    }
+
+    @media (max-width: 520px) {
+      header {
+        min-height: 124px;
+        padding: 12px 10px;
+      }
+
+      .logo {
+        height: 40px;
+        max-width: 120px;
+      }
+
+      header h1 {
+        font-size: 22px;
+      }
+
+      header p {
+        font-size: 12px;
+      }
+
+      .view-toggle,
+      .theme-toggle,
+      .kebab-button {
+        padding: 7px 9px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .pagination-bar {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 10px;
+      }
+
+      .pagination-left {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 8px;
+        flex: 0 0 auto;
+      }
+
+      .pagination-controls {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 6px;
+        flex: 0 0 auto;
+      }
+
+      .pagination-controls button {
+        padding: 7px 9px;
+        font-size: 12px;
+        flex: 0 0 auto;
+      }
+
+      .pagination-info {
+        padding: 7px 10px;
+        font-size: 12px;
+        flex: 0 0 auto;
+      }
+
+      .page-size-wrap {
+        padding: 6px 7px 6px 10px;
+        font-size: 12px;
+        flex: 0 0 auto;
+      }
+
+      .page-size-select {
+        padding: 6px 8px;
+        font-size: 12px;
       }
     }
 
@@ -1304,59 +1213,32 @@
           </div>
 
           <button class="advanced-search-button" id="advancedToggle" type="button">Advanced search ▾</button>
-          </div>
+          <button class="advanced-search-button" id="clearAdvancedSearch" type="button">Clear search</button>
+        </div>
 
         <div class="advanced-clear-row" id="advancedActiveFilters"></div>
 
         <div class="advanced-filters" id="advancedFilters">
-          <div class="advanced-range-row">
-            <div class="filter-control distance-control">
-              <label class="filter-label">Distance range</label>
-              <div class="range-with-unit">
-                <input type="number" id="minDistance" min="0" step="0.1" placeholder="Min miles">
-                <input type="number" id="maxDistance" min="0" step="0.1" placeholder="Max miles">
-                <div class="unit-toggle" aria-label="Distance unit">
-                  <button type="button" id="milesButton" class="active">miles</button>
-                  <button type="button" id="kmButton">km</button>
-                </div>
-              </div>
+          <div class="filter-control distance-control">
+            <label class="filter-label">Distance range</label>
+
+            <div class="unit-toggle" aria-label="Distance unit">
+              <button type="button" id="milesButton" class="active">Miles</button>
+              <button type="button" id="kmButton">KM</button>
             </div>
 
-            <div class="filter-control distance-control">
-              <label class="filter-label">Ascent range</label>
-              <div class="range-with-unit ascent-input-row">
-                <input type="number" id="minAscent" min="0" step="1" placeholder="Min ft">
-                <input type="number" id="maxAscent" min="0" step="1" placeholder="Max ft">
-                <div class="unit-toggle" aria-label="Ascent unit">
-                  <button type="button" id="feetButton" class="active">ft</button>
-                  <button type="button" id="metresButton">metres</button>
-                </div>
-              </div>
+            <div class="distance-row">
+              <input type="number" id="minDistance" min="0" step="0.1" placeholder="Min distance">
+              <input type="number" id="maxDistance" min="0" step="0.1" placeholder="Max distance">
             </div>
           </div>
 
-          <div class="advanced-dynamic-filters" id="advancedDynamicFilters"></div>
-
-          <div class="filter-control advanced-chip-control-wide">
-            <details class="advanced-chip-panel collapsible-chip-panel">
-              <summary>Starts from</summary>
-              <div class="quick-buttons" id="advancedStartQuickButtons"></div>
-            </details>
-          </div>
-
-          <div class="filter-control advanced-chip-control-wide">
-            <details class="advanced-chip-panel collapsible-chip-panel">
-              <summary>Passes through</summary>
-              <div class="quick-buttons" id="advancedPassesThroughQuickButtons"></div>
-            </details>
-          </div>
-
-          <div class="advanced-published-row advanced-footer-row">
-            <button class="clear-search-link" id="clearAdvancedSearch" type="button">Clear search</button>
-            <label class="published-checkbox subtle-published-checkbox" title="Admin option for reviewing unpublished route records">
-              <input type="checkbox" id="showUnpublishedRoutes">
-              Show unpublished routes
-            </label>
+          <div class="filter-control distance-control">
+            <label class="filter-label">Ascent range (ft)</label>
+            <div class="distance-row">
+              <input type="number" id="minAscent" min="0" step="1" placeholder="Min ascent">
+              <input type="number" id="maxAscent" min="0" step="1" placeholder="Max ascent">
+            </div>
           </div>
         </div>
       </section>
@@ -1602,10 +1484,7 @@
       "image",
       "photo",
       "photo_url",
-      "run_category",
-      "published",
-      "start_point",
-      "passes_through"
+      "run_category"
     ];
 
     let routesData = [];
@@ -1618,7 +1497,6 @@
       away: { page: 1, pageSize: 25 }
     };
     let distanceUnit = "miles";
-    let ascentUnit = "ft";
     let activeQuickStart = "";
     let activeQuickPassesThrough = [];
     let activeQuickTerrain = "";
@@ -1627,8 +1505,6 @@
     let activeAwayPassesThrough = [];
     let activeAwayTerrain = "";
     let awayDistance = { min: null, max: null };
-    let activeAdvancedStarts = [];
-    let activeAdvancedPassesThrough = [];
     let plannerOptions = { short: [], medium: [], long: [] };
     let plannerIndexes = { short: 0, medium: 0, long: 0 };
     let currentViewMode = "tile";
@@ -1745,20 +1621,6 @@
       return distanceUnit === "km" ? (miles * 1.60934).toFixed(1) : miles.toFixed(1);
     }
 
-    function feetToMetres(feet) {
-      return (feet * 0.3048).toFixed(0);
-    }
-
-    function inputAscentToFeet(value) {
-      const number = parseFloat(value);
-      if (isNaN(number)) return null;
-      return ascentUnit === "m" ? number / 0.3048 : number;
-    }
-
-    function feetToCurrentUnit(feet) {
-      return ascentUnit === "m" ? feetToMetres(feet) : feet.toFixed(0);
-    }
-
     function getFirstAvailable(route, keys) {
       for (const key of keys) {
         const value = getRouteValue(route, key);
@@ -1805,7 +1667,7 @@
     }
 
     function createDynamicFilters() {
-      const filtersContainer = document.getElementById("advancedDynamicFilters") || document.getElementById("advancedFilters");
+      const filtersContainer = document.getElementById("advancedFilters");
 
       const filterFields = headers.filter(header => {
         if (EXCLUDED_FILTER_FIELDS.includes(header)) return false;
@@ -1873,7 +1735,9 @@
         });
 
         select.addEventListener("change", () => {
-          getTabState("browse").page = 1;
+          if (field === "start_point") activeQuickStart = select.value;
+          if (field === "terrain") activeQuickTerrain = select.value;
+          updateQuickButtonStates();
           renderAllRouteViews();
         });
 
@@ -1963,7 +1827,7 @@
     }
 
     function routeMatchesAwayFilters(route, options = {}) {
-      if (normaliseCategory(route) !== "away day run" || !isRoutePublished(route)) return false;
+      if (normaliseCategory(route) !== "away day run") return false;
 
       const ignoreStart = options.ignoreStart || false;
       const ignorePassesThrough = options.ignorePassesThrough || false;
@@ -2001,7 +1865,7 @@
 
     function presetRangeHasAwayRoutes(min, max) {
       return routesData.some(route => {
-        if (normaliseCategory(route) !== "away day run" || !isRoutePublished(route)) return false;
+        if (normaliseCategory(route) !== "away day run") return false;
         const miles = getMiles(route);
         const matchesMin = min === null || miles >= min;
         const matchesMax = max === null || miles <= max;
@@ -2027,7 +1891,7 @@
       passesThroughContainer.innerHTML = "";
       terrainContainer.innerHTML = "";
 
-      const allAwayRoutes = routesData.filter(route => normaliseCategory(route) === "away day run" && isRoutePublished(route));
+      const allAwayRoutes = routesData.filter(route => normaliseCategory(route) === "away day run");
       const routesForStartChips = routesData.filter(route => routeMatchesAwayFilters(route, { ignoreStart: true }));
       const routesForPassesThroughChips = getAwayOptionRoutes();
 
@@ -2176,11 +2040,7 @@
 
       const filter = document.querySelector(`.dynamic-filter[data-field="${field}"]`);
 
-      if (field === "start_point") {
-        activeAdvancedStarts = value ? [value] : [];
-      } else if (field === "passes_through") {
-        activeAdvancedPassesThrough = value ? [value] : [];
-      } else if (filter) {
+      if (filter) {
         const exists = Array.from(filter.options).some(option => option.value === value);
 
         if (!exists) {
@@ -2196,7 +2056,11 @@
         searchBox.value = value;
       }
 
-      getTabState("browse").page = 1;
+      if (field === "start_point") activeQuickStart = value;
+      if (field === "passes_through") activeQuickPassesThrough = value ? [value] : [];
+      if (field === "terrain") activeQuickTerrain = value;
+
+      updateQuickButtonStates();
       renderAllRouteViews();
 
       const browsePanel = document.getElementById("browseRoutesPanel");
@@ -2222,14 +2086,8 @@
       return getRouteValue(route, "run_category").trim().toLowerCase();
     }
 
-    function isRoutePublished(route) {
-      if (!headers.includes("published")) return true;
-      const value = getRouteValue(route, "published").toLowerCase();
-      return ["published", "yes", "y", "true", "1", "live"].includes(value);
-    }
-
     function isStandardRoute(route) {
-      return !normaliseCategory(route) && isRoutePublished(route);
+      return !normaliseCategory(route);
     }
 
     function getFindRunRoutes() {
@@ -2238,135 +2096,50 @@
 
     function getCategoryRoutes(categoryName) {
       const target = categoryName.trim().toLowerCase();
-      return routesData.filter(route => normaliseCategory(route) === target && isRoutePublished(route));
+      return routesData.filter(route => normaliseCategory(route) === target);
     }
 
-    function advancedPublishedMatches(route) {
-      const showUnpublished = document.getElementById("showUnpublishedRoutes")?.checked;
-      return isRoutePublished(route) || showUnpublished;
-    }
-
-    function routeMatchesAdvancedFilters(route, options = {}) {
-      const ignoreStart = options.ignoreStart || false;
-      const ignorePassesThrough = options.ignorePassesThrough || false;
-
-      if (!advancedPublishedMatches(route)) return false;
-
+    function getBrowseRoutes() {
       const search = document.getElementById("search").value.toLowerCase();
       const dynamicFilters = Array.from(document.querySelectorAll(".dynamic-filter"));
       const minDistanceMiles = inputDistanceToMiles(document.getElementById("minDistance").value);
       const maxDistanceMiles = inputDistanceToMiles(document.getElementById("maxDistance").value);
-      const minAscentFeet = inputAscentToFeet(document.getElementById("minAscent").value.replace(/,/g, ""));
-      const maxAscentFeet = inputAscentToFeet(document.getElementById("maxAscent").value.replace(/,/g, ""));
+      const minAscent = parseFloat(document.getElementById("minAscent").value.replace(/,/g, ""));
+      const maxAscent = parseFloat(document.getElementById("maxAscent").value.replace(/,/g, ""));
 
-      const searchableText = headers
-        .filter(header => !["image_url", "image", "photo_url", "photo"].includes(header))
-        .map(header => getRouteValue(route, header))
-        .join(" ")
-        .toLowerCase();
+      return routesData.filter(route => {
+        const searchableText = headers
+          .filter(header => !["image_url", "image", "photo_url", "photo"].includes(header))
+          .map(header => getRouteValue(route, header))
+          .join(" ")
+          .toLowerCase();
 
-      const routeMiles = getMiles(route);
-      const routeAscent = getAscent(route);
-      const routePassesThrough = splitMultiValues(getRouteValue(route, "passes_through"));
+        const matchesSearch = searchableText.includes(search);
 
-      const matchesSearch = searchableText.includes(search);
-      const matchesMinDistance = minDistanceMiles === null || routeMiles >= minDistanceMiles;
-      const matchesMaxDistance = maxDistanceMiles === null || routeMiles <= maxDistanceMiles;
-      const matchesMinAscent = minAscentFeet === null || routeAscent >= minAscentFeet;
-      const matchesMaxAscent = maxAscentFeet === null || routeAscent <= maxAscentFeet;
+        const routeMiles = getMiles(route);
+        const routeAscent = getAscent(route);
+        const matchesMinDistance = minDistanceMiles === null || routeMiles >= minDistanceMiles;
+        const matchesMaxDistance = maxDistanceMiles === null || routeMiles <= maxDistanceMiles;
+        const matchesMinAscent = isNaN(minAscent) || routeAscent >= minAscent;
+        const matchesMaxAscent = isNaN(maxAscent) || routeAscent <= maxAscent;
 
-      const matchesStarts = ignoreStart || !activeAdvancedStarts.length || activeAdvancedStarts.includes(getRouteValue(route, "start_point"));
-      const matchesPassesThrough = ignorePassesThrough || !activeAdvancedPassesThrough.length || activeAdvancedPassesThrough.every(value => routePassesThrough.includes(value));
+        const matchesDynamicFilters = dynamicFilters.every(filter => {
+          const field = filter.dataset.field;
+          const selectedValue = filter.value;
 
-      const matchesDynamicFilters = dynamicFilters.every(filter => {
-        const field = filter.dataset.field;
-        const selectedValue = filter.value;
+          if (!selectedValue) return true;
 
-        if (!selectedValue) return true;
+          const routeValue = getRouteValue(route, field);
 
-        const routeValue = getRouteValue(route, field);
+          if (field === "tags" || field === "passes_through") {
+            return splitMultiValues(routeValue).includes(selectedValue);
+          }
 
-        if (field === "tags") {
-          return splitMultiValues(routeValue).includes(selectedValue);
-        }
+          return routeValue === selectedValue;
+        });
 
-        return routeValue === selectedValue;
+        return matchesSearch && matchesMinDistance && matchesMaxDistance && matchesMinAscent && matchesMaxAscent && matchesDynamicFilters;
       });
-
-      return matchesSearch && matchesMinDistance && matchesMaxDistance && matchesMinAscent && matchesMaxAscent && matchesStarts && matchesPassesThrough && matchesDynamicFilters;
-    }
-
-    function makeAdvancedChip(container, className, label, value, field, isActive) {
-      const button = document.createElement("button");
-      button.className = `quick-button ${className}${isActive ? " active" : ""}`;
-      button.textContent = label;
-      button.dataset.value = value;
-      button.addEventListener("click", () => setAdvancedChipFilter(field, value));
-      container.appendChild(button);
-    }
-
-    function populateAdvancedChips() {
-      const startContainer = document.getElementById("advancedStartQuickButtons");
-      const passesThroughContainer = document.getElementById("advancedPassesThroughQuickButtons");
-      if (!startContainer || !passesThroughContainer) return;
-
-      startContainer.innerHTML = "";
-      passesThroughContainer.innerHTML = "";
-
-      const fallbackRoutes = routesData.filter(route => advancedPublishedMatches(route));
-      const routesForStartChips = routesData.filter(route => routeMatchesAdvancedFilters(route, { ignoreStart: true }));
-      const routesForPassesThroughChips = routesData.filter(route => routeMatchesAdvancedFilters(route));
-
-      let starts = uniqueValuesFromRoutes(routesForStartChips.length ? routesForStartChips : fallbackRoutes, "start_point");
-      activeAdvancedStarts.forEach(value => {
-        if (value && !starts.includes(value)) starts.push(value);
-      });
-      starts = starts.sort((a, b) => a.localeCompare(b));
-
-      let passesThroughValues = uniqueMultiValuesFromRoutes(routesForPassesThroughChips, "passes_through");
-      activeAdvancedPassesThrough.forEach(value => {
-        if (value && !passesThroughValues.includes(value)) passesThroughValues.push(value);
-      });
-      passesThroughValues = passesThroughValues.sort((a, b) => a.localeCompare(b));
-
-      makeAdvancedChip(startContainer, "advanced-start", "Any start", "", "start_point", activeAdvancedStarts.length === 0);
-      starts.forEach(start => {
-        makeAdvancedChip(startContainer, "advanced-start", start, start, "start_point", activeAdvancedStarts.includes(start));
-      });
-
-      makeAdvancedChip(passesThroughContainer, "advanced-passes-through", "Anywhere", "", "passes_through", activeAdvancedPassesThrough.length === 0);
-      passesThroughValues.forEach(value => {
-        makeAdvancedChip(passesThroughContainer, "advanced-passes-through", value, value, "passes_through", activeAdvancedPassesThrough.includes(value));
-      });
-    }
-
-    function setAdvancedChipFilter(field, value) {
-      if (field === "start_point") {
-        if (!value) {
-          activeAdvancedStarts = [];
-        } else if (activeAdvancedStarts.includes(value)) {
-          activeAdvancedStarts = activeAdvancedStarts.filter(item => item !== value);
-        } else {
-          activeAdvancedStarts = [...activeAdvancedStarts, value];
-        }
-      }
-
-      if (field === "passes_through") {
-        if (!value) {
-          activeAdvancedPassesThrough = [];
-        } else if (activeAdvancedPassesThrough.includes(value)) {
-          activeAdvancedPassesThrough = activeAdvancedPassesThrough.filter(item => item !== value);
-        } else {
-          activeAdvancedPassesThrough = [...activeAdvancedPassesThrough, value];
-        }
-      }
-
-      getTabState("browse").page = 1;
-      renderAllRouteViews();
-    }
-
-    function getBrowseRoutes() {
-      return routesData.filter(route => routeMatchesAdvancedFilters(route));
     }
 
     function hasAdvancedSearchActive() {
@@ -2377,8 +2150,7 @@
       const minAscent = document.getElementById("minAscent").value.trim();
       const maxAscent = document.getElementById("maxAscent").value.trim();
       const dynamicActive = Array.from(document.querySelectorAll(".dynamic-filter")).some(filter => filter.value);
-      const showUnpublished = document.getElementById("showUnpublishedRoutes")?.checked;
-      return Boolean(search || sortBy !== "default" || minDistance || maxDistance || minAscent || maxAscent || dynamicActive || showUnpublished || activeAdvancedStarts.length || activeAdvancedPassesThrough.length);
+      return Boolean(search || sortBy !== "default" || minDistance || maxDistance || minAscent || maxAscent || dynamicActive);
     }
 
     function clearAdvancedSearch() {
@@ -2388,10 +2160,6 @@
       document.getElementById("maxDistance").value = "";
       document.getElementById("minAscent").value = "";
       document.getElementById("maxAscent").value = "";
-      const showUnpublished = document.getElementById("showUnpublishedRoutes");
-      if (showUnpublished) showUnpublished.checked = false;
-      activeAdvancedStarts = [];
-      activeAdvancedPassesThrough = [];
       document.querySelectorAll(".dynamic-filter").forEach(filter => { filter.value = ""; });
       getTabState("browse").page = 1;
       renderAllRouteViews();
@@ -2404,15 +2172,6 @@
       if (field === "maxDistance") document.getElementById("maxDistance").value = "";
       if (field === "minAscent") document.getElementById("minAscent").value = "";
       if (field === "maxAscent") document.getElementById("maxAscent").value = "";
-      if (field === "showUnpublishedRoutes") document.getElementById("showUnpublishedRoutes").checked = false;
-      if (field.startsWith("advancedStart:")) {
-        const value = field.replace("advancedStart:", "");
-        activeAdvancedStarts = activeAdvancedStarts.filter(item => item !== value);
-      }
-      if (field.startsWith("advancedPassesThrough:")) {
-        const value = field.replace("advancedPassesThrough:", "");
-        activeAdvancedPassesThrough = activeAdvancedPassesThrough.filter(item => item !== value);
-      }
       if (field.startsWith("dynamic:")) {
         const filterField = field.replace("dynamic:", "");
         const filter = document.querySelector(`.dynamic-filter[data-field="${filterField}"]`);
@@ -2440,15 +2199,10 @@
 
       if (search) chips.push(advancedChip(`Search: ${search}`, "search"));
       if (sortBy.value !== "default") chips.push(advancedChip(`Sort: ${sortBy.options[sortBy.selectedIndex].text}`, "sortBy"));
-      const distanceLabel = distanceUnit === "km" ? "km" : "miles";
-      const ascentLabel = ascentUnit === "m" ? "m" : "ft";
-      if (minDistance) chips.push(advancedChip(`Min distance: ${minDistance} ${distanceLabel}`, "minDistance"));
-      if (maxDistance) chips.push(advancedChip(`Max distance: ${maxDistance} ${distanceLabel}`, "maxDistance"));
-      if (minAscent) chips.push(advancedChip(`Min ascent: ${minAscent} ${ascentLabel}`, "minAscent"));
-      if (maxAscent) chips.push(advancedChip(`Max ascent: ${maxAscent} ${ascentLabel}`, "maxAscent"));
-      if (document.getElementById("showUnpublishedRoutes")?.checked) chips.push(advancedChip("Including unpublished", "showUnpublishedRoutes"));
-      activeAdvancedStarts.forEach(value => chips.push(advancedChip(`Starts from: ${value}`, `advancedStart:${value}`)));
-      activeAdvancedPassesThrough.forEach(value => chips.push(advancedChip(`Passes through: ${value}`, `advancedPassesThrough:${value}`)));
+      if (minDistance) chips.push(advancedChip(`Min distance: ${minDistance}`, "minDistance"));
+      if (maxDistance) chips.push(advancedChip(`Max distance: ${maxDistance}`, "maxDistance"));
+      if (minAscent) chips.push(advancedChip(`Min ascent: ${minAscent} ft`, "minAscent"));
+      if (maxAscent) chips.push(advancedChip(`Max ascent: ${maxAscent} ft`, "maxAscent"));
 
       document.querySelectorAll(".dynamic-filter").forEach(filter => {
         if (!filter.value) return;
@@ -2547,16 +2301,7 @@
     }
 
     function resetPaginationAndRender() {
-      const browseState = getTabState("browse");
-      browseState.page = 1;
-
-      // Keep Advanced Search paginated when filters change.
-      // Older saved settings, or the previous All option, can leave the tab showing everything on one page.
-      if (browseState.pageSize === "all") {
-        browseState.pageSize = 25;
-        localStorage.setItem("hh-page-size-browse", "25");
-      }
-
+      getTabState("browse").page = 1;
       renderAllRouteViews();
     }
 
@@ -2567,7 +2312,6 @@
     }
 
     function renderAllRouteViews() {
-      populateAdvancedChips();
       displayPaginatedRoutes(getSortedRoutes(getFindRunRoutes()), "findRoutes", "findCount", "find", ["FindTop", "FindBottomTop"]);
 
       const browseRoutes = getSortedRoutes(getBrowseRoutes());
@@ -2989,28 +2733,6 @@ ${longLink}`;
       renderAllRouteViews();
     }
 
-    function setAscentUnit(unit) {
-      const oldUnit = ascentUnit;
-      ascentUnit = unit;
-
-      const minInput = document.getElementById("minAscent");
-      const maxInput = document.getElementById("maxAscent");
-
-      if (oldUnit !== unit) {
-        if (minInput.value) minInput.value = feetToCurrentUnit(inputAscentToFeet(minInput.value));
-        if (maxInput.value) maxInput.value = feetToCurrentUnit(inputAscentToFeet(maxInput.value));
-      }
-
-      document.getElementById("feetButton").classList.toggle("active", unit === "ft");
-      document.getElementById("metresButton").classList.toggle("active", unit === "m");
-
-      minInput.placeholder = unit === "m" ? "Min m" : "Min ft";
-      maxInput.placeholder = unit === "m" ? "Max m" : "Max ft";
-
-      localStorage.setItem("hh-ascent-unit", unit);
-      renderAllRouteViews();
-    }
-
     function setActiveTab(tabName) {
       const tabs = {
         find: {
@@ -3070,7 +2792,6 @@ ${longLink}`;
     document.getElementById("maxDistance").addEventListener("input", resetPaginationAndRender);
     document.getElementById("minAscent").addEventListener("input", resetPaginationAndRender);
     document.getElementById("maxAscent").addEventListener("input", resetPaginationAndRender);
-    document.getElementById("showUnpublishedRoutes").addEventListener("change", resetPaginationAndRender);
 
     document.getElementById("clearAdvancedSearch").addEventListener("click", clearAdvancedSearch);
 
@@ -3135,8 +2856,6 @@ ${longLink}`;
     document.getElementById("listViewButton").addEventListener("click", () => setViewMode("list"));
     document.getElementById("milesButton").addEventListener("click", () => setDistanceUnit("miles"));
     document.getElementById("kmButton").addEventListener("click", () => setDistanceUnit("km"));
-    document.getElementById("feetButton").addEventListener("click", () => setAscentUnit("ft"));
-    document.getElementById("metresButton").addEventListener("click", () => setAscentUnit("m"));
 
     document.getElementById("findRunTab").addEventListener("click", () => setActiveTab("find"));
     document.getElementById("browseRoutesTab").addEventListener("click", () => setActiveTab("browse"));
@@ -3183,15 +2902,7 @@ ${longLink}`;
 
     ["find", "browse", "strava", "away"].forEach(tabName => {
       const savedSize = localStorage.getItem(`hh-page-size-${tabName}`);
-      if (savedSize) {
-        // Advanced Search should default to a real page size so unpublished routes do not all appear on one page.
-        if (tabName === "browse" && savedSize === "all") {
-          paginationState[tabName].pageSize = 25;
-          localStorage.setItem(`hh-page-size-${tabName}`, "25");
-        } else {
-          paginationState[tabName].pageSize = savedSize === "all" ? "all" : Number(savedSize);
-        }
-      }
+      if (savedSize) paginationState[tabName].pageSize = savedSize === "all" ? "all" : Number(savedSize);
     });
 
     const savedTheme = localStorage.getItem("hh-theme");
@@ -3211,9 +2922,6 @@ ${longLink}`;
 
     const savedDistanceUnit = localStorage.getItem("hh-distance-unit") || "miles";
     setDistanceUnit(savedDistanceUnit);
-
-    const savedAscentUnit = localStorage.getItem("hh-ascent-unit") || "ft";
-    setAscentUnit(savedAscentUnit);
 
     localStorage.setItem("hh-active-tab", "find");
     setActiveTab("find");
