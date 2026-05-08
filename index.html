@@ -2563,7 +2563,7 @@
     }
 
     function routeMatchesAwayFilters(route, options = {}) {
-      if (normaliseCategory(route) !== "away day run" || !isRoutePublished(route)) return false;
+      if (!isAwayDayRoute(route) || !isRoutePublished(route)) return false;
 
       const ignoreStart = options.ignoreStart || false;
       const ignorePassesThrough = options.ignorePassesThrough || false;
@@ -2601,7 +2601,7 @@
 
     function presetRangeHasAwayRoutes(min, max) {
       return routesData.some(route => {
-        if (normaliseCategory(route) !== "away day run" || !isRoutePublished(route)) return false;
+        if (!isAwayDayRoute(route) || !isRoutePublished(route)) return false;
         const miles = getMiles(route);
         const matchesMin = min === null || miles >= min;
         const matchesMax = max === null || miles <= max;
@@ -2627,7 +2627,7 @@
       passesThroughContainer.innerHTML = "";
       terrainContainer.innerHTML = "";
 
-      const allAwayRoutes = routesData.filter(route => normaliseCategory(route) === "away day run" && isRoutePublished(route));
+      const allAwayRoutes = routesData.filter(route => isAwayDayRoute(route) && isRoutePublished(route));
       const routesForStartChips = routesData.filter(route => routeMatchesAwayFilters(route, { ignoreStart: true }));
       const routesForPassesThroughChips = getAwayOptionRoutes();
 
@@ -2822,10 +2822,33 @@
       return getRouteValue(route, "run_category").trim().toLowerCase();
     }
 
+    function isAwayDayRoute(route) {
+      const category = normaliseCategory(route);
+      return category === "away day run" || category === "away day runs";
+    }
+
+    function isStravaArtRoute(route) {
+      return normaliseCategory(route) === "strava art";
+    }
+
     function isRoutePublished(route) {
+      // Treat routes as published unless they are explicitly marked as unpublished.
+      // This prevents older/blank rows disappearing from public tabs.
       if (!headers.includes("published")) return true;
-      const value = getRouteValue(route, "published").toLowerCase();
-      return ["published", "yes", "y", "true", "1", "live"].includes(value);
+
+      const value = getRouteValue(route, "published").toLowerCase().trim();
+
+      const unpublishedValues = [
+        "unpublished",
+        "not published",
+        "draft",
+        "no",
+        "n",
+        "false",
+        "0"
+      ];
+
+      return !unpublishedValues.includes(value);
     }
 
     function isStandardRoute(route) {
@@ -2838,7 +2861,12 @@
 
     function getCategoryRoutes(categoryName) {
       const target = categoryName.trim().toLowerCase();
-      return routesData.filter(route => normaliseCategory(route) === target && isRoutePublished(route));
+      return routesData.filter(route => {
+        if (!isRoutePublished(route)) return false;
+        if (target === "away day run" || target === "away day runs") return isAwayDayRoute(route);
+        if (target === "strava art") return isStravaArtRoute(route);
+        return normaliseCategory(route) === target;
+      });
     }
 
     function advancedPublishedMatches(route) {
