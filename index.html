@@ -2832,23 +2832,24 @@
     }
 
     function isRoutePublished(route) {
-      // Treat routes as published unless they are explicitly marked as unpublished.
-      // This prevents older/blank rows disappearing from public tabs.
+      // Only show routes publicly when the Published column is explicitly marked as published.
+      // Blank values, draft/unpublished/no/false etc. are treated as unpublished.
       if (!headers.includes("published")) return true;
 
       const value = getRouteValue(route, "published").toLowerCase().trim();
 
-      const unpublishedValues = [
-        "unpublished",
-        "not published",
-        "draft",
-        "no",
-        "n",
-        "false",
-        "0"
+      const publishedValues = [
+        "published",
+        "publish",
+        "yes",
+        "y",
+        "true",
+        "1",
+        "approved",
+        "live"
       ];
 
-      return !unpublishedValues.includes(value);
+      return publishedValues.includes(value);
     }
 
     function isStandardRoute(route) {
