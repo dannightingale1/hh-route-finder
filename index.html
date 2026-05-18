@@ -1792,6 +1792,7 @@
       <button class="tab-button active" id="findRunTab" type="button">Local Routes</button>
       <button class="tab-button" id="awayDayRunTab" type="button">Away Day Routes</button>
       <button class="tab-button" id="stravaArtTab" type="button">Strava Art</button>
+      <button class="tab-button" id="raceRoutesTab" type="button">Race Routes</button>
       <button class="tab-button" id="browseRoutesTab" type="button">Advanced Search</button>
     </div>
 
@@ -2065,6 +2066,93 @@
       </div>
     </section>
 
+
+    <section class="tab-panel" id="raceRoutesPanel">
+      <section class="panel">
+        <h2>Race Routes</h2>
+        <p>Use the chips to narrow race routes by distance, terrain, start location and places they pass through.</p>
+
+        <div class="find-grid">
+          <div class="find-step">
+            <h3>1. How far?</h3>
+            <div class="quick-buttons">
+              <button class="quick-button race-distance-preset" data-min="0" data-max="3.1">Under 5k</button>
+              <button class="quick-button race-distance-preset" data-min="0" data-max="3.5">Around 5k</button>
+              <button class="quick-button race-distance-preset" data-min="3.6" data-max="5.3">Around 7.5k</button>
+              <button class="quick-button race-distance-preset" data-min="5.4" data-max="6.8">Around 10k</button>
+              <button class="quick-button race-distance-preset" data-min="6.9" data-max="">Longer</button>
+              <button class="quick-button" id="clearRaceDistancePreset" type="button">Any distance</button>
+            </div>
+          </div>
+
+          <div class="find-step">
+            <h3>2. What type?</h3>
+            <div class="quick-buttons" id="raceTerrainQuickButtons"></div>
+          </div>
+
+          <div class="find-step">
+            <h3>3. Where from?</h3>
+            <div class="quick-buttons" id="raceStartQuickButtons"></div>
+          </div>
+
+          <div class="find-step">
+            <h3>4. Passes through?</h3>
+            <div class="quick-buttons" id="racePassesThroughQuickButtons"></div>
+          </div>
+
+          <div class="find-actions">
+            <button class="button" id="clearRaceRun" type="button">Clear choices</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="count" id="raceRoutesCount"></div>
+
+      <div class="pagination-bar" id="raceRoutesPaginationTop">
+        <div class="pagination-left">
+          <div class="pagination-controls">
+            <button type="button" id="firstPageRaceRoutesTop">Start</button>
+            <button type="button" id="prevPageRaceRoutesTop">Back</button>
+            <button type="button" id="nextPageRaceRoutesTop">Forward</button>
+            <button type="button" id="lastPageRaceRoutesTop">End</button>
+          </div>
+          <div class="pagination-info" id="pageInfoRaceRoutesTop">Page 1 of 1</div>
+        </div>
+        <label class="page-size-wrap">
+          Per page
+          <select id="pageSizeSelectRaceRoutesTop" class="page-size-select">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="all">All</option>
+          </select>
+        </label>
+      </div>
+      <section class="routes tile-view" id="raceRoutes"></section>
+      <div class="pagination-bar" id="raceRoutesBottomPaginationTop">
+        <div class="pagination-left">
+          <div class="pagination-controls">
+            <button type="button" id="firstPageRaceRoutesBottomTop">Start</button>
+            <button type="button" id="prevPageRaceRoutesBottomTop">Back</button>
+            <button type="button" id="nextPageRaceRoutesBottomTop">Forward</button>
+            <button type="button" id="lastPageRaceRoutesBottomTop">End</button>
+          </div>
+          <div class="pagination-info" id="pageInfoRaceRoutesBottomTop">Page 1 of 1</div>
+        </div>
+        <label class="page-size-wrap">
+          Per page
+          <select id="pageSizeSelectRaceRoutesBottomTop" class="page-size-select">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="all">All</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
     <section class="tab-panel" id="awayDayRunPanel">
       <section class="panel">
         <h2>Away Day Routes</h2>
@@ -2223,6 +2311,7 @@
       find: { page: 1, pageSize: 25 },
       browse: { page: 1, pageSize: 25 },
       strava: { page: 1, pageSize: 25 },
+      race: { page: 1, pageSize: 25 },
       away: { page: 1, pageSize: 25 }
     };
     let distanceUnit = "miles";
@@ -2235,6 +2324,10 @@
     let activeAwayPassesThrough = [];
     let activeAwayTerrain = [];
     let awayDistance = { min: null, max: null };
+    let activeRaceStart = "";
+    let activeRacePassesThrough = [];
+    let activeRaceTerrain = [];
+    let raceDistance = { min: null, max: null };
     let activeAdvancedStarts = [];
     let activeAdvancedPassesThrough = [];
     let activeAdvancedTerrain = [];
@@ -2708,6 +2801,7 @@
         createDynamicFilters();
         populateFindRunButtons();
         populateAwayRunButtons();
+        populateRaceRunButtons();
         populatePlanner();
         renderAllRouteViews();
       })
@@ -2716,6 +2810,8 @@
           `<div class="empty">Sorry, the routes could not be loaded.</div>`;
         document.getElementById("browseRoutes").innerHTML =
           `<div class="empty">Sorry, the routes could not be loaded.</div>`;
+        const raceRoutes = document.getElementById("raceRoutes");
+        if (raceRoutes) raceRoutes.innerHTML = `<div class="empty">Sorry, the routes could not be loaded.</div>`;
         console.error(error);
       });
 
@@ -2846,6 +2942,191 @@
       return normaliseCategory(route) === "strava art";
     }
 
+    function isRaceRoute(route) {
+      const category = normaliseCategory(route);
+      return category === "race route" || category === "race routes";
+    }
+
+    function routeMatchesRaceFilters(route, options = {}) {
+      if (!isRaceRoute(route) || !isRoutePublished(route)) return false;
+
+      const ignoreStart = options.ignoreStart || false;
+      const ignorePassesThrough = options.ignorePassesThrough || false;
+      const ignoreTerrain = options.ignoreTerrain || false;
+      const ignoreDistance = options.ignoreDistance || false;
+
+      const routeMiles = getMiles(route);
+      const routePassesThrough = splitMultiValues(getRouteValue(route, "passes_through"));
+
+      const matchesMin = ignoreDistance || raceDistance.min === null || routeMiles >= raceDistance.min;
+      const matchesMax = ignoreDistance || raceDistance.max === null || routeMiles <= raceDistance.max;
+      const matchesStart = ignoreStart || !activeRaceStart || getRouteValue(route, "start_point") === activeRaceStart;
+      const matchesPassesThrough = ignorePassesThrough || !activeRacePassesThrough.length || activeRacePassesThrough.every(value => routePassesThrough.includes(value));
+      const matchesTerrain = ignoreTerrain || !activeRaceTerrain.length || activeRaceTerrain.includes(getRouteValue(route, "terrain"));
+
+      return matchesMin && matchesMax && matchesStart && matchesPassesThrough && matchesTerrain;
+    }
+
+    function getRaceRoutes() {
+      return routesData.filter(route => routeMatchesRaceFilters(route));
+    }
+
+    function getRaceOptionRoutes() {
+      return routesData.filter(route => routeMatchesRaceFilters(route));
+    }
+
+    function makeRaceChip(container, className, label, value, field, isActive) {
+      const button = document.createElement("button");
+      button.className = `quick-button ${className}${isActive ? " active" : ""}`;
+      button.textContent = label;
+      button.dataset.value = value;
+      button.addEventListener("click", () => setRaceFilter(field, value));
+      container.appendChild(button);
+    }
+
+    function presetRangeHasRaceRoutes(min, max) {
+      return routesData.some(route => {
+        if (!isRaceRoute(route) || !isRoutePublished(route)) return false;
+        const miles = getMiles(route);
+        const matchesMin = min === null || miles >= min;
+        const matchesMax = max === null || miles <= max;
+        return matchesMin && matchesMax;
+      });
+    }
+
+    function updateRaceDistanceChipVisibility() {
+      document.querySelectorAll(".race-distance-preset").forEach(button => {
+        const min = button.dataset.min ? parseFloat(button.dataset.min) : null;
+        const max = button.dataset.max ? parseFloat(button.dataset.max) : null;
+        button.classList.toggle("hidden-distance-chip", !presetRangeHasRaceRoutes(min, max));
+      });
+    }
+
+    function populateRaceRunButtons() {
+      const startContainer = document.getElementById("raceStartQuickButtons");
+      const passesThroughContainer = document.getElementById("racePassesThroughQuickButtons");
+      const terrainContainer = document.getElementById("raceTerrainQuickButtons");
+      if (!startContainer || !passesThroughContainer || !terrainContainer) return;
+
+      startContainer.innerHTML = "";
+      passesThroughContainer.innerHTML = "";
+      terrainContainer.innerHTML = "";
+
+      const allRaceRoutes = routesData.filter(route => isRaceRoute(route) && isRoutePublished(route));
+      const routesForStartChips = routesData.filter(route => routeMatchesRaceFilters(route, { ignoreStart: true }));
+      const routesForPassesThroughChips = getRaceOptionRoutes();
+
+      const starts = uniqueValuesFromRoutes(routesForStartChips.length ? routesForStartChips : allRaceRoutes, "start_point");
+      let passesThroughValues = uniqueMultiValuesFromRoutes(routesForPassesThroughChips, "passes_through");
+
+      activeRacePassesThrough.forEach(value => {
+        if (!passesThroughValues.includes(value)) passesThroughValues.push(value);
+      });
+      passesThroughValues = passesThroughValues.sort((a, b) => a.localeCompare(b));
+
+      let terrains = uniqueValuesFromRoutes(routesData.filter(route => routeMatchesRaceFilters(route, { ignoreTerrain: true })), "terrain");
+      activeRaceTerrain.forEach(value => { if (value && !terrains.includes(value)) terrains.push(value); });
+      terrains = terrains.sort((a, b) => a.localeCompare(b));
+
+      makeRaceChip(terrainContainer, "race-terrain", "Any terrain", "", "terrain", activeRaceTerrain.length === 0);
+      terrains.forEach(terrain => {
+        makeRaceChip(terrainContainer, "race-terrain", terrain, terrain, "terrain", activeRaceTerrain.includes(terrain));
+      });
+
+      makeRaceChip(startContainer, "race-start", "Any start", "", "start_point", !activeRaceStart);
+      starts.forEach(start => {
+        makeRaceChip(startContainer, "race-start", start, start, "start_point", start === activeRaceStart);
+      });
+
+      makeRaceChip(passesThroughContainer, "race-passes-through", "Anywhere", "", "passes_through", activeRacePassesThrough.length === 0);
+      passesThroughValues.forEach(value => {
+        makeRaceChip(passesThroughContainer, "race-passes-through", value, value, "passes_through", activeRacePassesThrough.includes(value));
+      });
+
+      updateRaceDistanceChipVisibility();
+    }
+
+    function setRaceDistance(min, max) {
+      raceDistance = { min, max };
+      getTabState("race").page = 1;
+      populateRaceRunButtons();
+      updateRaceButtonStates();
+      renderAllRouteViews();
+    }
+
+    function setRaceFilter(field, value) {
+      if (field === "start_point") {
+        activeRaceStart = value;
+      }
+
+      if (field === "passes_through") {
+        if (!value) {
+          activeRacePassesThrough = [];
+        } else if (activeRacePassesThrough.includes(value)) {
+          activeRacePassesThrough = activeRacePassesThrough.filter(item => item !== value);
+        } else {
+          activeRacePassesThrough = [...activeRacePassesThrough, value];
+        }
+      }
+
+      if (field === "terrain") {
+        if (!value) {
+          activeRaceTerrain = [];
+        } else if (activeRaceTerrain.includes(value)) {
+          activeRaceTerrain = activeRaceTerrain.filter(item => item !== value);
+        } else {
+          activeRaceTerrain = [...activeRaceTerrain, value];
+        }
+      }
+
+      getTabState("race").page = 1;
+      populateRaceRunButtons();
+      updateRaceButtonStates();
+      renderAllRouteViews();
+    }
+
+    function updateRaceButtonStates() {
+      document.querySelectorAll(".race-start").forEach(button => {
+        button.classList.toggle("active", button.dataset.value === activeRaceStart);
+      });
+
+      document.querySelectorAll(".race-passes-through").forEach(button => {
+        const value = button.dataset.value;
+        button.classList.toggle("active", value ? activeRacePassesThrough.includes(value) : activeRacePassesThrough.length === 0);
+      });
+
+      document.querySelectorAll(".race-terrain").forEach(button => {
+        const value = button.dataset.value;
+        button.classList.toggle("active", value ? activeRaceTerrain.includes(value) : activeRaceTerrain.length === 0);
+      });
+
+      document.querySelectorAll(".race-distance-preset").forEach(button => {
+        const presetMin = button.dataset.min ? parseFloat(button.dataset.min) : null;
+        const presetMax = button.dataset.max ? parseFloat(button.dataset.max) : null;
+
+        const minMatch = (presetMin === null && raceDistance.min === null) || (presetMin !== null && raceDistance.min !== null && Math.abs(presetMin - raceDistance.min) < 0.05);
+        const maxMatch = (presetMax === null && raceDistance.max === null) || (presetMax !== null && raceDistance.max !== null && Math.abs(presetMax - raceDistance.max) < 0.05);
+
+        button.classList.toggle("active", minMatch && maxMatch);
+      });
+
+      const clearDistance = document.getElementById("clearRaceDistancePreset");
+      if (clearDistance) clearDistance.classList.toggle("active", raceDistance.min === null && raceDistance.max === null);
+    }
+
+    function clearRaceRun() {
+      raceDistance = { min: null, max: null };
+      activeRaceStart = "";
+      activeRacePassesThrough = [];
+      activeRaceTerrain = [];
+      getTabState("race").page = 1;
+      populateRaceRunButtons();
+      updateRaceButtonStates();
+      renderAllRouteViews();
+    }
+
+
+
     function isRoutePublished(route) {
       // Only show routes publicly when the Published column is explicitly marked as published.
       // Blank values, draft/unpublished/no/false etc. are treated as unpublished.
@@ -2880,6 +3161,7 @@
       return routesData.filter(route => {
         if (!isRoutePublished(route)) return false;
         if (target === "away day run" || target === "away day runs") return isAwayDayRoute(route);
+        if (target === "race route" || target === "race routes") return isRaceRoute(route);
         if (target === "strava art") return isStravaArtRoute(route);
         return normaliseCategory(route) === target;
       });
@@ -3251,9 +3533,12 @@
 
       displayPaginatedRoutes(getSortedRoutes(getCategoryRoutes("Strava Art")), "stravaArtRoutes", "stravaArtCount", "strava", ["StravaArtTop", "StravaArtBottomTop"]);
 
+      displayPaginatedRoutes(getSortedRoutes(getRaceRoutes()), "raceRoutes", "raceRoutesCount", "race", ["RaceRoutesTop", "RaceRoutesBottomTop"]);
+
       displayPaginatedRoutes(getSortedRoutes(getAwayDayRunRoutes()), "awayDayRunRoutes", "awayDayRunCount", "away", ["AwayDayRunTop", "AwayDayRunBottomTop"]);
       renderAdvancedActiveFilters();
       updateAwayDistanceChipVisibility();
+      updateRaceDistanceChipVisibility();
     }
 
     function setQuickDistance(min, max) {
@@ -3642,7 +3927,7 @@ ${longLink}`;
 
       currentViewMode = mode;
 
-      ["findRoutes", "browseRoutes", "stravaArtRoutes", "awayDayRunRoutes"].forEach(id => {
+      ["findRoutes", "browseRoutes", "stravaArtRoutes", "raceRoutes", "awayDayRunRoutes"].forEach(id => {
         const routes = document.getElementById(id);
         routes.classList.remove("tile-view", "list-view");
         routes.classList.add(mode === "list" ? "list-view" : "tile-view");
@@ -3711,6 +3996,10 @@ ${longLink}`;
         strava: {
           button: document.getElementById("stravaArtTab"),
           panel: document.getElementById("stravaArtPanel")
+        },
+        race: {
+          button: document.getElementById("raceRoutesTab"),
+          panel: document.getElementById("raceRoutesPanel")
         },
         away: {
           button: document.getElementById("awayDayRunTab"),
@@ -3796,6 +4085,23 @@ ${longLink}`;
 
     document.getElementById("clearAwayRun").addEventListener("click", clearAwayRun);
 
+
+    document.querySelectorAll(".race-distance-preset").forEach(button => {
+      button.addEventListener("click", () => {
+        const min = button.dataset.min ? parseFloat(button.dataset.min) : null;
+        const max = button.dataset.max ? parseFloat(button.dataset.max) : null;
+        setRaceDistance(min, max);
+      });
+    });
+
+    document.getElementById("clearRaceDistancePreset").addEventListener("click", () => {
+      setRaceDistance(null, null);
+    });
+
+    document.getElementById("clearRaceRun").addEventListener("click", clearRaceRun);
+
+
+
     document.getElementById("showAllRoutes").addEventListener("click", () => {
       clearFindRun();
       setActiveTab("browse");
@@ -3828,6 +4134,7 @@ ${longLink}`;
     document.getElementById("findRunTab").addEventListener("click", () => setActiveTab("find"));
     document.getElementById("browseRoutesTab").addEventListener("click", () => setActiveTab("browse"));
     document.getElementById("stravaArtTab").addEventListener("click", () => setActiveTab("strava"));
+    document.getElementById("raceRoutesTab").addEventListener("click", () => setActiveTab("race"));
     document.getElementById("awayDayRunTab").addEventListener("click", () => setActiveTab("away"));
     document.getElementById("kebabButton").addEventListener("click", event => {
       event.stopPropagation();
@@ -3841,6 +4148,7 @@ ${longLink}`;
     function getRoutesForTab(tabName) {
       if (tabName === "find") return getSortedRoutes(getFindRunRoutes());
       if (tabName === "strava") return getSortedRoutes(getCategoryRoutes("Strava Art"));
+      if (tabName === "race") return getSortedRoutes(getRaceRoutes());
       if (tabName === "away") return getSortedRoutes(getAwayDayRunRoutes());
       return getSortedRoutes(getBrowseRoutes());
     }
@@ -3865,10 +4173,12 @@ ${longLink}`;
     addPaginationListeners("find", "FindBottomTop");
     addPaginationListeners("strava", "StravaArtTop");
     addPaginationListeners("strava", "StravaArtBottomTop");
+    addPaginationListeners("race", "RaceRoutesTop");
+    addPaginationListeners("race", "RaceRoutesBottomTop");
     addPaginationListeners("away", "AwayDayRunTop");
     addPaginationListeners("away", "AwayDayRunBottomTop");
 
-    ["find", "browse", "strava", "away"].forEach(tabName => {
+    ["find", "browse", "strava", "race", "away"].forEach(tabName => {
       const savedSize = localStorage.getItem(`hh-page-size-${tabName}`);
       if (savedSize) {
         // Advanced Search should default to a real page size so unpublished routes do not all appear on one page.
