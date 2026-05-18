@@ -1759,39 +1759,6 @@
       }
     }
 
-
-
-    /* Route provider icon buttons */
-    .route-platform-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 38px;
-      height: 38px;
-      border-radius: 999px;
-      background: #ffffff;
-      border: 1px solid var(--hh-green);
-      text-decoration: none;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.10);
-      padding: 6px;
-    }
-
-    .route-platform-link:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.16);
-    }
-
-    .route-platform-icon {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      display: block;
-    }
-
-    body.dark .route-platform-link {
-      background: #ffffff;
-    }
-
 </style>
 </head>
 
@@ -2752,31 +2719,6 @@
         console.error(error);
       });
 
-
-    function getRoutePlatformIcon(routeUrl) {
-      if (!routeUrl) return "";
-
-      const url = String(routeUrl).toLowerCase();
-
-      if (url.includes("strava.com")) {
-        return `
-          <a class="route-platform-link" href="${escapeForAttribute(routeUrl)}" target="_blank" rel="noopener noreferrer" title="Open route on Strava" aria-label="Open route on Strava">
-            <img src="Strava.webp" alt="Strava" class="route-platform-icon" loading="lazy">
-          </a>
-        `;
-      }
-
-      if (url.includes("outdooractive.com")) {
-        return `
-          <a class="route-platform-link" href="${escapeForAttribute(routeUrl)}" target="_blank" rel="noopener noreferrer" title="Open route on OutdoorActive" aria-label="Open route on OutdoorActive">
-            <img src="Outdooractive.webp" alt="OutdoorActive" class="route-platform-icon" loading="lazy">
-          </a>
-        `;
-      }
-
-      return "";
-    }
-
     function routeCardHtml(route) {
       const name = getRouteValue(route, "name");
       const miles = getMiles(route);
@@ -2819,7 +2761,7 @@
             ${passesThroughHtml}
             ${tagsHtml}
             <div class="button-row">
-              ${link ? getRoutePlatformIcon(link) || `<a class="button" href="${escapeForAttribute(link)}" target="_blank" rel="noopener">View route</a>` : ""}
+              ${link ? `<a class="button" href="${escapeForAttribute(link)}" target="_blank" rel="noopener">View route</a>` : ""}
               ${link ? `<button class="button copy-button" type="button" onclick="copyRouteUrl('${escapeForAttribute(link)}', this)">Copy URL</button>` : ""}
             </div>
           </div>
@@ -3570,7 +3512,7 @@
             </div>
 
             <div class="button-row">
-              ${link ? getRoutePlatformIcon(link) || `<a class="button" href="${escapeForAttribute(link)}" target="_blank" rel="noopener">View</a>` : ""}
+              ${link ? `<a class="button" href="${escapeForAttribute(link)}" target="_blank" rel="noopener">View</a>` : ""}
             </div>
           </div>
         </div>
